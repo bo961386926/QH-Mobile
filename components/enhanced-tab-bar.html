@@ -1,0 +1,132 @@
+<!-- 增强版底部导航栏组件 -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200" style="z-index: 1000; height: 60px;">
+    <div class="flex flex-row justify-around items-center h-full">
+        <div class="ios-nav-item flex flex-col items-center justify-center flex-1 h-full py-1" data-page="home">
+            <i class="fa fa-home text-lg"></i>
+            <span class="text-xs mt-1">首页</span>
+        </div>
+        <div class="ios-nav-item flex flex-col items-center justify-center flex-1 h-full py-1" data-page="monitor">
+            <i class="fa fa-television text-lg"></i>
+            <span class="text-xs mt-1">监控</span>
+        </div>
+        <div class="ios-nav-item flex flex-col items-center justify-center flex-1 h-full py-1" data-page="operation">
+            <i class="fa fa-wrench text-lg"></i>
+            <span class="text-xs mt-1">运维</span>
+        </div>
+        <div class="ios-nav-item flex flex-col items-center justify-center flex-1 h-full py-1" data-page="report">
+            <i class="fa fa-bar-chart text-lg"></i>
+            <span class="text-xs mt-1">报表</span>
+        </div>
+        <div class="ios-nav-item flex flex-col items-center justify-center flex-1 h-full py-1" data-page="profile">
+            <i class="fa fa-user-o text-lg"></i>
+            <span class="text-xs mt-1">我的</span>
+        </div>
+    </div>
+</nav>
+
+<script>
+    // 页面切换功能
+    function initEnhancedTabBar() {
+        try {
+            // 获取当前页面文件名
+            const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
+            const pageMap = {
+                '农饮水运维移动端': 'home',
+                '监控中心': 'monitor',
+                '运维中心': 'operation',
+                '报表中心': 'report',
+                '个人中心': 'profile'
+            };
+            const currentTab = pageMap[currentPage] || 'home';
+            
+            // 设置当前页面对应的导航项为激活状态
+            document.querySelectorAll('.ios-nav-item').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-page') === currentTab) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // 添加点击事件监听器
+            document.querySelectorAll('.ios-nav-item').forEach(item => {
+                // 先移除可能已存在的事件监听器，避免重复绑定
+                item.removeEventListener('click', handleEnhancedNavClick);
+                // 添加点击事件监听器
+                item.addEventListener('click', handleEnhancedNavClick);
+            });
+            
+            console.log('增强版底部导航栏初始化完成');
+        } catch (error) {
+            console.error('初始化底部导航栏时出错:', error);
+        }
+    }
+    
+    // 导航点击处理函数
+    function handleEnhancedNavClick(event) {
+        try {
+            // 阻止默认行为
+            event.preventDefault();
+            
+            // 添加点击反馈效果
+            this.style.opacity = '0.7';
+            setTimeout(() => {
+                this.style.opacity = '1';
+            }, 150);
+            
+            // 移除所有激活状态
+            document.querySelectorAll('.ios-nav-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 添加当前激活状态
+            this.classList.add('active');
+            
+            // 页面跳转逻辑
+            const page = this.getAttribute('data-page');
+            const pageMap = {
+                'home': '农饮水运维移动端.html',
+                'monitor': '监控中心.html',
+                'operation': '运维中心.html',
+                'report': '报表中心.html',
+                'profile': '个人中心.html'
+            };
+            
+            if (pageMap[page]) {
+                // 添加页面切换动画
+                document.body.style.opacity = '0.8';
+                document.body.style.transform = 'scale(0.98)';
+                document.body.style.transition = 'all 0.2s ease-in-out';
+                
+                // 延迟跳转以显示动画
+                setTimeout(() => {
+                    window.location.href = pageMap[page];
+                }, 200);
+            } else {
+                console.warn('未知的页面:', page);
+            }
+        } catch (error) {
+            console.error('处理导航点击时出错:', error);
+            // 即使出错也尝试跳转
+            const page = this.getAttribute('data-page');
+            const pageMap = {
+                'home': '农饮水运维移动端.html',
+                'monitor': '监控中心.html',
+                'operation': '运维中心.html',
+                'report': '报表中心.html',
+                'profile': '个人中心.html'
+            };
+            
+            if (pageMap[page]) {
+                window.location.href = pageMap[page];
+            }
+        }
+    }
+    
+    // 初始化增强版底部导航栏
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initEnhancedTabBar);
+    } else {
+        // 如果页面已经加载完成，直接初始化
+        setTimeout(initEnhancedTabBar, 0);
+    }
+</script>

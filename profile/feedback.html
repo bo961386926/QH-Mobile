@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>意见反馈 - 农饮水运维移动端</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .app-header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 15px;
+        }
+        
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            padding: 10px 0;
+            z-index: 100;
+        }
+        
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            color: var(--gray-text);
+            font-size: 12px;
+            padding: 5px 0;
+        }
+        
+        .tab-item.active {
+            color: var(--primary-color);
+        }
+        
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+        
+        .form-label.required::after {
+            content: " *";
+            color: var(--danger-color);
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(0, 122, 255, 0.05);
+        }
+        
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .image-preview-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger-color);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .submit-btn {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 12px;
+            font-weight: 500;
+            border-radius: 12px;
+        }
+        
+        .submit-btn:disabled {
+            background-color: #ccc;
+            border-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="app-header py-3 px-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <button class="btn btn-sm btn-outline-secondary" onclick="goBack()">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+            </div>
+            <h1 class="h5 mb-0">意见反馈</h1>
+            <div></div>
+        </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="container-fluid px-3 py-3">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h2 class="h5 fw-bold mb-2">意见反馈</h2>
+                    <p class="text-muted small">您的反馈对我们非常重要，我们会认真对待每一条意见</p>
+                </div>
+                
+                <form id="feedbackForm">
+                    <!-- 问题类型 -->
+                    <div class="mb-4">
+                        <label for="issueType" class="form-label required">问题类型</label>
+                        <select class="form-select" id="issueType" required>
+                            <option value="" disabled selected>请选择问题类型</option>
+                            <option value="操作失败">操作失败</option>
+                            <option value="功能建议">功能建议</option>
+                            <option value="界面问题">界面问题</option>
+                            <option value="其他">其他</option>
+                        </select>
+                        <div class="invalid-feedback">请选择问题类型</div>
+                    </div>
+                    
+                    <!-- 问题描述 -->
+                    <div class="mb-4">
+                        <label for="issueDescription" class="form-label required">问题描述</label>
+                        <textarea class="form-control" id="issueDescription" rows="5" placeholder="请详细描述您遇到的问题或建议，以便我们更好地理解和解决" required></textarea>
+                        <div class="invalid-feedback">请输入问题描述</div>
+                    </div>
+                    
+                    <!-- 上传图片 -->
+                    <div class="mb-4">
+                        <label class="form-label">上传图片（可选）</label>
+                        <p class="text-muted small mb-2">最多可上传3张图片，帮助我们更好地理解问题</p>
+                        <div class="upload-area" id="uploadArea">
+                            <i class="bi bi-cloud-arrow-up" style="font-size: 24px; color: var(--gray-text);"></i>
+                            <p class="mb-0 mt-2 small" style="color: var(--gray-text);">点击上传或拖拽图片到此处</p>
+                            <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
+                        </div>
+                        <div class="image-preview" id="imagePreview"></div>
+                    </div>
+                    
+                    <!-- 联系方式 -->
+                    <div class="mb-4">
+                        <label for="contact" class="form-label">联系方式（可选）</label>
+                        <input type="text" class="form-control" id="contact" placeholder="可留手机号/邮箱，便于我们向您反馈处理结果">
+                    </div>
+                    
+                    <!-- 提交按钮 -->
+                    <button type="submit" class="btn submit-btn w-100">提交反馈</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 返回个人中心页面
+        function goBack() {
+            window.location.href = '个人中心.html';
+        }
+        
+        // 图片上传相关变量
+        let uploadedImages = [];
+        const maxImages = 3;
+        
+        // 获取DOM元素
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        
+        // 点击上传区域触发文件选择
+        uploadArea.addEventListener('click', () => {
+            if (uploadedImages.length < maxImages) {
+                fileInput.click();
+            }
+        });
+        
+        // 文件选择处理
+        fileInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        });
+        
+        // 拖拽上传功能
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#007AFF';
+            uploadArea.style.backgroundColor = 'rgba(0, 122, 255, 0.1)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ddd';
+            uploadArea.style.backgroundColor = 'transparent';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ddd';
+            uploadArea.style.backgroundColor = 'transparent';
+            
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        });
+        
+        // 处理文件
+        function handleFiles(files) {
+            // 过滤出图片文件
+            const imageFiles = files.filter(file => file.type.startsWith('image/'));
+            
+            // 检查数量限制
+            const remainingSlots = maxImages - uploadedImages.length;
+            if (remainingSlots <= 0) {
+                alert(`最多只能上传${maxImages}张图片`);
+                return;
+            }
+            
+            const filesToAdd = imageFiles.slice(0, remainingSlots);
+            
+            // 添加文件到预览
+            filesToAdd.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedImages.push({
+                        file: file,
+                        src: e.target.result
+                    });
+                    updateImagePreview();
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            // 如果有被忽略的文件，提示用户
+            if (files.length > imageFiles.length) {
+                alert('只能上传图片文件');
+            }
+            
+            if (files.length > remainingSlots) {
+                alert(`最多只能上传${maxImages}张图片，已达到上限`);
+            }
+        }
+        
+        // 更新图片预览
+        function updateImagePreview() {
+            imagePreview.innerHTML = '';
+            
+            uploadedImages.forEach((image, index) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'image-preview-item';
+                previewItem.innerHTML = `
+                    <img src="${image.src}" alt="预览图片">
+                    <div class="remove-image" data-index="${index}">×</div>
+                `;
+                imagePreview.appendChild(previewItem);
+            });
+            
+            // 添加删除事件
+            document.querySelectorAll('.remove-image').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const index = parseInt(this.getAttribute('data-index'));
+                    uploadedImages.splice(index, 1);
+                    updateImagePreview();
+                });
+            });
+        }
+        
+        // 表单提交处理
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 检查必填项
+            const issueType = document.getElementById('issueType').value;
+            const issueDescription = document.getElementById('issueDescription').value;
+            
+            if (!issueType) {
+                document.getElementById('issueType').classList.add('is-invalid');
+                return;
+            } else {
+                document.getElementById('issueType').classList.remove('is-invalid');
+            }
+            
+            if (!issueDescription.trim()) {
+                document.getElementById('issueDescription').classList.add('is-invalid');
+                return;
+            } else {
+                document.getElementById('issueDescription').classList.remove('is-invalid');
+            }
+            
+            // 收集表单数据
+            const formData = {
+                issueType: issueType,
+                issueDescription: issueDescription,
+                contact: document.getElementById('contact').value,
+                imageCount: uploadedImages.length
+            };
+            
+            // 这里应该是实际的提交逻辑
+            console.log('提交反馈数据:', formData);
+            console.log('上传的图片数量:', uploadedImages.length);
+            
+            // 显示提交成功提示
+            alert('感谢您的反馈！我们已经收到您的意见。');
+            
+            // 跳转回个人中心页面
+            window.location.href = '个人中心.html';
+        });
+        
+        // 表单验证
+        document.getElementById('issueType').addEventListener('change', function() {
+            if (this.value) {
+                this.classList.remove('is-invalid');
+            }
+        });
+        
+        document.getElementById('issueDescription').addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.classList.remove('is-invalid');
+            }
+        });
+    </script>
+</body>
+</html>

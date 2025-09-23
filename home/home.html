@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>农饮水运维移动端</title>
+    <!-- 引入公共CSS -->
+    <!-- 引入Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+            --card-bg: #FFFFFF;
+            --border-color: #E5E5EA;
+        }
+        
+        /* 首页特定样式 */
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            padding-top: 48px;
+            padding-bottom: 60px;
+        }
+        
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+        
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .welcome-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: #111111;
+        }
+        
+        .location-info {
+            font-size: 14px;
+            color: #666666;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #666666;
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff3b30;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .main-content {
+            padding: 16px;
+        }
+        
+        /* 轮播图样式 */
+        .carousel {
+            position: relative;
+            margin-bottom: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .carousel-inner {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+        }
+        
+        .carousel-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .carousel-item.active {
+            opacity: 1;
+        }
+        
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .carousel-indicators {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+        }
+        
+        .carousel-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .carousel-indicator.active {
+            background-color: #ffffff;
+        }
+        
+        .carousel-control {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .carousel-control.prev {
+            left: 10px;
+        }
+        
+        .carousel-control.next {
+            right: 10px;
+        }
+        
+        /* 通知横幅 */
+        .banner {
+            background-color: #fffbe6;
+            border-left: 4px solid #ffd700;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #8a6d3b;
+            border-radius: 8px;
+        }
+        
+        /* 卡片容器 */
+        .card-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #111111;
+            margin: 0;
+        }
+        
+        .card-body {
+            padding: 16px;
+        }
+        
+        /* 功能模块网格 */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        
+        .module-item {
+            text-align: center;
+        }
+        
+        .module-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .module-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 20px;
+        }
+        
+        .module-icon.primary-bg {
+            background-color: rgba(0, 122, 255, 0.1);
+            color: #007AFF;
+        }
+        
+        .module-icon.secondary-bg {
+            background-color: rgba(52, 199, 89, 0.1);
+            color: #34C759;
+        }
+        
+        .module-icon.warning-bg {
+            background-color: rgba(255, 149, 0, 0.1);
+            color: #FF9500;
+        }
+        
+        .module-icon.danger-bg {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+        }
+        
+        .module-text {
+            font-size: 12px;
+            color: #111111;
+        }
+        
+        /* 任务列表 */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .task-item {
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
+        .task-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111111;
+        }
+        
+        .task-badge {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: #ffffff;
+        }
+        
+        .badge-warning {
+            background-color: #ff9500;
+        }
+        
+        .badge-primary {
+            background-color: #007AFF;
+        }
+        
+        .badge-secondary {
+            background-color: #34C759;
+        }
+        
+        .task-details {
+            font-size: 12px;
+            color: #666666;
+        }
+        
+        /* 查看全部链接 */
+        .view-all-link {
+            font-size: 14px;
+            color: #007AFF;
+            text-decoration: none;
+        }
+        
+        /* 底部导航栏样式 */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray-text);
+            font-size: 12px;
+        }
+        
+        .tab-item.active {
+            color: var(--primary-color);
+        }
+        
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="app-header">
+        <div class="user-info">
+            <span class="welcome-text">欢迎回来，张工</span>
+            <span class="location-info">杭州 晴 28°C</span>
+        </div>
+        <div class="header-actions">
+            <button class="action-btn">
+                <i class="bi bi-search"></i>
+            </button>
+            <div style="position: relative;">
+                <button class="action-btn">
+                    <i class="bi bi-bell"></i>
+                </button>
+                <span class="notification-badge">3</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="main-content">
+        <!-- 轮播Banner -->
+        <div id="bannerCarousel" class="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="../images/1.png" alt="智慧水务管理系统">
+                </div>
+                <div class="carousel-item">
+                    <img src="../images/2.png" alt="实时监控">
+                </div>
+                <div class="carousel-item">
+                    <img src="../images/3.png" alt="数据分析报告">
+                </div>
+            </div>
+            <div class="carousel-indicators">
+                <button class="carousel-indicator active" data-slide-to="0"></button>
+                <button class="carousel-indicator" data-slide-to="1"></button>
+                <button class="carousel-indicator" data-slide-to="2"></button>
+            </div>
+            <button class="carousel-control prev">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button class="carousel-control next">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- 消息通知Banner -->
+        <div class="banner">
+            <div>重要通知：本月运维报告已生成</div>
+        </div>
+        
+        <!-- 功能模块入口 -->
+        <div class="card-container">
+            <div class="card-header">
+                <h2 class="card-title">功能模块</h2>
+            </div>
+            <div class="card-body">
+                <div class="module-grid">
+                    <div class="module-item">
+                       
+                            <div class="module-icon primary-bg">
+                                <i class="bi bi-map"></i>
+                            </div>
+                            <div class="module-text">地图</div>
+                      
+                    </div>
+                    <div class="module-item">
+                       
+                            <div class="module-icon secondary-bg">
+                                <i class="bi bi-bar-chart"></i>
+                            </div>
+                            <div class="module-text">报表</div>
+                     
+                    </div>
+                    <div class="module-item">
+                     
+                            <div class="module-icon warning-bg">
+                                <i class="bi bi-clipboard-data"></i>
+                            </div>
+                         <div class="module-text">报表</div>
+                    </div>
+                    <div class="module-item">
+                      
+                            <div class="module-icon danger-bg">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="module-text">告警</div>
+                       
+                    </div>
+                    <div class="module-item">
+                       
+                            <div class="module-icon primary-bg">
+                                <i class="bi bi-card-list"></i>
+                            </div>
+                            <div class="module-text">任务</div>
+                       
+                    </div>
+                    <div class="module-item">
+                       
+                            <div class="module-icon secondary-bg">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="module-text">人员</div>
+                      
+                    </div>
+                    <div class="module-item">
+                     
+                            <div class="module-icon warning-bg">
+                                <i class="bi bi-water"></i>
+                            </div>
+                            <div class="module-text">泵站</div>
+                    </div>
+                    <div class="module-item">
+                       
+                            <div class="module-icon danger-bg">
+                                <i class="bi bi-gear"></i>
+                            </div>
+                            <div class="module-text">设置</div>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 待办任务 -->
+        <div class="card-container">
+            <div class="card-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 class="card-title">我的任务</h2>
+                    <a href="#" class="view-all-link">查看全部</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="task-list">
+                    <div class="task-item">
+                        <div class="task-header">
+                            <div class="task-title">处理紧急工单 #WC-202306015</div>
+                            <span class="task-badge badge-warning">待处理</span>
+                        </div>
+                        <div class="task-details">东区泵站 · 一级紧急 · 今天 14:00前完成</div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-header">
+                            <div class="task-title">审核巡检报告</div>
+                            <span class="task-badge badge-primary">待审核</span>
+                        </div>
+                        <div class="task-details">待审核 3 份报告</div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-header">
+                            <div class="task-title">提交月度总结</div>
+                            <span class="task-badge badge-secondary">进行中</span>
+                        </div>
+                        <div class="task-details">截止日期 6月25日</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部导航栏 -->
+    <nav class="tab-bar">
+        <a href="home.html" class="tab-item active" data-page="home">
+            <span class="tab-icon"><i class="bi bi-house"></i></span>
+            <span class="tab-text">首页</span>
+        </a>
+        <a href="../monitor/monitor.html" class="tab-item" data-page="monitor">
+            <span class="tab-icon"><i class="bi bi-tv"></i></span>
+            <span class="tab-text">监控</span>
+        </a>
+        <a href="../operation/operation.html" class="tab-item" data-page="operation">
+            <span class="tab-icon"><i class="bi bi-tools"></i></span>
+            <span class="tab-text">运维</span>
+        </a>
+        <a href="../report/report.html" class="tab-item" data-page="report">
+            <span class="tab-icon"><i class="bi bi-bar-chart"></i></span>
+            <span class="tab-text">报表</span>
+        </a>
+        <a href="../profile/profile.html" class="tab-item" data-page="profile">
+            <span class="tab-icon"><i class="bi bi-person"></i></span>
+            <span class="tab-text">我的</span>
+        </a>
+    </nav>
+
+    <script>
+        // 轮播图功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const carousel = document.getElementById('bannerCarousel');
+            const items = carousel.querySelectorAll('.carousel-item');
+            const indicators = carousel.querySelectorAll('.carousel-indicator');
+            const prevBtn = carousel.querySelector('.carousel-control.prev');
+            const nextBtn = carousel.querySelector('.carousel-control.next');
+            
+            let currentIndex = 0;
+            const totalItems = items.length;
+            
+            // 显示指定索引的幻灯片
+            function showSlide(index) {
+                // 隐藏所有幻灯片
+                items.forEach(item => item.classList.remove('active'));
+                indicators.forEach(indicator => indicator.classList.remove('active'));
+                
+                // 显示当前幻灯片
+                items[index].classList.add('active');
+                indicators[index].classList.add('active');
+                
+                currentIndex = index;
+            }
+            
+            // 下一张
+            function nextSlide() {
+                const nextIndex = (currentIndex + 1) % totalItems;
+                showSlide(nextIndex);
+            }
+            
+            // 上一张
+            function prevSlide() {
+                const prevIndex = (currentIndex - 1 + totalItems) % totalItems;
+                showSlide(prevIndex);
+            }
+            
+            // 点击指示器
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', () => {
+                    showSlide(index);
+                });
+            });
+            
+            // 点击控制按钮
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+            
+            // 自动播放
+            setInterval(nextSlide, 5000);
+        });
+        
+        // 功能模块点击事件
+        document.querySelectorAll('.module-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const moduleName = this.nextElementSibling.textContent;
+                console.log('点击模块:', moduleName);
+            });
+        });
+    </script>
+</body>
+</html>

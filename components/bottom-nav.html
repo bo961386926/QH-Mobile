@@ -1,0 +1,50 @@
+<!-- 底部导航栏组件 -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50" style="height: 60px;">
+    <div class="flex justify-around items-center h-full">
+        <a href="农饮水运维移动端.html" class="nav-item flex flex-col items-center justify-center flex-1 h-full py-1" data-page="home">
+            <i class="fa fa-home text-lg"></i>
+            <span class="text-xs mt-1">首页</span>
+        </a>
+        <a href="监控中心.html" class="nav-item flex flex-col items-center justify-center flex-1 h-full py-1" data-page="monitor">
+            <i class="fa fa-television text-lg"></i>
+            <span class="text-xs mt-1">监控</span>
+        </a>
+        <a href="运维中心.html" class="nav-item flex flex-col items-center justify-center flex-1 h-full py-1" data-page="operation">
+            <i class="fa fa-wrench text-lg"></i>
+            <span class="text-xs mt-1">运维</span>
+        </a>
+        <a href="报表中心.html" class="nav-item flex flex-col items-center justify-center flex-1 h-full py-1" data-page="report">
+            <i class="fa fa-bar-chart text-lg"></i>
+            <span class="text-xs mt-1">报表</span>
+        </a>
+        <a href="个人中心.html" class="nav-item flex flex-col items-center justify-center flex-1 h-full py-1" data-page="profile">
+            <i class="fa fa-user-o text-lg"></i>
+            <span class="text-xs mt-1">我的</span>
+        </a>
+    </div>
+</nav>
+
+<style>
+    .nav-item {
+        color: #8E8E93; /* 默认灰色 */
+        transition: color 0.2s ease;
+        text-decoration: none;
+    }
+    
+    .nav-item.active {
+        color: #007AFF; /* 激活状态使用主题蓝色 */
+    }
+    
+    .nav-item i {
+        font-size: 20px;
+    }
+    
+    .nav-item span {
+        font-size: 12px;
+    }
+</style>
+
+<script>
+    // 移除动态加载代码，使用静态导航栏实现页面跳转
+    // 页面跳转功能已通过href属性实现，无需额外JavaScript代码
+</script>

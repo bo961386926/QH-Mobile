@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>农饮水运维移动端</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .app-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .app-logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary-color), #0A84FF);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 48px;
+        }
+        
+        .card {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 25px 15px;
+        }
+        
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 28px;
+        }
+        
+        .primary-bg {
+            background-color: rgba(0, 122, 255, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .secondary-bg {
+            background-color: rgba(52, 199, 89, 0.1);
+            color: var(--secondary-color);
+        }
+        
+        .warning-bg {
+            background-color: rgba(255, 149, 0, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .danger-bg {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .info-bg {
+            background-color: rgba(99, 99, 195, 0.1);
+            color: #6363C3;
+        }
+        
+        .version-info {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--gray-text);
+            font-size: 14px;
+        }
+        
+        .btn-launch {
+            background: linear-gradient(135deg, var(--primary-color), #0A84FF);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 25px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .btn-launch:hover {
+            background: linear-gradient(135deg, #0062cc, #0070e0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <div class="app-logo">
+                <i class="bi bi-droplet"></i>
+            </div>
+            <h1 class="h2 fw-bold">运维移动端</h1>
+            <p class="text-muted">专业的城市排水管理平台</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6 col-lg-4">
+                <div class="card">
+                    <div class="feature-card">
+                        <div class="feature-icon primary-bg">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                        </div>
+                        <h3 class="h5 fw-bold mb-2">登录页面</h3>
+                        <p class="small text-muted mb-3">账号密码登录、短信验证码登录</p>
+                        <a href="登录.html" class="btn btn-outline-primary btn-sm">查看页面</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card">
+                    <div class="feature-card">
+                        <div class="feature-icon secondary-bg">
+                            <i class="bi bi-house"></i>
+                        </div>
+                        <h3 class="h5 fw-bold mb-2">首页</h3>
+                        <p class="small text-muted mb-3">数据概览、功能模块、地图展示、待办任务</p>
+                        <a href="home/home.html" class="btn btn-outline-primary btn-sm">查看页面</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card">
+                    <div class="feature-card">
+                        <div class="feature-icon danger-bg">
+                            <i class="bi bi-clipboard-data"></i>
+                        </div>
+                        <h3 class="h5 fw-bold mb-2">监控中心</h3>
+                        <p class="small text-muted mb-3">站点监控、高压泵数据、告警信息、一站一档案</p>
+                        <a href="monitor/monitor.html" class="btn btn-outline-primary btn-sm">查看页面</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card">
+                    <div class="feature-card">
+                        <div class="feature-icon warning-bg">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                        <h3 class="h5 fw-bold mb-2">运维中心</h3>
+                        <p class="small text-muted mb-3">运维概览、快捷功能、工单管理、巡检记录</p>
+                        <a href="operation/operation.html" class="btn btn-outline-primary btn-sm">查看页面</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card">
+                    <div class="feature-card">
+                        <div class="feature-icon warning-bg">
+                            <i class="bi bi-bar-chart"></i>
+                        </div>
+                        <h3 class="h5 fw-bold mb-2">报表中心</h3>
+                        <p class="small text-muted mb-3">工单统计、泵站运行、人员考勤、综合分析</p>
+                        <a href="report/report.html" class="btn btn-outline-primary btn-sm">查看页面</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card">
+                    <div class="feature-card">
+                        <div class="feature-icon info-bg">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <h3 class="h5 fw-bold mb-2">个人中心</h3>
+                        <p class="small text-muted mb-3">个人信息、个人设置、消息管理、系统信息</p>
+                        <a href="profile/profile.html" class="btn btn-outline-primary btn-sm">查看页面</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="登录.html" class="btn btn-launch">
+                <i class="bi bi-play-circle me-2"></i>启动应用
+            </a>
+        </div>
+        
+        <div class="version-info">
+            <p class="mb-0">运维移动端 v1.0</p>
+            <p class="mb-0">基于PRD文档开发的功能框架</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

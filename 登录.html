@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 兰溪智慧排水运维移动端</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #007AFF, #0A84FF);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .login-container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+        }
+        
+        .app-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .app-logo i {
+            font-size: 60px;
+            color: var(--primary-color);
+            background-color: rgba(0, 122, 255, 0.1);
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        
+        .app-logo h1 {
+            color: var(--dark-text);
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .app-logo p {
+            color: var(--gray-text);
+            margin: 5px 0 0 0;
+        }
+        
+        .login-form {
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-control {
+            width: 100%;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.15);
+        }
+        
+        .btn-login {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 10px;
+            width: 100%;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .btn-login:hover {
+            background-color: #0062cc;
+        }
+        
+        .btn-login:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .login-options a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .divider {
+            text-align: center;
+            position: relative;
+            margin: 25px 0;
+            color: var(--gray-text);
+        }
+        
+        .divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #eee;
+            z-index: 1;
+        }
+        
+        .divider span {
+            background-color: white;
+            position: relative;
+            z-index: 2;
+            padding: 0 15px;
+        }
+        
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border: 1px solid #eee;
+            color: var(--gray-text);
+            font-size: 20px;
+            text-decoration: none;
+        }
+        
+        .social-btn:hover {
+            background-color: #e9ecef;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="app-logo">
+            <i class="bi bi-droplet"></i>
+            <h1>兰溪排水</h1>
+            <p>智慧运维管理平台</p>
+        </div>
+        
+        <form class="login-form">
+            <div class="form-group">
+                <input type="text" class="form-control" id="username" placeholder="请输入账号">
+            </div>
+            
+            <div class="form-group">
+                <input type="password" class="form-control" id="password" placeholder="请输入密码">
+            </div>
+            
+            <button type="button" class="btn-login" id="loginBtn">登录</button>
+            
+            <div class="login-options">
+                <a href="#" id="smsLoginLink">短信验证码登录</a>
+                <a href="#">忘记密码？</a>
+            </div>
+        </form>
+        
+        <div class="divider">
+            <span>其他登录方式</span>
+        </div>
+        
+        <div class="social-login">
+            <a href="#" class="social-btn">
+                <i class="bi bi-fingerprint"></i>
+            </a>
+            <a href="#" class="social-btn">
+                <i class="bi bi-phone"></i>
+            </a>
+            <a href="#" class="social-btn">
+                <i class="bi bi-shield-lock"></i>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 登录按钮点击事件
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                alert('请输入账号和密码');
+                return;
+            }
+            
+            // 模拟登录过程
+            this.innerHTML = '<span class="spinner"></span> 登录中...';
+            this.disabled = true;
+            
+            setTimeout(() => {
+                // 模拟登录成功
+                window.location.href = 'home/home.html';
+            }, 1500);
+        });
+        
+        // 短信验证码登录链接
+        document.getElementById('smsLoginLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('跳转到短信验证码登录页面');
+            // 这里可以跳转到短信登录页面
+        });
+    </script>
+</body>
+</html>

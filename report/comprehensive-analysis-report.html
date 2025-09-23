@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>综合分析报表</title>
+    <!-- 引入Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+            --card-bg: #FFFFFF;
+            --border-color: #E5E5EA;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            padding-top: 56px;
+            padding-bottom: 80px;
+        }
+        
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .back-button {
+            background: none;
+            border: none;
+            color: var(--gray-text);
+            font-size: 18px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .back-button:hover {
+            color: var(--primary-color);
+            background-color: rgba(0, 122, 255, 0.1);
+        }
+        
+        .main-content {
+            padding: 16px;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .date-filter-container {
+            padding: 12px;
+        }
+        
+        .date-filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .date-filter-label {
+            font-size: 14px;
+            color: var(--gray-text);
+        }
+        
+        .date-filters {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .date-filter {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            background-color: var(--card-bg);
+            color: var(--gray-text);
+        }
+        
+        .date-filter.active {
+            background-color: rgba(0, 122, 255, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .section-action {
+            font-size: 14px;
+            color: var(--primary-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .score-overview {
+            padding: 16px;
+        }
+        
+        .score-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .score-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .rank-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(0, 122, 255, 0.1);
+            color: var(--primary-color);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+        
+        .score-info {
+            flex: 1;
+        }
+        
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        
+        .site-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .site-score {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--light-bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+        }
+        
+        .chart-container {
+            height: 240px;
+            padding: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="app-header">
+        <div>
+            <button id="back-button" class="back-button">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+        </div>
+        <h1 class="header-title">综合分析报表</h1>
+        <div></div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- 日期筛选器 -->
+        <div class="card">
+            <div class="date-filter-container">
+                <div class="date-filter-header">
+                    <span class="date-filter-label">数据周期</span>
+                    <div class="date-filters">
+                        <button class="date-filter active">今日</button>
+                        <button class="date-filter">本周</button>
+                        <button class="date-filter">本月</button>
+                        <button class="date-filter">
+                            <i class="fa fa-calendar-o"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 站点评分总览 -->
+        <div class="card">
+            <div class="section-header">
+                <span class="section-title">站点评分总览</span>
+                <button class="section-action">更新数据</button>
+            </div>
+            <div class="score-overview">
+                <div class="score-item">
+                    <div class="rank-number">1</div>
+                    <div class="score-info">
+                        <div class="score-header">
+                            <span class="site-name">东区站点</span>
+                            <span class="site-score">92分</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 92%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="score-item">
+                    <div class="rank-number">2</div>
+                    <div class="score-info">
+                        <div class="score-header">
+                            <span class="site-name">南区站点</span>
+                            <span class="site-score">88分</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 88%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="score-item">
+                    <div class="rank-number">3</div>
+                    <div class="score-info">
+                        <div class="score-header">
+                            <span class="site-name">西区站点</span>
+                            <span class="site-score">85分</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 85%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 站点多维度对比 -->
+        <div class="card">
+            <div class="section-header">
+                <span class="section-title">站点多维度对比</span>
+                <button class="section-action">切换指标</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="siteComparisonChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 页面加载完成后加载底部导航栏组件
+        document.addEventListener('DOMContentLoaded', function() {
+            // 返回按钮功能
+            document.getElementById('back-button').addEventListener('click', function() {
+                window.location.href = './report.html';
+            });
+        });
+        
+        // 初始化图表
+        document.addEventListener('DOMContentLoaded', function() {
+            // 站点多维度对比图表
+            const siteComparisonCtx = document.getElementById('siteComparisonChart').getContext('2d');
+            new Chart(siteComparisonCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['工单处理', '设备运行', '人员出勤', '故障解决', '能耗控制'],
+                    datasets: [{
+                        label: '东区站点',
+                        data: [90, 95, 92, 94, 88],
+                        backgroundColor: 'rgba(0, 122, 255, 0.2)',
+                        borderColor: '#007AFF',
+                        pointBackgroundColor: '#007AFF'
+                    }, {
+                        label: '北区站点',
+                        data: [75, 70, 82, 68, 78],
+                        backgroundColor: 'rgba(255, 149, 0, 0.2)',
+                        borderColor: '#FF9500',
+                        pointBackgroundColor: '#FF9500'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            suggestedMin: 50,
+                            suggestedMax: 100
+                        }
+                    }
+                }
+            });
+
+            // 日期筛选器功能
+            const dateFilters = document.querySelectorAll('.date-filter');
+            dateFilters.forEach(filter => {
+                filter.addEventListener('click', function() {
+                    dateFilters.forEach(f => {
+                        f.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
