@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>扫码识别</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .app-header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 15px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #0062cc;
+            border-color: #0062cc;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: rgba(0, 122, 255, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        @keyframes scan {
+            0% { top: 4px; }
+            50% { top: calc(100% - 8px); }
+            100% { top: 4px; }
+        }
+        
+        .scan-line {
+            animation: scan 2s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- 扫码页面 -->
+    <div id="scan-page">
+        <header class="app-header py-3 px-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <button class="btn btn-sm btn-outline-secondary" onclick="window.location.href='site-inspection-home.html'">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+                <h1 class="h5 mb-0">扫码识别</h1>
+                <div></div> <!-- 占位，保持标题居中 -->
+            </div>
+        </header>
+        
+        <div class="container-fluid px-3 py-3">
+            <!-- 扫码框 -->
+            <div class="position-relative w-100" style="aspect-ratio: 1/1; max-width: 500px; margin: 0 auto;">
+                <div class="position-absolute top-0 start-0 w-100 h-100 border border-2 border-secondary rounded"></div>
+                
+                <!-- 扫描线动画 -->
+                <div class="position-absolute start-0 end-0 h-1 bg-warning scan-line"></div>
+                
+                <!-- 扫码区域背景 -->
+                <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center">
+                    <div class="w-75 h-75 bg-transparent"></div>
+                </div>
+                
+                <!-- 扫码提示 -->
+                <div class="position-absolute bottom-0 start-0 end-0 text-white text-center p-3">
+                    <p class="mb-0">请对准站点二维码进行扫描</p>
+                </div>
+            </div>
+            
+            <!-- 扫码按钮 -->
+            <div class="text-center mt-4">
+                <button class="btn btn-primary" onclick="startScan()">
+                    <i class="bi bi-qr-code-scan me-2"></i>
+                    开始扫码
+                </button>
+            </div>
+            
+            <!-- 扫码说明 -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h3 class="card-title h6 fw-bold mb-3">扫码说明</h3>
+                    <p class="mb-2">1. 请将二维码对准扫描框</p>
+                    <p class="mb-2">2. 确保光线充足，二维码清晰</p>
+                    <p class="mb-2">3. 扫描成功后将自动跳转到巡检页面</p>
+                    <p class="mb-0">4. 扫描完成后将自动跳转</p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <script>
+        // 开始扫码功能
+        function startScan() {
+            // 显示正在扫码的提示
+            const scanButton = document.querySelector('#scan-page .btn-primary');
+            const originalText = scanButton.innerHTML;
+            scanButton.innerHTML = '<i class="bi bi-arrow-repeat me-2"></i> 正在扫描...';
+            scanButton.disabled = true;
+            
+            // 模拟扫码过程（在实际应用中，这里会调用设备的摄像头进行扫码）
+            setTimeout(() => {
+                // 模拟扫码成功
+                const isScanSuccessful = Math.random() > 0.3; // 70%的成功率
+                
+                if (isScanSuccessful) {
+                    // 扫码成功，跳转到巡检模板选择页面
+                    window.location.href = 'inspection-template.html';
+                    
+                    // 显示成功提示
+                    alert('扫码成功！已识别站点：东河村污水站');
+                } else {
+                    // 扫码失败，显示错误提示
+                    alert('扫码失败，请重新尝试');
+                }
+                
+                // 恢复按钮状态
+                scanButton.innerHTML = originalText;
+                scanButton.disabled = false;
+            }, 2000); // 模拟2秒的扫码过程
+        }
+        
+        // 手动选择站点功能
+        function selectSite(siteName) {
+            // 跳转到巡检模板选择页面
+            window.location.href = 'inspection-template.html';
+            
+            // 显示选择的站点信息
+            alert(`已选择站点：${siteName}`);
+        }
+    </script>
+</body>
+</html>

@@ -6,6 +6,8 @@
     <title>人工考勤报表</title>
     <!-- 引入Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         :root {
             --primary-color: #007AFF;
@@ -309,33 +311,7 @@
                 <button class="section-action">筛选</button>
             </div>
             <div class="department-list">
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">运维一部</div>
-                        <div class="department-details">12人 · 出勤率 91.7%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 91.7%"></div>
-                    </div>
-                </div>
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">运维二部</div>
-                        <div class="department-details">15人 · 出勤率 93.3%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 93.3%"></div>
-                    </div>
-                </div>
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">监控中心</div>
-                        <div class="department-details">15人 · 出勤率 93.3%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 93.3%"></div>
-                    </div>
-                </div>
+                <canvas id="departmentChart" height="150"></canvas>
             </div>
         </div>
 
@@ -346,51 +322,7 @@
                 <button class="section-action">筛选</button>
             </div>
             <div class="department-list">
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">张三</div>
-                        <div class="department-details">运维一部 · 到岗率 98.5%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 98.5%"></div>
-                    </div>
-                </div>
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">李四</div>
-                        <div class="department-details">运维二部 · 到岗率 97.2%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 97.2%"></div>
-                    </div>
-                </div>
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">王五</div>
-                        <div class="department-details">监控中心 · 到岗率 96.8%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 96.8%"></div>
-                    </div>
-                </div>
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">赵六</div>
-                        <div class="department-details">运维一部 · 到岗率 95.6%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 95.6%"></div>
-                    </div>
-                </div>
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">钱七</div>
-                        <div class="department-details">运维二部 · 到岗率 94.3%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 94.3%"></div>
-                    </div>
-                </div>
+                <canvas id="personnelChart" height="200"></canvas>
             </div>
         </div>
 
@@ -401,51 +333,7 @@
                 <button class="section-action">筛选</button>
             </div>
             <div class="department-list">
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">东区站点</div>
-                        <div class="department-details">到岗率 96.7%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 96.7%"></div>
-                    </div>
-                </div>
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">南区站点</div>
-                        <div class="department-details">到岗率 95.4%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 95.4%"></div>
-                    </div>
-                </div>
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">西区站点</div>
-                        <div class="department-details">到岗率 94.2%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 94.2%"></div>
-                    </div>
-                </div>
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">北区站点</div>
-                        <div class="department-details">到岗率 93.8%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 93.8%"></div>
-                    </div>
-                </div>
-                <div class="department-item">
-                    <div class="department-info">
-                        <div class="department-name">中区站点</div>
-                        <div class="department-details">到岗率 92.5%</div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: 92.5%"></div>
-                    </div>
-                </div>
+                <canvas id="siteChart" height="200"></canvas>
             </div>
         </div>
     </main>
@@ -479,6 +367,148 @@
                     this.classList.add('active');
                 });
             });
+        });
+        
+        // 初始化部门考勤明细图表（横向柱状图）
+        const departmentCtx = document.getElementById('departmentChart').getContext('2d');
+        const departmentChart = new Chart(departmentCtx, {
+            type: 'bar',
+            data: {
+                labels: ['运维一部', '运维二部', '监控中心'],
+                datasets: [{
+                    label: '出勤率',
+                    data: [91.7, 93.3, 93.3],
+                    backgroundColor: [
+                        'rgba(0, 122, 255, 0.7)',
+                        'rgba(52, 199, 89, 0.7)',
+                        'rgba(255, 149, 0, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(0, 122, 255, 1)',
+                        'rgba(52, 199, 89, 1)',
+                        'rgba(255, 149, 0, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y', // 横向柱状图
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.x + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 初始化人员考勤到岗排名图表（垂直柱状图）
+        const personnelCtx = document.getElementById('personnelChart').getContext('2d');
+        const personnelChart = new Chart(personnelCtx, {
+            type: 'bar',
+            data: {
+                labels: ['张三', '李四', '王五', '赵六', '钱七'],
+                datasets: [{
+                    label: '到岗率',
+                    data: [98.5, 97.2, 96.8, 95.6, 94.3],
+                    backgroundColor: [
+                        'rgba(0, 122, 255, 0.7)',
+                        'rgba(52, 199, 89, 0.7)',
+                        'rgba(255, 149, 0, 0.7)',
+                        'rgba(255, 59, 48, 0.7)',
+                        'rgba(175, 82, 222, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(0, 122, 255, 1)',
+                        'rgba(52, 199, 89, 1)',
+                        'rgba(255, 149, 0, 1)',
+                        'rgba(255, 59, 48, 1)',
+                        'rgba(175, 82, 222, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 初始化站点到岗排名图表（饼图）
+        const siteCtx = document.getElementById('siteChart').getContext('2d');
+        const siteChart = new Chart(siteCtx, {
+            type: 'pie',
+            data: {
+                labels: ['东区站点', '南区站点', '西区站点', '北区站点', '中区站点'],
+                datasets: [{
+                    label: '到岗率',
+                    data: [96.7, 95.4, 94.2, 93.8, 92.5],
+                    backgroundColor: [
+                        'rgba(0, 122, 255, 0.7)',
+                        'rgba(52, 199, 89, 0.7)',
+                        'rgba(255, 149, 0, 0.7)',
+                        'rgba(255, 59, 48, 0.7)',
+                        'rgba(175, 82, 222, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(0, 122, 255, 1)',
+                        'rgba(52, 199, 89, 1)',
+                        'rgba(255, 149, 0, 1)',
+                        'rgba(255, 59, 48, 1)',
+                        'rgba(175, 82, 222, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + '%';
+                            }
+                        }
+                    }
+                }
+            }
         });
     </script>
 </body>

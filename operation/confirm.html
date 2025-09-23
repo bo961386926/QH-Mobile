@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>确认巡检结果</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .app-header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            background-color: white;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            margin-bottom: 15px;
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #0062cc;
+            border-color: #0062cc;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn-gray {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-gray:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <!-- 提交确认页面 -->
+    <div id="confirm-page">
+        <header class="bg-white text-primary p-4 shadow-md flex justify-between items-center sticky top-0 z-10">
+            <button id="back-button" class="back-button" onclick="window.location.href='inspection-form.html'">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <h1 class="text-lg font-bold">确认巡检结果</h1>
+            <div class="w-6"></div>
+        </header>
+        
+        <div class="p-4">
+            <!-- 站点信息 -->
+            <div class="card-shadow p-3 mb-4">
+                <h3 class="font-bold mb-2">巡检基本信息</h3>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                        <span class="text-gray-500">站点名称：</span>
+                        <span class="font-medium">东河村污水站</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">站点ID：</span>
+                        <span>WH-2023056</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">巡检人员：</span>
+                        <span>张三</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">巡检时间：</span>
+                        <span>2025-09-10 10:28</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">巡检模板：</span>
+                        <span>月度全面巡检模板</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">巡检结论：</span>
+                        <span class="text-green-600 font-medium">正常运行</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 检查项摘要 -->
+            <div class="card-shadow mb-4">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold">检查项摘要</h3>
+                </div>
+                
+                <div class="p-3">
+                    <div class="mb-3 pb-3 border-b border-gray-100">
+                        <h4 class="font-medium mb-2">1. 净水设施</h4>
+                        <div class="text-sm pl-3 space-y-1">
+                            <p>1.1 运转情况：正常</p>
+                            <p>1.2 机电设备运转：正常</p>
+                            <p>1.3 是否开启手动反冲洗：已开启</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 pb-3 border-b border-gray-100">
+                        <h4 class="font-medium mb-2">2. 清水池</h4>
+                        <div class="text-sm pl-3 space-y-1">
+                            <p>2.1 渗漏水：正常</p>
+                            <p>2.2 外表脱落：正常</p>
+                            <p>2.3 溢水管：正常</p>
+                            <p>2.4 警示牌：完好</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 pb-3 border-b border-gray-100">
+                        <h4 class="font-medium mb-2">3. 加药设备与记录</h4>
+                        <div class="text-sm pl-3 space-y-1">
+                            <p>3.1 絮凝加药设备：正常</p>
+                            <p>3.2 消杀剂加药设备：正常</p>
+                            <p>3.3 加药记录：已按标准完成</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 pb-3 border-b border-gray-100">
+                        <h4 class="font-medium mb-2">4. 厂区环境</h4>
+                        <div class="text-sm pl-3 space-y-1">
+                            <p>4.1 卫生状况：已清理</p>
+                            <p>4.2 杂草情况：已清理</p>
+                            <p>4.3 设施洁净度：符合标准</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium mb-2">5. 出厂水质</h4>
+                        <div class="text-sm pl-3 space-y-1">
+                            <p>5.1 出厂水水质：正常</p>
+                            <p>5.2 出厂水量：充足</p>
+                            <p>5.3 余氯情况：无余氯</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 多媒体文件 -->
+            <div class="card-shadow mb-16">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold">多媒体文件</h3>
+                </div>
+                
+                <div class="p-3">
+                    <div class="mb-3">
+                        <h4 class="font-medium text-sm mb-2">照片（1张）</h4>
+                        <div class="flex space-x-2">
+                            <div class="w-20 h-20 rounded-md overflow-hidden">
+                                <img src="https://picsum.photos/id/1025/200/200" alt="现场照片" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-sm mb-2">视频（1个）</h4>
+                        <div class="flex space-x-2">
+                            <div class="w-32 h-24 rounded-md overflow-hidden relative">
+                                <img src="https://picsum.photos/id/1039/320/240" alt="视频缩略图" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                    <i class="fa fa-play text-white text-xl"></i>
+                                </div>
+                                <div class="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 rounded">00:45</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部操作按钮 -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-[0_-1px_3px_rgba(0,0,0,0.1)] flex space-x-3">
+                <button class="flex-1 btn-gray py-3 px-4 rounded-lg font-medium text-center" onclick="window.location.href='inspection-form.html'">
+                    返回修改
+                </button>
+                <button class="flex-1 btn-primary rounded-lg font-medium text-center py-3" onclick="showSuccess()">
+                    提交巡检结果
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 提交成功弹窗 -->
+    <div id="success-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white rounded-lg w-4/5 max-w-sm p-6 transform scale-95 transition-transform duration-300" id="modal-content">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-check text-2xl text-green-500"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">提交成功</h3>
+                <p class="text-gray-600 mb-6">您的巡检记录已成功提交</p>
+                <button class="btn-primary w-full" onclick="closeSuccess()">
+                    返回首页
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 显示提交成功弹窗
+        function showSuccess() {
+            const modal = document.getElementById('success-modal');
+            const modalContent = document.getElementById('modal-content');
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
+        
+        // 关闭提交成功弹窗
+        function closeSuccess() {
+            const modal = document.getElementById('success-modal');
+            const modalContent = document.getElementById('modal-content');
+            
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                window.location.href = 'site-inspection-home.html';
+            }, 300);
+        }
+    </script>
+</body>
+</html>

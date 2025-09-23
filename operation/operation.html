@@ -103,14 +103,10 @@
         /* 运维数据概览 */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
-        }
-        
-        @media (min-width: 768px) {
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         .stats-card {
@@ -401,6 +397,10 @@
                         <div class="stats-value text-success">92%</div>
                         <div class="stats-label">完成率</div>
                     </div>
+                    <div class="stats-card">
+                        <div class="stats-value text-danger">12</div>
+                        <div class="stats-label">事件统计</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -431,7 +431,7 @@
                         <div class="module-text">巡检记录</div>
                     </div>
                     <div class="module-item">
-                        <a href="site-inspection.html" class="module-link">
+                        <a href="site-inspection-home.html" class="module-link">
                             <div class="module-icon primary-bg">
                                 <i class="bi bi-geo-alt"></i>
                             </div>
