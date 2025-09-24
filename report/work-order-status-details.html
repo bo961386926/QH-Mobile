@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>工单详情</title>
-    <!-- 引入Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>工单状态分布详情</title>
+    <!-- 引入Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- 引入Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
     <style>
         :root {
@@ -224,24 +225,70 @@
             background-color: var(--danger-color);
         }
         
-        .time-filters {
-            display: flex;
-            gap: 8px;
+        .status-list {
+            padding: 16px;
         }
         
-        .time-filter {
-            padding: 4px 8px;
-            border-radius: 4px;
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-info {
+            flex: 1;
+        }
+        
+        .status-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .status-count {
             font-size: 12px;
-            border: none;
-            cursor: pointer;
-            background-color: var(--card-bg);
             color: var(--gray-text);
         }
         
-        .time-filter.active {
-            background-color: rgba(0, 122, 255, 0.1);
-            color: var(--primary-color);
+        .status-percentage {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .status-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--light-bg);
+            border-radius: 4px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+        
+        .status-bar {
+            height: 100%;
+            border-radius: 4px;
+        }
+        
+        .status-bar.primary {
+            background-color: var(--primary-color);
+        }
+        
+        .status-bar.warning {
+            background-color: var(--warning-color);
+        }
+        
+        .status-bar.secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .status-bar.danger {
+            background-color: var(--danger-color);
         }
     </style>
 </head>
@@ -254,7 +301,7 @@
                 <i class="fa fa-arrow-left"></i>
             </button>
         </div>
-        <h1 class="header-title">工单统计</h1>
+        <h1 class="header-title">工单状态分布详情</h1>
         <div></div>
     </header>
 
@@ -270,75 +317,60 @@
                         <button class="date-filter">本周</button>
                         <button class="date-filter">本月</button>
                         <button class="date-filter">
-                            <i class="fa fa-calendar-o"></i>
+                            <i class="bi bi-calendar"></i>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 工单核心指标 -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value">24</div>
-                <div class="stat-label">今日新增工单</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value text-warning">8</div>
-                <div class="stat-label">待处理工单</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value text-secondary">16</div>
-                <div class="stat-label">已完成工单</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value text-danger">2</div>
-                <div class="stat-label">逾期未处理</div>
-            </div>
-        </div>
-
-        <!-- 工单状态分布 -->
+        <!-- 工单状态详细分布 -->
         <div class="card">
             <div class="section-header">
-                <span class="section-title">工单状态分布</span>
-                <button class="section-action" id="view-details-btn">详情</button>
+                <span class="section-title">工单状态详细分布</span>
             </div>
-            <div class="chart-container">
-                <canvas id="workorderStatusChart"></canvas>
-            </div>
-            <div class="legend-container">
-                <div class="legend-item">
-                    <span class="legend-color primary"></span>
-                    <span>待处理</span>
+            <div class="status-list">
+                <div class="status-item">
+                    <div class="status-info">
+                        <div class="status-name">待处理</div>
+                        <div class="status-count">12个工单</div>
+                    </div>
+                    <div class="status-percentage">12%</div>
                 </div>
-                <div class="legend-item">
-                    <span class="legend-color warning"></span>
-                    <span>处理中</span>
+                <div class="status-item">
+                    <div class="status-info">
+                        <div class="status-name">处理中</div>
+                        <div class="status-count">25个工单</div>
+                    </div>
+                    <div class="status-percentage">25%</div>
                 </div>
-                <div class="legend-item">
-                    <span class="legend-color secondary"></span>
-                    <span>已完成</span>
+                <div class="status-item">
+                    <div class="status-info">
+                        <div class="status-name">已完成</div>
+                        <div class="status-count">48个工单</div>
+                    </div>
+                    <div class="status-percentage">48%</div>
                 </div>
-                <div class="legend-item">
-                    <span class="legend-color danger"></span>
-                    <span>已逾期</span>
+                <div class="status-item">
+                    <div class="status-info">
+                        <div class="status-name">已逾期</div>
+                        <div class="status-count">5个工单</div>
+                    </div>
+                    <div class="status-percentage">5%</div>
                 </div>
             </div>
         </div>
 
-        <!-- 工单处理效率 -->
+        <!-- 区域统计排名 -->
         <div class="card">
             <div class="section-header">
-                <span class="section-title">工单处理效率趋势</span>
-                <div class="time-filters">
-                    <button class="time-filter active">7天</button>
-                    <button class="time-filter">30天</button>
-                </div>
+                <span class="section-title">区域工单处理排名</span>
             </div>
             <div class="chart-container">
-                <canvas id="workorderEfficiencyChart"></canvas>
+                <canvas id="areaRankingChart"></canvas>
             </div>
         </div>
+
     </main>
 
     <script>
@@ -346,12 +378,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // 返回按钮功能
             document.getElementById('back-button').addEventListener('click', function() {
-                window.location.href = './report.html';
-            });
-            
-            // 查看详情按钮功能
-            document.getElementById('view-details-btn').addEventListener('click', function() {
-                window.location.href = './work-order-status-details.html';
+                window.location.href = './work-order-details.html';
             });
             
             // 日期筛选器功能
@@ -365,62 +392,24 @@
                 });
             });
             
-            // 时间筛选器功能
-            const timeFilters = document.querySelectorAll('.time-filter');
-            timeFilters.forEach(filter => {
-                filter.addEventListener('click', function() {
-                    timeFilters.forEach(f => {
-                        f.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                });
-            });
-        });
-        
-        // 初始化图表
-        document.addEventListener('DOMContentLoaded', function() {
-            // 工单状态分布图表
-            const workorderStatusCtx = document.getElementById('workorderStatusChart').getContext('2d');
-            new Chart(workorderStatusCtx, {
-                type: 'doughnut',
+            // 初始化图表
+            // 区域统计排名图表
+            const areaRankingCtx = document.getElementById('areaRankingChart').getContext('2d');
+            new Chart(areaRankingCtx, {
+                type: 'bar',
                 data: {
-                    labels: ['待处理', '处理中', '已完成', '已逾期'],
+                    labels: ['兰溪市赤溪街道', '兰溪市云山街道', '兰溪市灵洞乡', '兰溪市游埠镇', '兰溪市马涧镇'],
                     datasets: [{
-                        data: [12, 25, 48, 5],
+                        label: '工单处理数量',
+                        data: [68, 52, 45, 38, 32],
                         backgroundColor: [
                             '#007AFF',
-                            '#FF9500',
                             '#34C759',
-                            '#FF3B30'
+                            '#FF9500',
+                            '#FF3B30',
+                            '#8E8E93'
                         ],
                         borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    cutout: '70%'
-                }
-            });
-
-            // 工单处理效率趋势图表
-            const workorderEfficiencyCtx = document.getElementById('workorderEfficiencyChart').getContext('2d');
-            new Chart(workorderEfficiencyCtx, {
-                type: 'line',
-                data: {
-                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
-                    datasets: [{
-                        label: '平均处理时长(小时)',
-                        data: [4.2, 3.8, 4.5, 3.2, 3.6, 3.1],
-                        borderColor: '#007AFF',
-                        backgroundColor: 'rgba(0, 122, 255, 0.1)',
-                        fill: true,
-                        tension: 0.4
                     }]
                 },
                 options: {
