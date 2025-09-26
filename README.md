@@ -25,21 +25,6 @@ QH-Mobile/
 └── README.md                 # 项目说明文档
 ```
 
-## 版本说明
-
-### 优化版
-- 使用原生CSS和JavaScript实现
-- 统一的样式和脚本管理
-- 所有页面引用公共的`assets/styles.css`和`assets/scripts.js`
-- 使用相对路径确保文件间正确引用
-- 模块化设计，每个功能模块独立成页
-
-### 整合版
-- 使用Tailwind CSS框架实现现代化界面
-- 集成Chart.js图表库提供数据可视化
-- 使用Font Awesome图标库
-- 响应式设计适配移动设备
-- 统一的单页应用结构
 
 ## 功能模块
 
