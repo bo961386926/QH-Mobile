@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>维护记录</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .app-header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            background-color: white;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            margin-bottom: 15px;
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-radio {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .form-radio:checked {
+            border-color: var(--primary-color);
+        }
+        
+        .form-radio:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+        }
+        
+        .text-danger {
+            color: var(--danger-color);
+        }
+        
+        .ml-1 {
+            margin-left: 0.25rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #0062cc;
+            border-color: #0062cc;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn-gray {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-gray:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+        
+        /* 图片上传区域样式 */
+        .photo-upload-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .photo-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .remove-photo {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .upload-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .upload-placeholder:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .upload-placeholder i {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        /* 视频上传区域样式 */
+        .video-upload-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .video-item {
+            position: relative;
+            width: 120px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        
+        .video-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-duration {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        
+        .remove-video {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .video-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 80px;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .video-placeholder:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .video-placeholder i {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 维护填报页面 -->
+    <div id="maintenance-form-page">
+    <header class="bg-white text-primary p-4 shadow-md flex justify-between items-center sticky top-0 z-10">
+            <button onclick="window.location.href='maintenance-template.html'" class="text-primary back-button">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <h1 class="text-lg font-bold">东河村污水站 - 维护记录</h1>
+            <button class="text-primary">
+                
+            </button>
+        </header>
+        
+        <div class="p-4 pt-2">
+            <!-- 维护信息 -->
+            <div class="bg-blue-50 p-3 rounded-lg text-sm mb-4">
+                <div class="flex justify-between">
+                    <span>维护人员：</span>
+                    <span class="font-medium">张三</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>维护时间：</span>
+                    <div>
+                        <input type="datetime-local" id="maintenance-time" class="border border-gray-300 rounded-md p-1 text-sm" value="2025-09-23T13:59">
+                    </div>
+                </div>
+                <div class="flex justify-between">
+                    <span>维护模板：</span>
+                    <span class="font-medium">月度全面维护模板</span>
+                </div>
+            </div>
+            
+            <!-- 净水设施检查项 -->
+            <div class="card-shadow mb-4">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold flex items-center">
+                        <i class="fa fa-tint text-primary mr-2"></i>
+                        1. 净水设施
+                    </h3>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">1.1 运转情况</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="operation-status" class="form-radio text-primary" checked value="normal">
+                                <span class="ml-1">正常</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="operation-status" class="form-radio text-primary" value="abnormal">
+                                <span class="ml-1">异常</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                    
+                    <!-- 异常时的照片上传区域 -->
+                    <div id="operation-status-photo-upload" class="mt-3" style="display: none;">
+                        <div class="mb-2">
+                            <label class="font-medium block mb-1">异常情况照片 <span class="text-danger">*</span></label>
+                            <div class="photo-upload-area" id="operation-status-photo-container">
+                                <div class="upload-placeholder" onclick="document.getElementById('operation-status-photo-input').click()">
+                                    <i class="fa fa-plus"></i>
+                                    <span class="text-xs">添加</span>
+                                </div>
+                                <input type="file" id="operation-status-photo-input" accept="image/*" multiple style="display: none;" onchange="handlePhotoUpload(this, 'operation-status')">
+                            </div>
+                            <p class="text-xs text-gray-500">最多上传9张照片，支持前后对比</p>
+                        </div>
+                        <!-- 异常时的视频上传区域 -->
+                        <div class="mb-2">
+                            <label class="font-medium block mb-1">异常情况视频 <span class="text-danger">*</span></label>
+                            <div class="video-upload-area" id="operation-status-video-container">
+                                <div class="video-placeholder" onclick="document.getElementById('operation-status-video-input').click()">
+                                    <i class="fa fa-plus"></i>
+                                    <span class="text-xs">添加视频</span>
+                                </div>
+                                <input type="file" id="operation-status-video-input" accept="video/*" style="display: none;" onchange="handleVideoUpload(this, 'operation-status')">
+                            </div>
+                            <p class="text-xs text-gray-500">单个视频不超过100MB</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">1.2 机电设备运转</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="electromechanical" class="form-radio text-primary" checked value="normal">
+                                <span class="ml-1">正常</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="electromechanical" class="form-radio text-primary" value="abnormal">
+                                <span class="ml-1">异常</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                    
+                    <!-- 异常时的照片上传区域 -->
+                    <div id="electromechanical-photo-upload" class="mt-3" style="display: none;">
+                        <div class="mb-2">
+                            <label class="font-medium block mb-1">异常情况照片 <span class="text-danger">*</span></label>
+                            <div class="photo-upload-area" id="electromechanical-photo-container">
+                                <div class="upload-placeholder" onclick="document.getElementById('electromechanical-photo-input').click()">
+                                    <i class="fa fa-plus"></i>
+                                    <span class="text-xs">添加</span>
+                                </div>
+                                <input type="file" id="electromechanical-photo-input" accept="image/*" multiple style="display: none;" onchange="handlePhotoUpload(this, 'electromechanical')">
+                            </div>
+                            <p class="text-xs text-gray-500">最多上传9张照片，支持前后对比</p>
+                        </div>
+                        <!-- 异常时的视频上传区域 -->
+                        <div class="mb-2">
+                            <label class="font-medium block mb-1">异常情况视频 <span class="text-danger">*</span></label>
+                            <div class="video-upload-area" id="electromechanical-video-container">
+                                <div class="video-placeholder" onclick="document.getElementById('electromechanical-video-input').click()">
+                                    <i class="fa fa-plus"></i>
+                                    <span class="text-xs">添加视频</span>
+                                </div>
+                                <input type="file" id="electromechanical-video-input" accept="video/*" style="display: none;" onchange="handleVideoUpload(this, 'electromechanical')">
+                            </div>
+                            <p class="text-xs text-gray-500">单个视频不超过100MB</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">1.3 是否开启手动反冲洗</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="backwash" class="form-radio text-primary" checked value="opened">
+                                <span class="ml-1">已开启</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="backwash" class="form-radio text-primary" value="closed">
+                                <span class="ml-1">未开启</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                    
+                    <!-- 异常时的照片上传区域 -->
+                    <div id="backwash-photo-upload" class="mt-3" style="display: none;">
+                        <div class="mb-2">
+                            <label class="font-medium block mb-1">异常情况照片 <span class="text-danger">*</span></label>
+                            <div class="photo-upload-area" id="backwash-photo-container">
+                                <div class="upload-placeholder" onclick="document.getElementById('backwash-photo-input').click()">
+                                    <i class="fa fa-plus"></i>
+                                    <span class="text-xs">添加</span>
+                                </div>
+                                <input type="file" id="backwash-photo-input" accept="image/*" multiple style="display: none;" onchange="handlePhotoUpload(this, 'backwash')">
+                            </div>
+                            <p class="text-xs text-gray-500">最多上传9张照片，支持前后对比</p>
+                        </div>
+                        <!-- 异常时的视频上传区域 -->
+                        <div class="mb-2">
+                            <label class="font-medium block mb-1">异常情况视频 <span class="text-danger">*</span></label>
+                            <div class="video-upload-area" id="backwash-video-container">
+                                <div class="video-placeholder" onclick="document.getElementById('backwash-video-input').click()">
+                                    <i class="fa fa-plus"></i>
+                                    <span class="text-xs">添加视频</span>
+                                </div>
+                                <input type="file" id="backwash-video-input" accept="video/*" style="display: none;" onchange="handleVideoUpload(this, 'backwash')">
+                            </div>
+                            <p class="text-xs text-gray-500">单个视频不超过100MB</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 清水池检查项 -->
+            <div class="card-shadow mb-4">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold flex items-center">
+                        <i class="fa fa-tint text-primary mr-2"></i>
+                        2. 清水池
+                    </h3>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">2.1 渗漏水</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="water-leak" class="form-radio text-primary" checked value="normal">
+                                <span class="ml-1">正常</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="water-leak" class="form-radio text-primary" value="leak">
+                                <span class="ml-1">有渗水</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">2.2 外表脱落</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="surface" class="form-radio text-primary" checked value="normal">
+                                <span class="ml-1">正常</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="surface" class="form-radio text-primary" value="peeling">
+                                <span class="ml-1">有脱落</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">2.3 溢水管</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="overflow-pipe" class="form-radio text-primary" checked value="normal">
+                                <span class="ml-1">正常</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="overflow-pipe" class="form-radio text-primary" value="abnormal">
+                                <span class="ml-1">异常</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                </div>
+                
+                <div class="p-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">2.4 警示牌</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="warning-sign" class="form-radio text-primary" checked value="good">
+                                <span class="ml-1">完好</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="warning-sign" class="form-radio text-primary" value="damaged">
+                                <span class="ml-1">破损</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                </div>
+            </div>
+            
+            <!-- 加药设备检查项 -->
+            <div class="card-shadow mb-4">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold flex items-center">
+                        <i class="fa fa-flask text-primary mr-2"></i>
+                        3. 加药设备
+                    </h3>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">3.1 絮凝加药设备</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="flocculant-equipment" class="form-radio text-primary" checked value="normal">
+                                <span class="ml-1">正常</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="flocculant-equipment" class="form-radio text-primary" value="abnormal">
+                                <span class="ml-1">异常</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                </div>
+                <div class="p-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">3.2 消杀剂加药设备</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="disinfectant-equipment" class="form-radio text-primary" checked value="normal">
+                                <span class="ml-1">正常</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="disinfectant-equipment" class="form-radio text-primary" value="abnormal">
+                                <span class="ml-1">异常</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                </div>
+            </div>
+            
+            <!-- 加药记录 -->
+            <div class="card-shadow mb-4">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold flex items-center">
+                        <i class="fa fa-file-text-o text-primary mr-2"></i>
+                        4. 加药记录
+                    </h3>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <h4 class="font-medium mb-2">4.1 次氯酸钠加药记录</h4>
+                    <!-- 数据录入表单 -->
+                    <div class="mb-3">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">加药量 (ml)</label>
+                                <input type="number" class="w-full border border-gray-300 rounded-md p-2 text-sm" placeholder="请输入加药量">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">加药时间</label>
+                                <input type="datetime-local" class="w-full border border-gray-300 rounded-md p-2 text-sm" value="2025-09-10T10:28:23">
+                            </div>
+                        </div>
+                        <!-- <button class="bg-primary text-white py-1 px-3 rounded text-sm">保存记录</button> -->
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <h4 class="font-medium mb-2">4.2 氢氧化钠加药记录</h4>
+                    <!-- 数据录入表单 -->
+                    <div class="mb-3">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">加药量 (ml)</label>
+                                <input type="number" class="w-full border border-gray-300 rounded-md p-2 text-sm" placeholder="请输入加药量">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">加药时间</label>
+                                <input type="datetime-local" class="w-full border border-gray-300 rounded-md p-2 text-sm" value="2025-09-10T10:28:23">
+                            </div>
+                        </div>
+                        <!-- <button class="bg-primary text-white py-1 px-3 rounded text-sm">保存记录</button> -->
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                </div>
+                <div class="p-3">
+                    <h4 class="font-medium mb-2">4.3 絮凝剂加药记录</h4>
+                    <!-- 数据录入表单 -->
+                    <div class="mb-3">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">加药量 (ml)</label>
+                                <input type="number" class="w-full border border-gray-300 rounded-md p-2 text-sm" placeholder="请输入加药量">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">加药时间</label>
+                                <input type="datetime-local" class="w-full border border-gray-300 rounded-md p-2 text-sm" value="2025-09-10T10:28:23">
+                            </div>
+                        </div>
+                        <!-- <button class="bg-primary text-white py-1 px-3 rounded text-sm">保存记录</button> -->
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                </div>
+            </div>
+            
+            <!-- 厂区环境检查项 -->
+            <div class="card-shadow mb-4">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold flex items-center">
+                        <i class="fa fa-building-o text-primary mr-2"></i>
+                        5. 厂区环境
+                    </h3>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">5.1 卫生是否清理</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="sanitation" class="form-radio text-primary" checked value="cleaned">
+                                <span class="ml-1">已清理</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="sanitation" class="form-radio text-primary" value="uncleaned">
+                                <span class="ml-1">未清理</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">5.2 杂草是否清理</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="weeds" class="form-radio text-primary" checked value="cleaned">
+                                <span class="ml-1">已清理</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="weeds" class="form-radio text-primary" value="uncleaned">
+                                <span class="ml-1">未清理</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">5.3 围墙是否破损</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="fence" class="form-radio text-primary" checked value="undamaged">
+                                <span class="ml-1">无破损</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="fence" class="form-radio text-primary" value="damaged">
+                                <span class="ml-1">有破损</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">5.4 门锁是否完好</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="door-lock" class="form-radio text-primary" checked value="good">
+                                <span class="ml-1">完好</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="door-lock" class="form-radio text-primary" value="bad">
+                                <span class="ml-1">未锁</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">5.5 清水池表面是否洁净</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="tank-cleanliness" class="form-radio text-primary" checked value="clean">
+                                <span class="ml-1">洁净</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="tank-cleanliness" class="form-radio text-primary" value="unclean">
+                                <span class="ml-1">不洁净</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">5.6 制水设备表面是否洁净</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="equipment-cleanliness" class="form-radio text-primary" checked value="clean">
+                                <span class="ml-1">洁净</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="equipment-cleanliness" class="form-radio text-primary" value="unclean">
+                                <span class="ml-1">不洁净</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 出厂水质检查项 -->
+            <div class="card-shadow mb-4">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold flex items-center">
+                        <i class="fa fa-check-circle text-primary mr-2"></i>
+                        6. 出厂水质
+                    </h3>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">6.1 出厂水水质</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="water-quality" class="form-radio text-primary" checked value="normal">
+                                <span class="ml-1">正常</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="water-quality" class="form-radio text-primary" value="cloudy">
+                                <span class="ml-1">浑浊</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                </div>
+                
+                <div class="p-3 border-b border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">6.2 出厂水量充足</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="water-quantity" class="form-radio text-primary" checked value="adequate">
+                                <span class="ml-1">充足</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="water-quantity" class="form-radio text-primary" value="insufficient">
+                                <span class="ml-1">异常</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                </div>
+                
+                <div class="p-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-medium">6.3 是否有余氯</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="chlorine-residual" class="form-radio text-primary" checked value="none">
+                                <span class="ml-1">无余氯</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="chlorine-residual" class="form-radio text-primary" value="present">
+                                <span class="ml-1">有余氯</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea placeholder="请输入备注信息（可选）" class="w-full border border-gray-300 rounded-md p-2 text-sm h-12"></textarea>
+                </div>
+            </div>
+            
+            <!-- 图片上传区 -->
+            <div class="card-shadow mb-4">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold flex items-center">
+                        <i class="fa fa-camera text-primary mr-2"></i>
+                        现场照片
+                    </h3>
+                </div>
+                
+                <div class="p-3">
+                    <div class="mb-2">
+                        <label class="font-medium block mb-1">现场照片</label>
+                        <div class="photo-upload-area" id="general-photo-container">
+                            <div class="upload-placeholder" onclick="document.getElementById('general-photo-input').click()">
+                                <i class="fa fa-plus"></i>
+                                <span class="text-xs">添加照片</span>
+                            </div>
+                            <input type="file" id="general-photo-input" accept="image/*" multiple style="display: none;" onchange="handlePhotoUpload(this, 'general')">
+                        </div>
+                        <p class="text-xs text-gray-500">可上传检查前后的对比照片，最多9张</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 视频上传区 -->
+            <div class="card-shadow mb-6">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold flex items-center">
+                        <i class="fa fa-video-camera text-primary mr-2"></i>
+                        现场视频记录
+                    </h3>
+                </div>
+                
+                <div class="p-3">
+                    <div class="mb-2">
+                        <label class="font-medium block mb-1">现场视频</label>
+                        <div class="video-upload-area" id="video-container">
+                            <div class="video-placeholder" onclick="document.getElementById('video-input').click()">
+                                <i class="fa fa-plus"></i>
+                                <span class="text-xs">添加视频</span>
+                            </div>
+                            <input type="file" id="video-input" accept="video/*" style="display: none;" onchange="handleVideoUpload(this)">
+                        </div>
+                        <p class="text-xs text-gray-500">可上传现场视频，记录设备运行状态，单个视频不超过100MB</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 总体评价和建议 -->
+            <div class="card-shadow mb-16">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold">总体评价与建议</h3>
+                </div>
+                
+                <div class="p-3">
+                    <div class="mb-3">
+                        <label class="font-medium block mb-2">维护结论</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="conclusion" class="form-radio text-primary" checked value="normal">
+                                <span class="ml-1">正常运行</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="conclusion" class="form-radio text-primary" value="minor">
+                                <span class="ml-1">轻微异常</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="conclusion" class="form-radio text-primary" value="serious">
+                                <span class="ml-1">严重异常</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="font-medium block mb-2">建议与备注</label>
+                        <div class="relative">
+                            <textarea id="overall-evaluation" class="w-full border border-gray-300 rounded-md p-2 text-sm h-24" placeholder="请输入总体评价、处理建议或其他需要说明的事项..."></textarea>
+                            <button id="voice-input-btn" class="absolute bottom-2 right-2 bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center">
+                                <i class="fa fa-microphone"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部操作按钮 -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-[0_-1px_3px_rgba(0,0,0,0.1)] flex space-x-3">
+                <button class="flex-1 btn-gray py-3 px-4 rounded-lg font-medium text-center">
+                    保存草稿
+                </button>
+                <button class="flex-1 btn-primary" onclick="window.location.href='confirm.html'">
+                    下一步
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 控制异常情况下的照片上传区域显示
+        document.addEventListener('DOMContentLoaded', function() {
+            // 监听净水设施检查项的单选按钮变化
+            const operationStatusRadios = document.querySelectorAll('input[name="operation-status"]');
+            const electromechanicalRadios = document.querySelectorAll('input[name="electromechanical"]');
+            const backwashRadios = document.querySelectorAll('input[name="backwash"]');
+            
+            // 显示/隐藏异常情况照片上传区域
+            function setupRadioListener(radios, uploadId) {
+                radios.forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        const uploadArea = document.getElementById(uploadId);
+                        if (this.value === 'abnormal') {
+                            uploadArea.style.display = 'block';
+                        } else {
+                            uploadArea.style.display = 'none';
+                        }
+                    });
+                });
+            }
+            
+            setupRadioListener(operationStatusRadios, 'operation-status-photo-upload');
+            setupRadioListener(electromechanicalRadios, 'electromechanical-photo-upload');
+            setupRadioListener(backwashRadios, 'backwash-photo-upload');
+            
+            // 语音输入功能
+            const voiceBtn = document.getElementById('voice-input-btn');
+            const textarea = document.getElementById('overall-evaluation');
+            
+            if (voiceBtn && textarea) {
+                // 检查浏览器是否支持语音识别
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                
+                if (SpeechRecognition) {
+                    const recognition = new SpeechRecognition();
+                    recognition.continuous = false;
+                    recognition.interimResults = true;
+                    recognition.lang = 'zh-CN';
+                    
+                    // 开始语音识别
+                    voiceBtn.addEventListener('click', function() {
+                        recognition.start();
+                        voiceBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+                        voiceBtn.classList.add('bg-warning');
+                        voiceBtn.classList.remove('bg-primary');
+                    });
+                    
+                    // 识别结果处理
+                    recognition.onresult = function(event) {
+                        const transcript = Array.from(event.results)
+                            .map(result => result[0])
+                            .map(result => result.transcript)
+                            .join('');
+                        
+                        textarea.value += transcript;
+                    };
+                    
+                    // 识别结束处理
+                    recognition.onend = function() {
+                        voiceBtn.innerHTML = '<i class="fa fa-microphone"></i>';
+                        voiceBtn.classList.remove('bg-warning');
+                        voiceBtn.classList.add('bg-primary');
+                    };
+                    
+                    // 识别错误处理
+                    recognition.onerror = function(event) {
+                        console.error('语音识别错误:', event.error);
+                        voiceBtn.innerHTML = '<i class="fa fa-microphone"></i>';
+                        voiceBtn.classList.remove('bg-warning');
+                        voiceBtn.classList.add('bg-primary');
+                        
+                        // 如果是浏览器不支持的错误，显示提示
+                        if (event.error === 'not-allowed') {
+                            alert('语音识别权限被拒绝，请在浏览器设置中允许麦克风访问');
+                        } else if (event.error === 'no-speech') {
+                            alert('未检测到语音，请重试');
+                        } else {
+                            alert('语音识别出现错误，请重试');
+                        }
+                    };
+                } else {
+                    // 浏览器不支持语音识别，隐藏语音按钮
+                    voiceBtn.style.display = 'none';
+                }
+            }
+        });
+        
+        // 处理照片上传
+        function handlePhotoUpload(input, type) {
+            const container = document.getElementById(type + '-photo-container');
+            const files = input.files;
+            
+            // 限制最多9张照片
+            const existingPhotos = container.querySelectorAll('.photo-item').length;
+            const maxPhotos = 9;
+            
+            if (files.length + existingPhotos > maxPhotos) {
+                alert(`最多只能上传 ${maxPhotos} 张照片`);
+                return;
+            }
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const photoItem = document.createElement('div');
+                    photoItem.className = 'photo-item';
+                    photoItem.innerHTML = `
+                        <img src="${e.target.result}" alt="上传照片">
+                        <button class="remove-photo" onclick="removePhoto(this)">×</button>
+                    `;
+                    container.insertBefore(photoItem, container.lastChild);
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // 删除照片
+        function removePhoto(button) {
+            const photoItem = button.parentElement;
+            photoItem.remove();
+        }
+        
+        // 处理视频上传
+        function handleVideoUpload(input) {
+            const container = document.getElementById('video-container');
+            const file = input.files[0];
+            
+            if (!file) return;
+            
+            // 检查文件大小（不超过100MB）
+            if (file.size > 100 * 1024 * 1024) {
+                alert('视频文件不能超过100MB');
+                return;
+            }
+            
+            const videoUrl = URL.createObjectURL(file);
+            const duration = '00:45'; // 示例时长
+            
+            const videoItem = document.createElement('div');
+            videoItem.className = 'video-item';
+            videoItem.innerHTML = `
+                <img src="https://picsum.photos/id/1039/320/240" alt="视频缩略图">
+                <div class="video-duration">${duration}</div>
+                <button class="remove-video" onclick="removeVideo(this)">×</button>
+            `;
+            
+            // 移除占位符，添加视频项
+            const placeholder = container.querySelector('.video-placeholder');
+            if (placeholder) {
+                placeholder.remove();
+            }
+            container.appendChild(videoItem);
+        }
+        
+        // 删除视频
+        function removeVideo(button) {
+            const videoItem = button.parentElement;
+            videoItem.remove();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>维护记录</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .app-header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            background-color: white;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            margin-bottom: 15px;
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filter-item {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .filter-item.inactive {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        
+        .filter-item.inactive:hover {
+            background-color: #dee2e6;
+        }
+        
+        .btn-outline-secondary {
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #e9ecef;
+            border-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- 维护记录页面 -->
+    <div id="records-page">
+        <header class="bg-primary text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-10">
+            <button onclick="window.location.href='maintenance-home.html'" class="text-white back-button">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <h1 class="text-xl font-bold">维护记录</h1>
+            <button class="text-white">
+                <i class="fa fa-filter"></i>
+            </button>
+        </header>
+        
+        <div class="p-4">
+            <!-- 筛选条件 -->
+            <div class="mb-4 overflow-x-auto pb-2">
+                <div class="flex space-x-2 min-w-max">
+                    <div class="filter-item active">全部记录</div>
+                    <div class="filter-item inactive">正常记录</div>
+                    <div class="filter-item inactive">异常记录</div>
+                    <div class="filter-item inactive">本月</div>
+                    <div class="filter-item inactive">上月</div>
+                    <div class="filter-item inactive">自定义</div>
+                </div>
+            </div>
+            
+            <!-- 搜索框 -->
+            <div class="relative mb-6">
+                <input type="text" placeholder="搜索站点名称或编号..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm">
+                <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+            
+            <!-- 记录列表 -->
+            <div class="space-y-4">
+                <!-- 正常记录 -->
+                <div class="card-shadow p-4" onclick="window.location.href='record-detail.html'">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="font-bold text-lg">东河村污水站</h3>
+                            <p class="text-sm text-gray-500">ID: WH-2023056</p>
+                        </div>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">正常</span>
+                    </div>
+                    
+                    <div class="flex justify-between text-sm text-gray-600 mb-3">
+                        <div>
+                            <i class="fa fa-calendar-o mr-1"></i>
+                            2025-09-10 10:45
+                        </div>
+                        <div>
+                            <i class="fa fa-user-o mr-1"></i>
+                            张三
+                        </div>
+                        <div>
+                            <i class="fa fa-file-text-o mr-1"></i>
+                            月度巡检
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                        <span class="text-sm text-gray-500">包含1张照片 · 1段视频</span>
+                        <i class="fa fa-angle-right text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <!-- 异常记录 -->
+                <div class="card-shadow p-4" onclick="window.location.href='record-detail.html'">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="font-bold text-lg">西河村污水站</h3>
+                            <p class="text-sm text-gray-500">ID: WH-2023057</p>
+                        </div>
+                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">严重异常</span>
+                    </div>
+                    
+                    <div class="flex justify-between text-sm text-gray-600 mb-3">
+                        <div>
+                            <i class="fa fa-calendar-o mr-1"></i>
+                            2025-09-05 15:20
+                        </div>
+                        <div>
+                            <i class="fa fa-user-o mr-1"></i>
+                            李四
+                        </div>
+                        <div>
+                            <i class="fa fa-file-text-o mr-1"></i>
+                            故障排查
+                        </div>
+                    </div>
+                    
+                    <div class="bg-red-50 p-2 rounded text-sm text-red-600 mb-3">
+                        <i class="fa fa-exclamation-circle mr-1"></i>
+                        加药泵故障，无法正常工作，已上报维修
+                    </div>
+                    
+                    <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                        <span class="text-sm text-gray-500">包含3张照片 · 0段视频</span>
+                        <i class="fa fa-angle-right text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <!-- 轻微异常记录 -->
+                <div class="card-shadow p-4" onclick="window.location.href='record-detail.html'">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="font-bold text-lg">北岗村污水站</h3>
+                            <p class="text-sm text-gray-500">ID: WH-2023058</p>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">轻微异常</span>
+                    </div>
+                    
+                    <div class="flex justify-between text-sm text-gray-600 mb-3">
+                        <div>
+                            <i class="fa fa-calendar-o mr-1"></i>
+                            2025-09-01 09:15
+                        </div>
+                        <div>
+                            <i class="fa fa-user-o mr-1"></i>
+                            张三
+                        </div>
+                        <div>
+                            <i class="fa fa-file-text-o mr-1"></i>
+                            月度巡检
+                        </div>
+                    </div>
+                    
+                    <div class="bg-yellow-50 p-2 rounded text-sm text-yellow-600 mb-3">
+                        <i class="fa fa-info-circle mr-1"></i>
+                        电控箱指示灯闪烁，设备运行正常，建议后续观察
+                    </div>
+                    
+                    <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                        <span class="text-sm text-gray-500">包含2张照片 · 1段视频</span>
+                        <i class="fa fa-angle-right text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <!-- 更多记录 -->
+                <div class="card-shadow p-4" onclick="window.location.href='record-detail.html'">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="font-bold text-lg">东河村污水站</h3>
+                            <p class="text-sm text-gray-500">ID: WH-2023056</p>
+                        </div>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">正常</span>
+                    </div>
+                    
+                    <div class="flex justify-between text-sm text-gray-600 mb-3">
+                        <div>
+                            <i class="fa fa-calendar-o mr-1"></i>
+                            2025-08-18 14:30
+                        </div>
+                        <div>
+                            <i class="fa fa-user-o mr-1"></i>
+                            王五
+                        </div>
+                        <div>
+                            <i class="fa fa-file-text-o mr-1"></i>
+                            月度巡检
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                        <span class="text-sm text-gray-500">包含1张照片 · 0段视频</span>
+                        <i class="fa fa-angle-right text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 加载更多 -->
+            <div class="mt-6 text-center">
+                <button class="bg-white border border-gray-300 text-gray-600 py-2 px-6 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+                    加载更多 <i class="fa fa-refresh ml-1"></i>
+                </button>
+            </div>
+            
+            <!-- 底部留白，避免被导航遮挡 -->
+            <div class="h-20"></div>
+        </div>
+    </div>
+    
+    <script>
+        // 初始化筛选条件点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为筛选条件添加点击事件
+            const filterItems = document.querySelectorAll('.filter-item');
+            filterItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // 移除所有筛选项的激活状态
+                    filterItems.forEach(i => {
+                        i.classList.remove('active');
+                        i.classList.add('inactive');
+                    });
+                    
+                    // 为当前点击项添加激活状态
+                    this.classList.remove('inactive');
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

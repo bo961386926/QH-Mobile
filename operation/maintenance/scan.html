@@ -79,7 +79,7 @@
     <div id="scan-page">
         <header class="app-header py-3 px-3">
             <div class="d-flex justify-content-between align-items-center">
-                <button class="btn btn-sm " onclick="window.location.href='site-inspection-home.html'">
+                <button class="btn btn-sm " onclick="window.location.href='maintenance-home.html'">
                     <i class="bi bi-arrow-left"></i>
                 </button>
                 <h1 class="h5 mb-0">扫码识别</h1>
@@ -143,8 +143,8 @@
                 const isScanSuccessful = Math.random() > 0.3; // 70%的成功率
                 
                 if (isScanSuccessful) {
-                    // 扫码成功，跳转到巡检模板选择页面
-                    window.location.href = 'inspection-template.html';
+                    // 扫码成功，跳转到维护模板选择页面
+                    window.location.href = 'maintenance-template.html';
                     
                     // 显示成功提示
                     alert('扫码成功！已识别站点：东河村污水站');
@@ -161,8 +161,8 @@
         
         // 手动选择站点功能
         function selectSite(siteName) {
-            // 跳转到巡检模板选择页面
-            window.location.href = 'inspection-template.html';
+            // 跳转到维护模板选择页面
+            window.location.href = 'maintenance-template.html';
             
             // 显示选择的站点信息
             alert(`已选择站点：${siteName}`);

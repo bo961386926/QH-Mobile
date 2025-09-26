@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>巡检记录详情</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .app-header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            background-color: white;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            margin-bottom: 15px;
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-outline-secondary {
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #e9ecef;
+            border-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- 维护记录详情页 -->
+    <div id="record-detail-page">
+        <header class="bg-primary text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-10">
+            <button onclick="window.location.href='records.html'" class="text-white back-button">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <h1 class="text-lg font-bold">巡检详情</h1>
+            <div class="flex space-x-3">
+                <button class="text-white">
+                    <i class="fa fa-share-alt"></i>
+                </button>
+                <!-- <button class="text-white">
+                    <i class="fa fa-download"></i>
+                </button> -->
+            </div>
+        </header>
+        
+        <div class="p-4">
+            <!-- 站点信息 -->
+            <div class="card-shadow p-4 mb-4">
+                <div class="flex items-center mb-3">
+                    <img src="https://picsum.photos/id/131/60/60" alt="东河村污水站" class="w-12 h-12 rounded-lg mr-3">
+                    <div>
+                        <h2 class="font-bold text-lg">东河村污水站</h2>
+                        <p class="text-sm text-gray-500">ID: WH-2023056</p>
+                    </div>
+                    <span class="ml-auto bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">正常</span>
+                </div>
+                <div class="flex flex-wrap gap-y-2 text-sm text-gray-600 mb-3">
+                    <div class="w-1/2">
+                        <i class="fa fa-calendar mr-1 text-primary"></i>
+                        维护时间：2025-09-10 10:28
+                    </div>
+                    <div class="w-1/2">
+                        <i class="fa fa-user mr-1 text-primary"></i>
+                        维护人员：张三
+                    </div>
+                    <div class="w-1/2">
+                        <i class="fa fa-file-text mr-1 text-primary"></i>
+                        维护类型：月度全面维护
+                    </div>
+                    <div class="w-1/2">
+                        <i class="fa fa-map-marker mr-1 text-primary"></i>
+                        地址：北京市朝阳区东河村
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 检查项详情 -->
+            <div class="card-shadow mb-4">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold">检查项详情</h3>
+                </div>
+                
+                <div class="p-4">
+                    <div class="mb-4 pb-4 border-b border-gray-100">
+                        <h4 class="font-medium mb-3">1. 净水设施</h4>
+                        <div class="pl-3 space-y-3 text-sm">
+                            <div>
+                                <p class="font-medium">1.1 运转情况</p>
+                                <p class="text-gray-600">评价：正常</p>
+                            </div>
+                            <div>
+                                <p class="font-medium">1.2 机电设备运转</p>
+                                <p class="text-gray-600">评价：正常</p>
+                            </div>
+                            <div>
+                                <p class="font-medium">1.3 是否开启手动反冲洗</p>
+                                <p class="text-gray-600">评价：已开启</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4 pb-4 border-b border-gray-100">
+                        <h4 class="font-medium mb-3">2. 清水池</h4>
+                        <div class="pl-3 space-y-3 text-sm">
+                            <div>
+                                <p class="font-medium">2.1 渗漏水</p>
+                                <p class="text-gray-600">评价：正常</p>
+                            </div>
+                            <div>
+                                <p class="font-medium">2.2 外表脱落</p>
+                                <p class="text-gray-600">评价：正常</p>
+                            </div>
+                            <div>
+                                <p class="font-medium">2.3 溢水管</p>
+                                <p class="text-gray-600">评价：正常</p>
+                            </div>
+                            <div>
+                                <p class="font-medium">2.4 警示牌</p>
+                                <p class="text-gray-600">评价：完好</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4 pb-4 border-b border-gray-100">
+                        <h4 class="font-medium mb-3">3. 加药设备与记录</h4>
+                        <div class="pl-3 space-y-3 text-sm">
+                            <div>
+                                <p class="font-medium">3.1 加药设备状态</p>
+                                <p class="text-gray-600">絮凝加药设备：正常</p>
+                                <p class="text-gray-600">消杀剂加药设备：正常</p>
+                            </div>
+                            <div>
+                                <p class="font-medium">3.2 加药记录</p>
+                                <p class="text-gray-600">次氯酸钠：每次20ml，共4次，加药时间：2025-09-10 10:28:23</p>
+                                <p class="text-gray-600">氢氧化钠：每次20ml，共4次，加药时间：2025-09-10 10:28:23</p>
+                                <p class="text-gray-600">絮凝剂：每次20ml，共4次，加药时间：2025-09-10 10:28:23</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4 pb-4 border-b border-gray-100">
+                        <h4 class="font-medium mb-3">4. 厂区环境</h4>
+                        <div class="pl-3 space-y-3 text-sm">
+                            <p class="text-gray-600">卫生状况：已清理</p>
+                            <p class="text-gray-600">杂草情况：已清理</p>
+                            <p class="text-gray-600">围墙状况：无破损</p>
+                            <p class="text-gray-600">门锁状况：完好</p>
+                            <p class="text-gray-600">清水池表面：洁净</p>
+                            <p class="text-gray-600">制水设备表面：洁净</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4 pb-4 border-b border-gray-100">
+                        <h4 class="font-medium mb-3">5. 出厂水质</h4>
+                        <div class="pl-3 space-y-3 text-sm">
+                            <div>
+                                <p class="font-medium">5.1 出厂水水质</p>
+                                <p class="text-gray-600">评价：正常</p>
+                            </div>
+                            <div>
+                                <p class="font-medium">5.2 出厂水量</p>
+                                <p class="text-gray-600">评价：充足</p>
+                            </div>
+                            <div>
+                                <p class="font-medium">5.3 余氯情况</p>
+                                <p class="text-gray-600">评价：无余氯</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium mb-3">6. 总体评价与建议</h4>
+                        <div class="pl-3 space-y-3 text-sm">
+                            <div>
+                                <p class="font-medium">维护结论</p>
+                                <p class="text-gray-600">正常运行</p>
+                            </div>
+                            <div>
+                                <p class="font-medium">建议与备注</p>
+                                <p class="text-gray-600">设备运行状况良好，无异常情况。建议按照计划进行下次月度维护。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 多媒体资料 -->
+            <div class="card-shadow mb-4">
+                <div class="bg-gray-50 p-3 border-b border-gray-100">
+                    <h3 class="font-bold">多媒体资料</h3>
+                </div>
+                
+                <div class="p-4">
+                    <div class="mb-4">
+                        <h4 class="font-medium mb-3 text-sm">照片（1张）</h4>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="aspect-square rounded-md overflow-hidden relative">
+                                <img src="https://picsum.photos/id/1025/300/300" alt="现场照片" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium mb-3 text-sm">视频（1个）</h4>
+                        <div class="w-full aspect-video rounded-md overflow-hidden relative">
+                            <img src="https://picsum.photos/id/1039/600/400" alt="视频缩略图" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                <i class="fa fa-play-circle text-white text-4xl"></i>
+                            </div>
+                            <div class="absolute bottom-2 right-2 bg-black/70 text-white text-sm px-2 py-1 rounded">00:45</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部留白 -->
+            <div class="h-10"></div>
+        </div>
+    </div>
+</body>
+</html>

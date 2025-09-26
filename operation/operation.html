@@ -425,7 +425,7 @@
                         <div class="module-text">工单管理</div>
                     </div>
                     <div class="module-item">
-                        <a href="records.html" class="module-link">
+                        <a href="site-inspection/records.html" class="module-link">
                             <div class="module-icon danger-bg">
                                 <i class="bi bi-clipboard-check"></i>
                             </div>
@@ -433,7 +433,7 @@
                         </a>
                     </div>
                     <div class="module-item">
-                        <a href="site-inspection-home.html" class="module-link" style="display: block;">
+                        <a href="site-inspection/site-inspection-home.html" class="module-link" style="display: block;">
                             <div class="module-icon primary-bg">
                                 <i class="bi bi-geo-alt"></i>
                             </div>
@@ -441,10 +441,12 @@
                         </a>
                     </div>
                     <div class="module-item">
-                        <div class="module-icon secondary-bg">
-                            <i class="bi bi-wrench-adjustable"></i>
-                        </div>
-                        <div class="module-text">维护</div>
+                        <a href="maintenance/maintenance-home.html" class="module-link">
+                            <div class="module-icon secondary-bg">
+                                <i class="bi bi-wrench-adjustable"></i>
+                            </div>
+                            <div class="module-text">维护</div>
+                        </a>
                     </div>
                     <div class="module-item">
                         <div class="module-icon warning-bg">
@@ -458,15 +460,10 @@
                         </div>
                         <div class="module-text">校准</div>
                     </div>
-                    <div class="module-item">
-                        <div class="module-icon primary-bg">
-                            <i class="bi bi-droplet-half"></i>
-                        </div>
-                        <div class="module-text">水质填报</div>
-                    </div>
                 </div>
             </div>
         </div>
+        
         
         <!-- 我的待办 -->
         <div class="card-container">
@@ -575,7 +572,7 @@
         });
         
         // 为巡检模块链接添加点击事件
-        document.querySelector('a[href="site-inspection-home.html"]').addEventListener('click', function(e) {
+        document.querySelector('a[href="site-inspection/site-inspection-home.html"]').addEventListener('click', function(e) {
             console.log('跳转到站点巡检首页');
         });
     </script>

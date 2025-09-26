@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>兰溪智慧排水 - 考核查询</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script src="../../assets/scripts.js"></script>
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1E6BA5',      // 主色调：深蓝色
+                        secondary: '#36BFFA',    // 辅助色：亮蓝色
+                        accent: '#0F3460',       // 强调色：深蓝色
+                        neutral: '#F5F7FA',      // 中性色：浅灰
+                        success: '#10B981',      // 成功色：绿色
+                        warning: '#F59E0B',      // 警告色：黄色
+                        danger: '#EF4444',       // 危险色：红色
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .btn-effect {
+                transition: all 0.3s ease;
+            }
+            .btn-effect:active {
+                transform: scale(0.96);
+            }
+            .slide-in {
+                animation: slideIn 0.3s ease forwards;
+            }
+            .fade-in {
+                animation: fadeIn 0.3s ease forwards;
+            }
+            .progress-bar {
+                transition: width 1s ease-in-out;
+            }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+
+    <body class="bg-neutral min-h-screen font-sans text-gray-800 overflow-x-hidden pt-16">
+    
+    <!-- 运维企业视图 -->
+    <div id="company-view" class="min-h-screen flex flex-col">
+        <!-- 顶部导航 -->
+        <header class="bg-white text-gray-800 p-5 fixed top-0 left-0 right-0 shadow z-10">
+            <button id="back-from-company" class="absolute left-5 top-1/2 transform -translate-y-1/2">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <h1 class="text-center text-[clamp(1.2rem,4vw,1.5rem)] font-bold">考核评分查询</h1>
+        </header>
+        
+        <!-- 企业信息头部 -->
+        <div class="bg-white p-5">
+            <div class="flex items-center">
+                <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-4">
+                    <i class="bi bi-building text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-lg">A企业</h2>
+                    <p class="text-sm text-gray-500">负责区域：兰江片区管网运维</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 当月评分概览 -->
+        <div class="bg-white mt-3 p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="font-bold">2024年3月考核结果</h2>
+                <button id="export-report" class="bg-[#007AFF] text-white text-sm flex items-center px-3 py-1.5 rounded-lg btn-effect hover:bg-[#0062cc]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 inline" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg> 导出报告
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <!-- 总分卡片 -->
+                <div class="bg-primary/5 rounded-xl p-4 text-center">
+                    <p class="text-gray-500 text-sm">考核总分</p>
+                    <p class="text-3xl font-bold text-green-600 mt-1">92</p>
+                    <p class="text-xs text-gray-500 mt-1">满分：100分</p>
+                </div>
+                
+                <!-- 排名卡片 -->
+                <div class="bg-secondary/5 rounded-xl p-4 text-center">
+                    <p class="text-gray-500 text-sm">企业排名</p>
+                    <p class="text-3xl font-bold text-green-600 mt-1">2</p>
+                    <p class="text-xs text-gray-500 mt-1">共5家企业</p>
+                </div>
+            </div>
+            
+            <!-- 评分趋势图 -->
+            <div class="mt-6">
+                <h3 class="font-medium mb-3">近6个月评分趋势</h3>
+                <div class="h-64">
+                    <canvas id="score-trend-chart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 指标明细 -->
+        <div class="bg-white mt-3 p-5">
+            <h2 class="font-bold mb-4">考核指标明细</h2>
+            
+            <div class="space-y-4">
+                <!-- 指标1 -->
+                <div class="border border-gray-100 rounded-xl p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-medium">管网巡检覆盖率</h3>
+                            <p class="text-xs text-gray-500 mt-1">权重：20%</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-success">19/20分</p>
+                            <p class="text-xs text-gray-500">95%</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-success progress-bar" style="width: 95%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <p class="text-sm text-gray-600">考核说明：巡检覆盖率达到95%，符合要求</p>
+                        
+                        <div class="mt-2">
+                            <p class="text-xs text-gray-500 mb-1">考核依据：</p>
+                            <div class="flex gap-2">
+                                <div class="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 cursor-pointer view-evidence">
+                                    <img src="https://picsum.photos/200/200?random=1" alt="巡检记录照片" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 指标2 -->
+                <div class="border border-gray-100 rounded-xl p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-medium">故障修复时效</h3>
+                            <p class="text-xs text-gray-500 mt-1">权重：30%</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-warning">24/30分</p>
+                            <p class="text-xs text-gray-500">80%</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-warning progress-bar" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <p class="text-sm text-gray-600">考核说明：3处故障中，2处2-4小时修复，1处4-8小时修复，综合得80分</p>
+                        
+                        <div class="mt-2">
+                            <p class="text-xs text-gray-500 mb-1">考核依据：</p>
+                            <div class="flex gap-2">
+                                <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-xs cursor-pointer">
+                                    <i class="bi bi-file-text mr-1"></i> 修复记录.pdf
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 指标3 -->
+                <div class="border border-gray-100 rounded-xl p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-medium">汛期积水点处置时效</h3>
+                            <p class="text-xs text-gray-500 mt-1">权重：25%</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-warning">20/25分</p>
+                            <p class="text-xs text-gray-500">80%</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-warning progress-bar" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <p class="text-sm text-gray-600">考核说明：5处积水点中，3处处置及时，2处超时，扣5分</p>
+                        
+                        <div class="mt-2">
+                            <p class="text-xs text-gray-500 mb-1">考核依据：</p>
+                            <div class="flex gap-2">
+                                <div class="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 cursor-pointer view-evidence">
+                                    <img src="https://picsum.photos/200/200?random=2" alt="积水点处置照片" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 指标4 -->
+                <div class="border border-gray-100 rounded-xl p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-medium">设备完好率</h3>
+                            <p class="text-xs text-gray-500 mt-1">权重：15%</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-success">15/15分</p>
+                            <p class="text-xs text-gray-500">100%</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-success progress-bar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <p class="text-sm text-gray-600">考核说明：设备完好率100%，全部达标</p>
+                    </div>
+                </div>
+                
+                <!-- 指标5 -->
+                <div class="border border-gray-100 rounded-xl p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-medium">台账记录完整性</h3>
+                            <p class="text-xs text-gray-500 mt-1">权重：10%</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-danger">14/10分</p>
+                            <p class="text-xs text-gray-500">90%</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-danger progress-bar" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <p class="text-sm text-gray-600">考核说明：台账记录完整度90%，漏填1次巡检记录，扣1分</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 历史评分查询 -->
+        <div class="bg-white mt-3 p-5">
+            <h2 class="font-bold mb-4">历史考核记录</h2>
+            
+            <div class="space-y-3">
+                <!-- 历史记录1 -->
+                <div class="border border-gray-100 rounded-xl p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors">
+                    <div>
+                        <h3 class="font-medium">2024年2月考核</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">考核周期：2024-02-01至2024-02-29</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-primary">89分</p>
+                        <p class="text-xs text-gray-500">排名：3</p>
+                    </div>
+                </div>
+                
+                <!-- 历史记录2 -->
+                <div class="border border-gray-100 rounded-xl p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors">
+                    <div>
+                        <h3 class="font-medium">2024年1月考核</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">考核周期：2024-01-01至2024-01-31</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-primary">85分</p>
+                        <p class="text-xs text-gray-500">排名：4</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 证据查看弹窗 -->
+    <div id="evidence-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center">
+        <div class="relative max-w-full max-h-[90vh] p-4">
+            <button id="close-evidence" class="absolute top-2 right-2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center text-white z-10">
+                <i class="bi bi-x"></i>
+            </button>
+            <img id="evidence-image" src="" alt="考核依据图片" class="max-w-full max-h-[90vh] object-contain">
+        </div>
+    </div>
+    
+    <script>
+        // 初始化评分趋势图
+        const initChart = () => {
+            const ctx = document.getElementById('score-trend-chart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['10月', '11月', '12月', '1月', '2月', '3月'],
+                    datasets: [{
+                        label: '考核得分',
+                        data: [82, 84, 86, 85, 89, 92],
+                        borderColor: '#1E6BA5',
+                        backgroundColor: 'rgba(30, 107, 165, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#1E6BA5',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 70,
+                            max: 100,
+                            ticks: {
+                                stepSize: 10
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        };
+        
+        // 页面切换逻辑
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化图表
+            initChart();
+            
+            // 返回按钮
+            document.getElementById('back-from-company').addEventListener('click', () => {
+                window.location.href = '../home.html';
+            });
+            
+            // 查看考核依据
+            document.querySelectorAll('.view-evidence').forEach(item => {
+                item.addEventListener('click', () => {
+                    const imgSrc = item.querySelector('img').src;
+                    document.getElementById('evidence-image').src = imgSrc;
+                    document.getElementById('evidence-modal').classList.remove('hidden');
+                    document.getElementById('evidence-modal').classList.add('flex', 'fade-in');
+                });
+            });
+            
+            // 关闭证据查看
+            document.getElementById('close-evidence').addEventListener('click', () => {
+                document.getElementById('evidence-modal').classList.add('hidden');
+                document.getElementById('evidence-modal').classList.remove('flex', 'fade-in');
+            });
+            
+            // 导出报告
+            document.getElementById('export-report').addEventListener('click', () => {
+                alert('报告导出功能已触发，实际项目中会生成PDF文件');
+            });
+        });
+    </script>
+</body>
+</html>
