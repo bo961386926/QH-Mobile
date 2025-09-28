@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>巡检统计报表</title>
+    <!-- 引入Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+            --card-bg: #FFFFFF;
+            --border-color: #E5E5EA;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            padding-top: 56px;
+            padding-bottom: 80px;
+        }
+        
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .back-button {
+            background: none;
+            border: none;
+            color: var(--gray-text);
+            font-size: 18px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .back-button:hover {
+            color: var(--primary-color);
+            background-color: rgba(0, 122, 255, 0.1);
+        }
+        
+        .main-content {
+            padding: 16px;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .date-filter-container {
+            padding: 12px;
+        }
+        
+        .date-filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .date-filter-label {
+            font-size: 14px;
+            color: var(--gray-text);
+        }
+        
+        .date-filters {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .date-filter {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            background-color: var(--card-bg);
+            color: var(--gray-text);
+        }
+        
+        .date-filter.active {
+            background-color: rgba(0, 122, 255, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .stat-value.text-primary {
+            color: var(--primary-color);
+        }
+        
+        .stat-value.text-warning {
+            color: var(--warning-color);
+        }
+        
+        .stat-value.text-secondary {
+            color: var(--secondary-color);
+        }
+        
+        .stat-value.text-danger {
+            color: var(--danger-color);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .section-action {
+            font-size: 14px;
+            color: var(--primary-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .chart-container {
+            height: 240px;
+            padding: 16px;
+        }
+        
+        .legend-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            padding: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+        
+        .legend-color.primary {
+            background-color: var(--primary-color);
+        }
+        
+        .legend-color.warning {
+            background-color: var(--warning-color);
+        }
+        
+        .legend-color.secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .legend-color.danger {
+            background-color: var(--danger-color);
+        }
+        
+        .time-filters {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .time-filter {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            border: none;
+            cursor: pointer;
+            background-color: var(--card-bg);
+            color: var(--gray-text);
+        }
+        
+        .time-filter.active {
+            background-color: rgba(0, 122, 255, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .ranking-list {
+            padding: 16px;
+        }
+        
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .ranking-item:last-child {
+            border-bottom: none;
+        }
+        
+        .rank-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        .rank-1 {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .rank-2 {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .rank-3 {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .rank-other {
+            background-color: var(--light-bg);
+            color: var(--gray-text);
+        }
+        
+        .company-info {
+            flex: 1;
+        }
+        
+        .company-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .company-details {
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+        
+        .company-score {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .trend-up {
+            color: var(--secondary-color);
+        }
+        
+        .trend-down {
+            color: var(--danger-color);
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--light-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+        }
+        
+        .progress-bar.inspection {
+            background-color: var(--primary-color);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="app-header">
+        <div>
+            <button id="back-button" class="back-button">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+        </div>
+        <h1 class="header-title">巡检统计报表</h1>
+        <div></div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- 日期筛选器 -->
+        <div class="card">
+            <div class="date-filter-container">
+                <div class="date-filter-header">
+                    <span class="date-filter-label">数据周期</span>
+                    <div class="date-filters">
+                        <button class="date-filter">上月</button>
+                        <button class="date-filter active">本月</button>
+                        <button class="date-filter">近三月</button>
+                        <button class="date-filter">
+                            <i class="bi bi-calendar"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心指标 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value text-primary">92%</div>
+                <div class="stat-label">巡检完成率</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value text-warning">48</div>
+                <div class="stat-label">应巡检站点</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value text-secondary">44</div>
+                <div class="stat-label">已巡检站点</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value text-danger">4</div>
+                <div class="stat-label">未巡检站点</div>
+            </div>
+        </div>
+
+        <!-- 运维单位排名列表 -->
+        <div class="card">
+            <div class="section-header">
+                <span class="section-title">运维单位巡检完成情况排名</span>
+            </div>
+            <div class="ranking-list">
+                <!-- 排名第1 -->
+                <div class="ranking-item">
+                    <div class="rank-number rank-1">1</div>
+                    <div class="company-info">
+                        <div class="company-name">A企业</div>
+                        <div class="company-details">负责区域：兰江片区</div>
+                        <div class="progress-container">
+                            <div class="progress-bar inspection" style="width: 95%"></div>
+                        </div>
+                        <div class="company-details">巡检完成率: 95%</div>
+                    </div>
+                </div>
+                
+                <!-- 排名第2 -->
+                <div class="ranking-item">
+                    <div class="rank-number rank-2">2</div>
+                    <div class="company-info">
+                        <div class="company-name">B企业</div>
+                        <div class="company-details">负责区域：城区</div>
+                        <div class="progress-container">
+                            <div class="progress-bar inspection" style="width: 90%"></div>
+                        </div>
+                        <div class="company-details">巡检完成率: 90%</div>
+                    </div>
+                </div>
+                
+                <!-- 排名第3 -->
+                <div class="ranking-item">
+                    <div class="rank-number rank-3">3</div>
+                    <div class="company-info">
+                        <div class="company-name">D企业</div>
+                        <div class="company-details">负责区域：赤溪片区</div>
+                        <div class="progress-container">
+                            <div class="progress-bar inspection" style="width: 88%"></div>
+                        </div>
+                        <div class="company-details">巡检完成率: 88%</div>
+                    </div>
+                </div>
+                
+                <!-- 排名第4 -->
+                <div class="ranking-item">
+                    <div class="rank-number rank-other">4</div>
+                    <div class="company-info">
+                        <div class="company-name">E企业</div>
+                        <div class="company-details">负责区域：永昌片区</div>
+                        <div class="progress-container">
+                            <div class="progress-bar inspection" style="width: 85%"></div>
+                        </div>
+                        <div class="company-details">巡检完成率: 85%</div>
+                    </div>
+                </div>
+                
+                <!-- 排名第5 -->
+                <div class="ranking-item">
+                    <div class="rank-number rank-other">5</div>
+                    <div class="company-info">
+                        <div class="company-name">C企业</div>
+                        <div class="company-details">负责区域：游埠片区</div>
+                        <div class="progress-container">
+                            <div class="progress-bar inspection" style="width: 75%"></div>
+                        </div>
+                        <div class="company-details">巡检完成率: 75%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 完成率趋势 -->
+        <div class="card">
+            <div class="section-header">
+                <span class="section-title">巡检完成率趋势</span>
+                <div class="time-filters">
+                    <button class="time-filter active">6个月</button>
+                    <button class="time-filter">12个月</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="completionTrendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 各区域对比 -->
+        <div class="card">
+            <div class="section-header">
+                <span class="section-title">各区域巡检完成情况对比</span>
+                <button class="section-action">详情</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="regionComparisonChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 返回按钮功能
+            document.getElementById('back-button').addEventListener('click', function() {
+                window.location.href = './report.html';
+            });
+            
+            // 日期筛选器功能
+            const dateFilters = document.querySelectorAll('.date-filter');
+            dateFilters.forEach(filter => {
+                filter.addEventListener('click', function() {
+                    dateFilters.forEach(f => {
+                        f.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+            
+            // 时间筛选器功能
+            const timeFilters = document.querySelectorAll('.time-filter');
+            timeFilters.forEach(filter => {
+                filter.addEventListener('click', function() {
+                    timeFilters.forEach(f => {
+                        f.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+            
+            // 初始化图表
+            initCharts();
+        });
+        
+        // 初始化图表
+        function initCharts() {
+            // 完成率趋势图表
+            const completionTrendCtx = document.getElementById('completionTrendChart').getContext('2d');
+            new Chart(completionTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [
+                        {
+                            label: '巡检完成率',
+                            data: [85, 87, 89, 90, 91, 92],
+                            borderColor: '#007AFF',
+                            backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 70,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+
+            // 各区域对比图表
+            const regionComparisonCtx = document.getElementById('regionComparisonChart').getContext('2d');
+            new Chart(regionComparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['兰江片区', '城区', '赤溪片区', '永昌片区', '游埠片区'],
+                    datasets: [
+                        {
+                            label: '巡检完成率',
+                            data: [95, 90, 88, 85, 75],
+                            backgroundColor: '#007AFF',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

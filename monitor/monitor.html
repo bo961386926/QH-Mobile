@@ -30,6 +30,36 @@
             padding-bottom: 60px;
         }
         
+        /* Tab按钮样式 */
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--gray-text);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .tab-button:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+        
         .header {
             position: fixed;
             top: 0;
@@ -457,7 +487,7 @@
                         <h3 class="section-title">雨水管网</h3>
                     </div>
                     <div class="list-group">
-                        <div class="list-group-item" onclick="window.location.href='../operation/records.html'">
+                        <div class="list-group-item" onclick="window.location.href='../operation/site-inspection/records.html'">
                             <div class="item-content">
                                 <div class="item-title">雨水井</div>
                                 <div class="item-subtitle">共 12 个</div>
@@ -467,7 +497,7 @@
                                 <span class="status-text">正常</span>
                             </div>
                         </div>
-                        <div class="list-group-item" onclick="window.location.href='../operation/records.html'">
+                        <div class="list-group-item" onclick="window.location.href='../operation/site-inspection/records.html'">
                             <div class="item-content">
                                 <div class="item-title">雨水泵站</div>
                                 <div class="item-subtitle">共 5 个</div>
@@ -477,7 +507,7 @@
                                 <span class="status-text">压力偏高</span>
                             </div>
                         </div>
-                        <div class="list-group-item" onclick="window.location.href='../operation/records.html'">
+                        <div class="list-group-item" onclick="window.location.href='../operation/site-inspection/records.html'">
                             <div class="item-content">
                                 <div class="item-title">积水</div>
                                 <div class="item-subtitle">共 3 处</div>
@@ -487,7 +517,7 @@
                                 <span class="status-text">异常</span>
                             </div>
                         </div>
-                        <div class="list-group-item" onclick="window.location.href='../operation/records.html'">
+                        <div class="list-group-item" onclick="window.location.href='../operation/site-inspection/records.html'">
                             <div class="item-content">
                                 <div class="item-title">排口</div>
                                 <div class="item-subtitle">共 8 个</div>
@@ -506,7 +536,7 @@
                         <h3 class="section-title">污水管网</h3>
                     </div>
                     <div class="list-group">
-                        <div class="list-group-item" onclick="window.location.href='../operation/records.html'">
+                        <div class="list-group-item" onclick="window.location.href='../operation/site-inspection/records.html'">
                             <div class="item-content">
                                 <div class="item-title">排污企业</div>
                                 <div class="item-subtitle">共 15 家</div>
@@ -516,7 +546,7 @@
                                 <span class="status-text">正常</span>
                             </div>
                         </div>
-                        <div class="list-group-item" onclick="window.location.href='../operation/records.html'">
+                        <div class="list-group-item" onclick="window.location.href='../operation/site-inspection/records.html'">
                             <div class="item-content">
                                 <div class="item-title">污水泵站</div>
                                 <div class="item-subtitle">共 7 个</div>
@@ -526,7 +556,7 @@
                                 <span class="status-text">压力偏高</span>
                             </div>
                         </div>
-                        <div class="list-group-item" onclick="window.location.href='../operation/records.html'">
+                        <div class="list-group-item" onclick="window.location.href='../operation/site-inspection/records.html'">
                             <div class="item-content">
                                 <div class="item-title">窨井</div>
                                 <div class="item-subtitle">共 24 个</div>
@@ -536,7 +566,7 @@
                                 <span class="status-text">正常</span>
                             </div>
                         </div>
-                        <div class="list-group-item" onclick="window.location.href='../operation/records.html'">
+                        <div class="list-group-item" onclick="window.location.href='../operation/site-inspection/records.html'">
                             <div class="item-content">
                                 <div class="item-title">入流入渗网格</div>
                                 <div class="item-subtitle">共 10 个</div>
@@ -546,7 +576,7 @@
                                 <span class="status-text">异常</span>
                             </div>
                         </div>
-                        <div class="list-group-item" onclick="window.location.href='../operation/records.html'">
+                        <div class="list-group-item" onclick="window.location.href='../operation/site-inspection/records.html'">
                             <div class="item-content">
                                 <div class="item-title">污水厂</div>
                                 <div class="item-subtitle">共 3 个</div>
@@ -556,7 +586,7 @@
                                 <span class="status-text">正常</span>
                             </div>
                         </div>
-                        <div class="list-group-item" onclick="window.location.href='../operation/records.html'">
+                        <div class="list-group-item" onclick="window.location.href='../operation/site-inspection/records.html'">
                             <div class="item-content">
                                 <div class="item-title">排口</div>
                                 <div class="item-subtitle">共 6 个</div>
@@ -575,7 +605,7 @@
                         <h3 class="section-title">桥隧</h3>
                     </div>
                     <div class="list-group">
-                        <div class="list-group-item" onclick="window.location.href='../operation/records.html'">
+                        <div class="list-group-item" onclick="window.location.href='../operation/site-inspection/records.html'">
                             <div class="item-content">
                                 <div class="item-title">桥梁</div>
                                 <div class="item-subtitle">共 8 座</div>
@@ -585,7 +615,7 @@
                                 <span class="status-text">正常</span>
                             </div>
                         </div>
-                        <div class="list-group-item" onclick="window.location.href='../operation/records.html'">
+                        <div class="list-group-item" onclick="window.location.href='../operation/site-inspection/records.html'">
                             <div class="item-content">
                                 <div class="item-title">隧道</div>
                                 <div class="item-subtitle">共 3 座</div>
@@ -637,7 +667,7 @@
         </div>
         
         <!-- 一站一档案 -->
-        <div class="card-container">
+        <!-- <div class="card-container">
             <div class="card-header">
                 <div class="section-header">
                     <h2 class="section-title">一站一档案</h2>
@@ -665,7 +695,7 @@
                         <button class="detail-btn">查看详情</button>
                     </div>
                     <div class="archive-info">建设时间: 2021-03-10 | 设计参数: 400m³/h</div>
-                </div>
+                </div> -->
             </div>
         </div>
     </main>
@@ -695,62 +725,8 @@
     </nav>
 
     <script>
-        // 初始化图表
+        // 为标签按钮添加点击事件
         document.addEventListener('DOMContentLoaded', function() {
-            // 泵站压力趋势图表
-            const pumpPressureCtx = document.getElementById('pumpPressureChart').getContext('2d');
-            new Chart(pumpPressureCtx, {
-                type: 'line',
-                data: {
-                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '现在'],
-                    datasets: [{
-                        label: '进水压力',
-                        data: [3.0, 2.8, 3.1, 3.3, 3.2, 3.1, 3.2],
-                        borderColor: '#007AFF',
-                        tension: 0.3,
-                        borderWidth: 2,
-                        pointRadius: 3
-                    }, {
-                        label: '出水压力',
-                        data: [5.2, 5.0, 5.3, 5.6, 5.7, 5.8, 5.8],
-                        borderColor: '#FF9500',
-                        tension: 0.3,
-                        borderWidth: 2,
-                        pointRadius: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            },
-                            title: {
-                                display: true,
-                                text: '压力 (MPa)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false
-                        }
-                    }
-                }
-            });
-            
-            // 为标签按钮添加点击事件
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabContents = document.querySelectorAll('.tab-content');
             
@@ -770,7 +746,10 @@
                     });
                     
                     // 显示对应的标签页内容
-                    document.getElementById(targetTab + '-content').style.display = 'block';
+                    const targetContent = document.getElementById(targetTab + '-content');
+                    if (targetContent) {
+                        targetContent.style.display = 'block';
+                    }
                 });
             });
         });

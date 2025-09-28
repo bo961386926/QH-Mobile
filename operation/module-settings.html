@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>运维快捷功能设置</title>
+    <!-- 引入Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+            --card-bg: #FFFFFF;
+            --border-color: #E5E5EA;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            padding-top: 48px;
+            padding-bottom: 60px;
+        }
+        
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+        
+        .header-back {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--primary-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .header-actions {
+            width: 36px;
+            height: 36px;
+        }
+        
+        .main-content {
+            padding: 16px;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .card-padding {
+            padding: 16px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 16px;
+        }
+        
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        
+        .module-item {
+            text-align: center;
+        }
+        
+        .module-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .module-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 20px;
+        }
+        
+        .module-icon.primary-bg {
+            background-color: rgba(0, 122, 255, 0.1);
+            color: #007AFF;
+        }
+        
+        .module-icon.secondary-bg {
+            background-color: rgba(52, 199, 89, 0.1);
+            color: #34C759;
+        }
+        
+        .module-icon.warning-bg {
+            background-color: rgba(255, 149, 0, 0.1);
+            color: #FF9500;
+        }
+        
+        .module-icon.danger-bg {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+        }
+        
+        .module-text {
+            font-size: 12px;
+            color: #111111;
+        }
+        
+        .module-toggle {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+            margin-top: 8px;
+        }
+        
+        .module-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(16px);
+        }
+        
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray-text);
+            font-size: 12px;
+        }
+        
+        .tab-item.active {
+            color: var(--primary-color);
+        }
+        
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面容器 -->
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <header class="app-header">
+            <button class="header-back" onclick="history.back()">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <h1 class="header-title">快捷功能设置</h1>
+            <div class="header-actions"></div>
+        </header>
+
+        <!-- 主要内容区 -->
+        <main class="main-content">
+            <div class="card">
+                <div class="card-padding">
+                    <h2 class="section-title">运维快捷功能设置</h2>
+                    <div class="module-grid">
+                        <div class="module-item">
+                            <div class="module-icon primary-bg">
+                                <i class="bi bi-plus-circle"></i>
+                            </div>
+                            <div class="module-text">事件上报</div>
+                            <label class="module-toggle">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon secondary-bg">
+                                <i class="bi bi-list-task"></i>
+                            </div>
+                            <div class="module-text">工单管理</div>
+                            <label class="module-toggle">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon danger-bg">
+                                <i class="bi bi-clipboard-check"></i>
+                            </div>
+                            <div class="module-text">巡检记录</div>
+                            <label class="module-toggle">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon primary-bg">
+                                <i class="bi bi-geo-alt"></i>
+                            </div>
+                            <div class="module-text">巡检</div>
+                            <label class="module-toggle">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon secondary-bg">
+                                <i class="bi bi-wrench-adjustable"></i>
+                            </div>
+                            <div class="module-text">维护</div>
+                            <label class="module-toggle">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon warning-bg">
+                                <i class="bi bi-person-badge"></i>
+                            </div>
+                            <div class="module-text">考勤</div>
+                            <label class="module-toggle">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon danger-bg">
+                                <i class="bi bi-calculator"></i>
+                            </div>
+                            <div class="module-text">校准</div>
+                            <label class="module-toggle">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 底部导航栏 -->
+        <nav class="tab-bar">
+            <a href="../home/home.html" class="tab-item" data-page="home">
+                <span class="tab-icon"><i class="bi bi-house"></i></span>
+                <span class="tab-text">首页</span>
+            </a>
+            <a href="../monitor/monitor.html" class="tab-item" data-page="monitor">
+                <span class="tab-icon"><i class="bi bi-tv"></i></span>
+                <span class="tab-text">监控</span>
+            </a>
+            <a href="operation.html" class="tab-item active" data-page="operation">
+                <span class="tab-icon"><i class="bi bi-tools"></i></span>
+                <span class="tab-text">运维</span>
+            </a>
+            <a href="../report/report.html" class="tab-item" data-page="report">
+                <span class="tab-icon"><i class="bi bi-bar-chart"></i></span>
+                <span class="tab-text">报表</span>
+            </a>
+            <a href="../profile/profile.html" class="tab-item" data-page="profile">
+                <span class="tab-icon"><i class="bi bi-person"></i></span>
+                <span class="tab-text">我的</span>
+            </a>
+        </nav>
+    </div>
+    
+    <script>
+        // 保存设置
+        document.querySelectorAll('.module-toggle input').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const moduleName = this.closest('.module-item').querySelector('.module-text').textContent;
+                const isEnabled = this.checked;
+                console.log(`功能 "${moduleName}" 已${isEnabled ? '启用' : '禁用'}`);
+                // 这里可以添加保存设置的逻辑
+            });
+        });
+    </script>
+</body>
+</html>

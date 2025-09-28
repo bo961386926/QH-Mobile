@@ -256,22 +256,6 @@
 
     <!-- 主内容区 -->
     <main class="main-content">
-        <!-- 日期筛选器 -->
-        <div class="card">
-            <div class="date-filter-container">
-                <div class="date-filter-header">
-                    <span class="date-filter-label">数据周期</span>
-                    <div class="date-filters">
-                        <button class="date-filter active">今日</button>
-                        <button class="date-filter">本周</button>
-                        <button class="date-filter">本月</button>
-                        <button class="date-filter">
-                            <i class="fa fa-calendar-o"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- 考勤概览 -->
         <div class="card">
@@ -308,7 +292,6 @@
         <div class="card">
             <div class="section-header">
                 <span class="section-title">部门考勤明细</span>
-                <button class="section-action">筛选</button>
             </div>
             <div class="department-list">
                 <canvas id="departmentChart" height="150"></canvas>
@@ -319,7 +302,10 @@
         <div class="card">
             <div class="section-header">
                 <span class="section-title">人员考勤到岗排名</span>
-                <button class="section-action">筛选</button>
+            </div>
+            <div class="section-actions" style="padding: 0 16px 16px;">
+                <button class="section-action active" data-tab="personnel-top">前Top10</button>
+                <button class="section-action" data-tab="personnel-bottom">后Top10</button>
             </div>
             <div class="department-list">
                 <canvas id="personnelChart" height="200"></canvas>
@@ -330,7 +316,10 @@
         <div class="card">
             <div class="section-header">
                 <span class="section-title">站点到岗排名</span>
-                <button class="section-action">筛选</button>
+            </div>
+            <div class="section-actions" style="padding: 0 16px 16px;">
+                <button class="section-action active" data-tab="site-top">前Top10</button>
+                <button class="section-action" data-tab="site-bottom">后Top10</button>
             </div>
             <div class="department-list">
                 <canvas id="siteChart" height="200"></canvas>
@@ -346,28 +335,55 @@
                 window.location.href = './report.html';
             });
             
-            // 日期筛选器功能
-            const dateFilters = document.querySelectorAll('.date-filter');
-            dateFilters.forEach(filter => {
-                filter.addEventListener('click', function() {
-                    dateFilters.forEach(f => {
-                        f.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                });
-            });
-            
-            // 时间筛选器功能
+            // Tab切换功能
             const sectionActions = document.querySelectorAll('.section-action');
             sectionActions.forEach(action => {
                 action.addEventListener('click', function() {
-                    sectionActions.forEach(a => {
-                        a.classList.remove('active');
+                    const tab = this.getAttribute('data-tab');
+                    
+                    // 更新tab按钮状态
+                    const parentActions = this.parentElement.querySelectorAll('.section-action');
+                    parentActions.forEach(btn => {
+                        btn.classList.remove('active');
                     });
                     this.classList.add('active');
+                    
+                    // 根据tab更新图表数据
+                    updateChartData(tab);
                 });
             });
         });
+        
+        // 图表数据
+        const chartData = {
+            // 人员考勤数据 - 前Top10
+            personnelTop: {
+                labels: ['张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十', '郑一', '王二'],
+                duration: [42.5, 40.2, 38.8, 36.5, 34.2, 32.8, 31.5, 30.2, 29.8, 28.5],
+                count: [18, 17, 16, 15, 14, 13, 12, 11, 10, 9]
+            },
+            // 人员考勤数据 - 后Top10
+            personnelBottom: {
+                labels: ['冯三', '陈四', '褚五', '卫六', '蒋七', '沈八', '韩九', '杨十', '朱一', '秦二'],
+                duration: [12.5, 13.2, 14.8, 15.5, 16.2, 17.8, 18.5, 19.2, 20.8, 21.5],
+                count: [5, 5, 6, 6, 7, 7, 8, 8, 9, 9]
+            },
+            // 站点到岗数据 - 前Top10
+            siteTop: {
+                labels: ['东区站点', '南区站点', '西区站点', '北区站点', '中区站点', '新区站点', '老区站点', '工业区站点', '商业区站点', '住宅区站点'],
+                duration: [125.5, 118.2, 112.8, 108.5, 102.2, 98.8, 95.5, 92.2, 88.8, 85.5],
+                count: [45, 42, 40, 38, 36, 34, 32, 30, 28, 26]
+            },
+            // 站点到岗数据 - 后Top10
+            siteBottom: {
+                labels: ['远郊区站点', '山区站点', '湖滨站点', '海滨站点', '机场站点', '火车站站点', '港口站点', '开发区站点', '科技园站点', '大学城站点'],
+                duration: [45.5, 48.2, 52.8, 55.5, 58.2, 62.8, 65.5, 68.2, 72.8, 75.5],
+                count: [15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+            }
+        };
+        
+        // 初始化图表
+        let personnelChart, siteChart;
         
         // 初始化部门考勤明细图表（横向柱状图）
         const departmentCtx = document.getElementById('departmentChart').getContext('2d');
@@ -375,43 +391,43 @@
             type: 'bar',
             data: {
                 labels: ['运维一部', '运维二部', '监控中心'],
-                datasets: [{
-                    label: '出勤率',
-                    data: [91.7, 93.3, 93.3],
-                    backgroundColor: [
-                        'rgba(0, 122, 255, 0.7)',
-                        'rgba(52, 199, 89, 0.7)',
-                        'rgba(255, 149, 0, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(0, 122, 255, 1)',
-                        'rgba(52, 199, 89, 1)',
-                        'rgba(255, 149, 0, 1)'
-                    ],
-                    borderWidth: 1
-                }]
+                datasets: [
+                    {
+                        label: '考勤时长(小时)',
+                        data: [85.5, 82.2, 78.8],
+                        backgroundColor: 'rgba(0, 122, 255, 0.7)',
+                        borderColor: 'rgba(0, 122, 255, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '考勤次数',
+                        data: [32, 30, 28],
+                        backgroundColor: 'rgba(52, 199, 89, 0.7)',
+                        borderColor: 'rgba(52, 199, 89, 1)',
+                        borderWidth: 1
+                    }
+                ]
             },
             options: {
                 indexAxis: 'y', // 横向柱状图
                 scales: {
                     x: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        }
+                        beginAtZero: true
                     }
                 },
                 plugins: {
                     legend: {
-                        display: false
+                        display: true,
+                        position: 'top'
                     },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return context.parsed.x + '%';
+                                if (context.dataset.label.includes('时长')) {
+                                    return context.dataset.label + ': ' + context.parsed.x + '小时';
+                                } else {
+                                    return context.dataset.label + ': ' + context.parsed.x + '次';
+                                }
                             }
                         }
                     }
@@ -421,50 +437,46 @@
         
         // 初始化人员考勤到岗排名图表（垂直柱状图）
         const personnelCtx = document.getElementById('personnelChart').getContext('2d');
-        const personnelChart = new Chart(personnelCtx, {
+        personnelChart = new Chart(personnelCtx, {
             type: 'bar',
             data: {
-                labels: ['张三', '李四', '王五', '赵六', '钱七'],
-                datasets: [{
-                    label: '到岗率',
-                    data: [98.5, 97.2, 96.8, 95.6, 94.3],
-                    backgroundColor: [
-                        'rgba(0, 122, 255, 0.7)',
-                        'rgba(52, 199, 89, 0.7)',
-                        'rgba(255, 149, 0, 0.7)',
-                        'rgba(255, 59, 48, 0.7)',
-                        'rgba(175, 82, 222, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(0, 122, 255, 1)',
-                        'rgba(52, 199, 89, 1)',
-                        'rgba(255, 149, 0, 1)',
-                        'rgba(255, 59, 48, 1)',
-                        'rgba(175, 82, 222, 1)'
-                    ],
-                    borderWidth: 1
-                }]
+                labels: chartData.personnelTop.labels,
+                datasets: [
+                    {
+                        label: '考勤时长(小时)',
+                        data: chartData.personnelTop.duration,
+                        backgroundColor: 'rgba(0, 122, 255, 0.7)',
+                        borderColor: 'rgba(0, 122, 255, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '考勤次数',
+                        data: chartData.personnelTop.count,
+                        backgroundColor: 'rgba(52, 199, 89, 0.7)',
+                        borderColor: 'rgba(52, 199, 89, 1)',
+                        borderWidth: 1
+                    }
+                ]
             },
             options: {
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        }
+                        beginAtZero: true
                     }
                 },
                 plugins: {
                     legend: {
-                        display: false
+                        display: true,
+                        position: 'top'
                     },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return context.parsed.y + '%';
+                                if (context.dataset.label.includes('时长')) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '小时';
+                                } else {
+                                    return context.dataset.label + ': ' + context.parsed.y + '次';
+                                }
                             }
                         }
                     }
@@ -472,44 +484,84 @@
             }
         });
         
-        // 初始化站点到岗排名图表（饼图）
+        // 初始化站点到岗排名图表（柱状图）
         const siteCtx = document.getElementById('siteChart').getContext('2d');
-        const siteChart = new Chart(siteCtx, {
-            type: 'pie',
+        siteChart = new Chart(siteCtx, {
+            type: 'bar',
             data: {
-                labels: ['东区站点', '南区站点', '西区站点', '北区站点', '中区站点'],
-                datasets: [{
-                    label: '到岗率',
-                    data: [96.7, 95.4, 94.2, 93.8, 92.5],
-                    backgroundColor: [
-                        'rgba(0, 122, 255, 0.7)',
-                        'rgba(52, 199, 89, 0.7)',
-                        'rgba(255, 149, 0, 0.7)',
-                        'rgba(255, 59, 48, 0.7)',
-                        'rgba(175, 82, 222, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(0, 122, 255, 1)',
-                        'rgba(52, 199, 89, 1)',
-                        'rgba(255, 149, 0, 1)',
-                        'rgba(255, 59, 48, 1)',
-                        'rgba(175, 82, 222, 1)'
-                    ],
-                    borderWidth: 1
-                }]
+                labels: chartData.siteTop.labels,
+                datasets: [
+                    {
+                        label: '考勤时长(小时)',
+                        data: chartData.siteTop.duration,
+                        backgroundColor: 'rgba(0, 122, 255, 0.7)',
+                        borderColor: 'rgba(0, 122, 255, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '考勤次数',
+                        data: chartData.siteTop.count,
+                        backgroundColor: 'rgba(52, 199, 89, 0.7)',
+                        borderColor: 'rgba(52, 199, 89, 1)',
+                        borderWidth: 1
+                    }
+                ]
             },
             options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
                 plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return context.label + ': ' + context.parsed + '%';
+                                if (context.dataset.label.includes('时长')) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '小时';
+                                } else {
+                                    return context.dataset.label + ': ' + context.parsed.y + '次';
+                                }
                             }
                         }
                     }
                 }
             }
         });
+        
+        // 更新图表数据函数
+        function updateChartData(tab) {
+            switch(tab) {
+                case 'personnel-top':
+                    personnelChart.data.labels = chartData.personnelTop.labels;
+                    personnelChart.data.datasets[0].data = chartData.personnelTop.duration;
+                    personnelChart.data.datasets[1].data = chartData.personnelTop.count;
+                    personnelChart.update();
+                    break;
+                case 'personnel-bottom':
+                    personnelChart.data.labels = chartData.personnelBottom.labels;
+                    personnelChart.data.datasets[0].data = chartData.personnelBottom.duration;
+                    personnelChart.data.datasets[1].data = chartData.personnelBottom.count;
+                    personnelChart.update();
+                    break;
+                case 'site-top':
+                    siteChart.data.labels = chartData.siteTop.labels;
+                    siteChart.data.datasets[0].data = chartData.siteTop.duration;
+                    siteChart.data.datasets[1].data = chartData.siteTop.count;
+                    siteChart.update();
+                    break;
+                case 'site-bottom':
+                    siteChart.data.labels = chartData.siteBottom.labels;
+                    siteChart.data.datasets[0].data = chartData.siteBottom.duration;
+                    siteChart.data.datasets[1].data = chartData.siteBottom.count;
+                    siteChart.update();
+                    break;
+            }
+        }
     </script>
 </body>
 </html>

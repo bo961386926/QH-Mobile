@@ -100,7 +100,7 @@
         
         .report-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             margin-bottom: 24px;
         }
@@ -238,20 +238,20 @@
 <body>
     <!-- 页面容器 -->
     <div class="app-container">
-        <!-- 顶部导航栏 -->
-        <header class="app-header">
-            <div class="header-content">
-                <h1 class="header-title" id="pageTitle">报表中心</h1>
-            </div>
-            <div class="header-actions">
-                <button class="action-btn">
-                    <i class="bi bi-search"></i>
-                </button>
-                <button class="action-btn">
-                    <i class="bi bi-bell"></i>
-                </button>
-            </div>
-        </header>
+    <!-- 顶部导航栏 -->
+    <header class="app-header">
+        <div class="header-content">
+            <h1 class="header-title" id="pageTitle">报表中心</h1>
+        </div>
+        <div class="header-actions">
+            <button class="action-btn">
+                <i class="bi bi-search"></i>
+            </button>
+            <button class="action-btn">
+                <i class="bi bi-bell"></i>
+            </button>
+        </div>
+    </header>
 
         <!-- 主要内容区 -->
         <main class="main-content">
@@ -283,37 +283,28 @@
                             </div>
                             <div class="report-title">综合分析报表</div>
                         </a>
+                        <a href="company-ranking-report.html" class="report-card">
+                            <div class="report-icon bg-primary-light">
+                                <span>🏆</span>
+                            </div>
+                            <div class="report-title">考核排名报表</div>
+                        </a>
+                        <a href="inspection-statistics.html" class="report-card">
+                            <div class="report-icon bg-primary-light">
+                                <span>🔍</span>
+                            </div>
+                            <div class="report-title">巡检统计</div>
+                        </a>
+                        <a href="maintenance-statistics.html" class="report-card">
+                            <div class="report-icon bg-secondary-light">
+                                <span>🛠️</span>
+                            </div>
+                            <div class="report-title">维护统计</div>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-padding">
-                    <h2 class="section-title">常用报表</h2>
-                    <div class="list-group">
-                        <div class="list-item">
-                            <div class="list-item-content">
-                                <div class="list-item-title">工单处理效率分析</div>
-                                <div class="list-item-date">生成于 2023-06-15</div>
-                            </div>
-                         
-                        </div>
-                        <div class="list-item">
-                            <div class="list-item-content">
-                                <div class="list-item-title">泵站运行状态报告</div>
-                                <div class="list-item-date">生成于 2023-06-14</div>
-                            </div>
-                            
-                        </div>
-                        <div class="list-item">
-                            <div class="list-item-content">
-                                <div class="list-item-title">站点效率对比分析</div>
-                                <div class="list-item-date">生成于 2023-05-28</div>
-                                
-                        </div>
-                    </div>
-                </div>
-            </div>
         </main>
 
     <!-- 底部导航栏 -->
@@ -340,5 +331,8 @@
             </a>
         </nav>
     </div>
+    
+    <script>
+    </script>
 </body>
 </html>
