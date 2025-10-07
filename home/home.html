@@ -35,21 +35,24 @@
             top: 0;
             left: 0;
             right: 0;
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-color);
             z-index: 100;
-            height: 48px;
+            padding: 8px 16px;
+        }
+        
+        .header-top {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 0 16px;
+            align-items: center;
+            margin-bottom: 8px;
         }
         
         .user-info {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 8px;
         }
         
         .welcome-text {
@@ -59,14 +62,15 @@
         }
         
         .location-info {
-            font-size: 14px;
+            font-size: 12px;
             color: #666666;
+            white-space: nowrap;
         }
         
         .header-actions {
+            position: relative;
             display: flex;
-            gap: 16px;
-            justify-content: flex-end;
+            align-items: center;
         }
         
         .action-btn {
@@ -74,7 +78,6 @@
             border: none;
             font-size: 20px;
             color: #666666;
-            position: relative;
             width: 36px;
             height: 36px;
             border-radius: 50%;
@@ -85,8 +88,8 @@
         
         .notification-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
+            top: -3px;
+            right: -3px;
             background-color: #ff3b30;
             color: white;
             border-radius: 50%;
@@ -98,8 +101,73 @@
             justify-content: center;
         }
         
+        .search-container {
+            width: 100%;
+            padding: 0 16px;
+            box-sizing: border-box;
+        }
+        
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 48px 10px 48px;
+            border-radius: 22px;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            outline: none;
+            background-color: #f8f8f8;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary-color);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+        }
+        
+        .search-btn, .scan-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #666666;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 2;
+        }
+        
+        .search-btn {
+            right: 8px;
+        }
+        
+        .scan-btn {
+            left: 8px;
+        }
+        
+        .search-btn:hover, .scan-btn:hover {
+            background-color: #e0e0e0;
+            color: #000000;
+        }
+        
+        .search-btn:active, .scan-btn:active {
+            background-color: #d0d0d0;
+        }
+        
         .main-content {
             padding: 16px;
+            padding-top: 0;
         }
         
         /* 轮播图样式 */
@@ -108,6 +176,7 @@
             margin-bottom: 24px;
             border-radius: 12px;
             overflow: hidden;
+            margin-top: 16px;
         }
         
         .carousel-inner {
@@ -369,19 +438,27 @@
 <body>
     <!-- 顶部导航栏 -->
     <header class="app-header">
-        <div class="user-info">
-            <span class="welcome-text">欢迎回来，张工</span>
-            <span class="location-info">杭州 晴 28°C</span>
-        </div>
-        <div class="header-actions">
-            <button class="action-btn">
-                <i class="bi bi-search"></i>
-            </button>
-            <div style="position: relative;">
+        <div class="header-top">
+            <div class="user-info">
+                <span class="welcome-text">欢迎回来，张工</span>
+                <span class="location-info">杭州 晴 28°C</span>
+            </div>
+            <div class="header-actions">
                 <button class="action-btn">
                     <i class="bi bi-bell"></i>
                 </button>
                 <span class="notification-badge">3</span>
+            </div>
+        </div>
+        <div class="search-container">
+            <div class="search-wrapper">
+                <button class="scan-btn" onclick="scanQRCode()">
+                    <i class="bi bi-upc-scan"></i>
+                </button>
+                <input type="text" id="globalSearch" placeholder="全局搜索..." class="search-input" onclick="openSearchPage()">
+                <button class="search-btn" onclick="performSearch()">
+                    <i class="bi bi-search"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -431,7 +508,7 @@
                             <div class="module-icon primary-bg">
                                 <i class="bi bi-map"></i> 
                             </div>
-                            <div class="module-text">地图</div>
+                            <div class="module-text">站点地图</div>
                       
                     </div>
                     <div class="module-item">
@@ -463,26 +540,27 @@
                             <div class="module-icon primary-bg">
                                 <i class="bi bi-card-list"></i>
                             </div>
-                            <div class="module-text">任务</div>
+                            <div class="module-text">工单</div>
                        
                     </div>
                     <div class="module-item">
-                       
+                        <a href="../monitor/flood-points.html" class="module-link">
                             <div class="module-icon secondary-bg">
-                                <i class="bi bi-people"></i>
+                                <i class="bi bi-droplet"></i>
                             </div>
-                            <div class="module-text">人员</div>
-                      
+                            <div class="module-text">易涝点</div>
+                        </a>
                     </div>
                     <div class="module-item">
-                     
+                        <a href="../monitor/pump-station-monitoring.html" class="module-link">
                             <div class="module-icon warning-bg">
                                 <i class="bi bi-water"></i>
                             </div>
                             <div class="module-text">泵站</div>
+                        </a>
                     </div>
                     <div class="module-item">
-                        <a href="module-settings.html" class="module-link">
+                        <a href="more-modules.html" class="module-link">
                             <div class="module-icon danger-bg">
                                 <i class="bi bi-three-dots"></i>
                             </div>
@@ -612,6 +690,38 @@
                 console.log('点击模块:', moduleName);
             });
         });
+        
+        // 全局搜索功能
+        function performSearch() {
+            const searchTerm = document.getElementById('globalSearch').value.trim();
+            if (searchTerm) {
+                alert(`执行搜索: ${searchTerm}\n\n在实际应用中，这里会执行搜索逻辑`);
+                // 这里可以添加实际的搜索逻辑
+                // 例如：跳转到搜索结果页面，或在当前页面过滤内容
+            } else {
+                alert('请输入搜索关键词');
+            }
+        }
+        
+        // 回车键触发搜索
+        document.getElementById('globalSearch').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // 扫描二维码功能
+        function scanQRCode() {
+            alert('启动扫码功能\n\n在实际应用中，这里会调用摄像头扫描二维码/条形码');
+            // 这里可以集成实际的扫码功能
+            // 例如使用HTML5的getUserMedia API或第三方扫码库
+        }
+        
+        // 打开搜索页面
+        function openSearchPage() {
+            alert('打开搜索页面\n\n在实际应用中，这里会跳转到搜索页面');
+            // 这里可以添加跳转到搜索页面的逻辑
+        }
         
     </script>
 </body>

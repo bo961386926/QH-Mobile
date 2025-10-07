@@ -223,14 +223,14 @@
         </div>
         
         <div class="social-login">
+            <a href="#" class="social-btn" id="wechatLogin">
+                <i class="bi bi-wechat"></i>
+            </a>
             <a href="#" class="social-btn">
                 <i class="bi bi-fingerprint"></i>
             </a>
             <a href="#" class="social-btn">
-                <i class="bi bi-phone"></i>
-            </a>
-            <a href="#" class="social-btn">
-                <i class="bi bi-shield-lock"></i>
+                <i class="bi bi-person-circle"></i>
             </a>
         </div>
     </div>
@@ -261,6 +261,14 @@
             e.preventDefault();
             alert('跳转到短信验证码登录页面');
             // 这里可以跳转到短信登录页面
+        });
+        
+        // 微信登录按钮点击事件
+        document.getElementById('wechatLogin').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('跳转到微信登录页面');
+            // 这里可以实现微信登录逻辑
+            // 例如：跳转到微信授权页面或调用微信JS-SDK
         });
     </script>
 </body>

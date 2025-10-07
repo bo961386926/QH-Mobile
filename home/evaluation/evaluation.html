@@ -377,11 +377,6 @@
         <div class="bg-white mt-3 p-5">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="font-bold">2024年3月考核结果</h2>
-                <button id="export-report" class="bg-[#007AFF] text-white text-sm flex items-center px-3 py-1.5 rounded-lg btn-effect hover:bg-[#0062cc]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 inline" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                    </svg> 导出报告
-                </button>
             </div>
             
             <div class="grid grid-cols-2 gap-4">
@@ -751,10 +746,6 @@
                 });
             });
             
-            // 导出报告
-            document.getElementById('export-report').addEventListener('click', () => {
-                alert('报告导出功能已触发，实际项目中会生成PDF文件');
-            });
         });
     </script>
 </body>

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易涝点监测 - 农饮水运维移动端</title>
+    <!-- 引入Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+            --card-bg: #FFFFFF;
+            --border-color: #E5E5EA;
+        }
+        
+        /* 易涝点监测特定样式 */
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            padding-top: 48px;
+            padding-bottom: 60px;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #111111;
+            margin: 0;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #666666;
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .main-content {
+            padding: 16px;
+        }
+        
+        .card-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #111111;
+            margin: 0;
+        }
+        
+        .card-body {
+            padding: 16px;
+        }
+        
+        .map-placeholder {
+            height: 200px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            color: #999;
+        }
+        
+        .list-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .list-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-content {
+            flex: 1;
+        }
+        
+        .item-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111111;
+            margin-bottom: 4px;
+        }
+        
+        .item-subtitle {
+            font-size: 12px;
+            color: #666666;
+        }
+        
+        .status-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .status-normal {
+            background-color: #34C759;
+        }
+        
+        .status-warning {
+            background-color: #FF9500;
+        }
+        
+        .status-danger {
+            background-color: #FF3B30;
+        }
+        
+        .status-text {
+            font-size: 12px;
+            color: #111111;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #111111;
+            margin: 0;
+        }
+        
+        .history-btn {
+            padding: 6px 12px;
+            border-radius: 16px;
+            background-color: #f5f5f5;
+            color: #007AFF;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        @media (min-width: 768px) {
+            .data-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .pump-data-card {
+            text-align: center;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .data-label {
+            font-size: 12px;
+            color: #666666;
+            margin-bottom: 4px;
+        }
+        
+        .data-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #111111;
+            margin-bottom: 4px;
+        }
+        
+        .data-range {
+            font-size: 10px;
+            color: #666666;
+        }
+        
+        .data-range.warning {
+            color: #FF9500;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin-top: 16px;
+        }
+        
+        .alert-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+        
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .alert-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111111;
+        }
+        
+        .alert-badge {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: #ffffff;
+        }
+        
+        .badge-warning {
+            background-color: #FF9500;
+        }
+        
+        .badge-danger {
+            background-color: #FF3B30;
+        }
+        
+        .alert-description {
+            font-size: 12px;
+            color: #666666;
+            margin-bottom: 12px;
+        }
+        
+        .alert-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .alert-time {
+            font-size: 12px;
+            color: #666666;
+        }
+        
+        .detail-btn {
+            padding: 6px 12px;
+            border-radius: 16px;
+            background-color: #f5f5f5;
+            color: #007AFF;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .archive-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .archive-item:last-child {
+            border-bottom: none;
+        }
+        
+        .archive-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .archive-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111111;
+        }
+        
+        .archive-info {
+            font-size: 12px;
+            color: #666666;
+        }
+        
+        /* 底部导航栏样式 */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray-text);
+            font-size: 12px;
+        }
+        
+        .tab-item.active {
+            color: var(--primary-color);
+        }
+        
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        /* 筛选按钮样式 */
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .filter-button {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--gray-text);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .filter-button:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <button class="action-btn" onclick="window.location.href='../home/home.html'">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h1 class="header-title">易涝点监测</h1>
+        <div class="header-actions">
+            <button class="action-btn">
+                <i class="bi bi-funnel"></i>
+            </button>
+            <button class="action-btn">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="main-content">
+        <!-- 易涝点地图 -->
+        <div class="card-container">
+            <div class="card-header">
+                <h2 class="card-title">易涝点分布</h2>
+            </div>
+            <div class="card-body">
+                <div class="map-placeholder">
+                    <div>易涝点地图 - 显示各易涝点实时位置和状态</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 统计信息 -->
+        <div class="card-container">
+            <div class="card-header">
+                <h2 class="card-title">监测统计</h2>
+            </div>
+            <div class="card-body">
+                <div class="data-grid">
+                    <div class="pump-data-card">
+                        <div class="data-label">总监测点</div>
+                        <div class="data-value">24</div>
+                    </div>
+                    <div class="pump-data-card">
+                        <div class="data-label">正常点</div>
+                        <div class="data-value" style="color: #34C759;">18</div>
+                    </div>
+                    <div class="pump-data-card">
+                        <div class="data-label">预警点</div>
+                        <div class="data-value" style="color: #FF9500;">4</div>
+                    </div>
+                    <div class="pump-data-card">
+                        <div class="data-label">异常点</div>
+                        <div class="data-value" style="color: #FF3B30;">2</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 易涝点列表 -->
+        <div class="card-container">
+            <div class="card-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 class="card-title">易涝点列表</h2>
+                    <div class="filter-buttons" style="display: flex; gap: 8px;">
+                        <button class="filter-button active" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">全部</button>
+                        <button class="filter-button" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">正常</button>
+                        <button class="filter-button" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">预警</button>
+                        <button class="filter-button" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">异常</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">城西路与人民路交叉口</div>
+                            <div class="item-subtitle">积水深度: 15cm</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-danger"></span>
+                            <span class="status-text">异常</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">中山路地下通道</div>
+                            <div class="item-subtitle">积水深度: 8cm</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-warning"></span>
+                            <span class="status-text">预警</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">火车站广场</div>
+                            <div class="item-subtitle">积水深度: 0cm</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-normal"></span>
+                            <span class="status-text">正常</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">东湖公园东门</div>
+                            <div class="item-subtitle">积水深度: 22cm</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-danger"></span>
+                            <span class="status-text">异常</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">商业街南段</div>
+                            <div class="item-subtitle">积水深度: 5cm</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-warning"></span>
+                            <span class="status-text">预警</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">人民医院门口</div>
+                            <div class="item-subtitle">积水深度: 0cm</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-normal"></span>
+                            <span class="status-text">正常</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 查看更多 -->
+        <div style="text-align: center; padding: 16px;">
+            <button id="loadMoreBtn" style="padding: 10px 24px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                查看更多
+            </button>
+        </div>
+        
+    </main>
+
+
+    <script>
+        // 为筛选按钮添加点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('.filter-button');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有按钮的active类
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    // 添加当前按钮的active类
+                    this.classList.add('active');
+                });
+            });
+            
+            // 为"查看更多"按钮添加点击事件
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', function() {
+                    // 模拟加载更多数据
+                    const listGroup = document.querySelector('.list-group');
+                    if (listGroup) {
+                        // 创建新的易涝点项
+                        const newItems = [
+                            {
+                                title: "文化路与解放路交叉口",
+                                subtitle: "积水深度: 12cm",
+                                status: "warning",
+                                statusText: "预警"
+                            },
+                            {
+                                title: "体育中心南门",
+                                subtitle: "积水深度: 0cm",
+                                status: "normal",
+                                statusText: "正常"
+                            },
+                            {
+                                title: "大学城东门",
+                                subtitle: "积水深度: 18cm",
+                                status: "danger",
+                                statusText: "异常"
+                            }
+                        ];
+                        
+                        // 添加新项到列表
+                        newItems.forEach(item => {
+                            const newItem = document.createElement('div');
+                            newItem.className = 'list-group-item';
+                            newItem.innerHTML = `
+                                <div class="item-content">
+                                    <div class="item-title">${item.title}</div>
+                                    <div class="item-subtitle">${item.subtitle}</div>
+                                </div>
+                                <div class="status-container">
+                                    <span class="status-indicator status-${item.status}"></span>
+                                    <span class="status-text">${item.statusText}</span>
+                                </div>
+                            `;
+                            listGroup.appendChild(newItem);
+                        });
+                        
+                        // 更新按钮文本
+                        this.textContent = '已加载全部';
+                        this.disabled = true;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
