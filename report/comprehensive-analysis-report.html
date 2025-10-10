@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>综合分析报表</title>
+    <title>区域负荷综合分析报表</title>
     <!-- 引入Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
@@ -123,6 +123,44 @@
             color: var(--primary-color);
         }
         
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .stat-value.text-warning {
+            color: var(--warning-color);
+        }
+        
+        .stat-value.text-secondary {
+            color: var(--secondary-color);
+        }
+        
+        .stat-value.text-danger {
+            color: var(--danger-color);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+        
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -144,17 +182,17 @@
             cursor: pointer;
         }
         
-        .score-overview {
+        .load-overview {
             padding: 16px;
         }
         
-        .score-item {
+        .load-item {
             display: flex;
             align-items: center;
             margin-bottom: 16px;
         }
         
-        .score-item:last-child {
+        .load-item:last-child {
             margin-bottom: 0;
         }
         
@@ -171,22 +209,22 @@
             margin-right: 12px;
         }
         
-        .score-info {
+        .load-info {
             flex: 1;
         }
         
-        .score-header {
+        .load-header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 4px;
         }
         
-        .site-name {
+        .area-name {
             font-size: 14px;
             font-weight: 500;
         }
         
-        .site-score {
+        .area-load {
             font-size: 14px;
             font-weight: bold;
         }
@@ -201,13 +239,57 @@
         
         .progress-bar {
             height: 100%;
-            background-color: var(--secondary-color);
             border-radius: 4px;
+        }
+        
+        .progress-bar.low {
+            background-color: var(--secondary-color);
+        }
+        
+        .progress-bar.medium {
+            background-color: var(--warning-color);
+        }
+        
+        .progress-bar.high {
+            background-color: var(--danger-color);
         }
         
         .chart-container {
             height: 240px;
             padding: 16px;
+        }
+        
+        .legend-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            padding: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+        
+        .legend-color.normal {
+            background-color: var(--secondary-color);
+        }
+        
+        .legend-color.warning {
+            background-color: var(--warning-color);
+        }
+        
+        .legend-color.danger {
+            background-color: var(--danger-color);
         }
     </style>
 </head>
@@ -220,7 +302,7 @@
                 <i class="fa fa-arrow-left"></i>
             </button>
         </div>
-        <h1 class="header-title">综合分析报表</h1>
+        <h1 class="header-title">区域负荷综合分析报表</h1>
         <div></div>
     </header>
 
@@ -243,60 +325,128 @@
             </div>
         </div>
 
-        <!-- 站点评分总览 -->
+        <!-- 负荷核心指标 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value text-secondary">78%</div>
+                <div class="stat-label">平均负荷率</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value text-warning">3</div>
+                <div class="stat-label">中高负荷区域</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value text-danger">1</div>
+                <div class="stat-label">高负荷区域</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">5</div>
+                <div class="stat-label">监测区域</div>
+            </div>
+        </div>
+
+        <!-- 区域负荷总览 -->
         <div class="card">
             <div class="section-header">
-                <span class="section-title">站点评分总览</span>
+                <span class="section-title">区域负荷总览</span>
                 <button class="section-action">更新数据</button>
             </div>
-            <div class="score-overview">
-                <div class="score-item">
+            <div class="load-overview">
+                <div class="load-item">
                     <div class="rank-number">1</div>
-                    <div class="score-info">
-                        <div class="score-header">
-                            <span class="site-name">东区站点</span>
-                            <span class="site-score">92分</span>
+                    <div class="load-info">
+                        <div class="load-header">
+                            <span class="area-name">兰江街道</span>
+                            <span class="area-load">92%</span>
                         </div>
                         <div class="progress-container">
-                            <div class="progress-bar" style="width: 92%"></div>
+                            <div class="progress-bar high" style="width: 92%"></div>
                         </div>
                     </div>
                 </div>
-                <div class="score-item">
+                <div class="load-item">
                     <div class="rank-number">2</div>
-                    <div class="score-info">
-                        <div class="score-header">
-                            <span class="site-name">南区站点</span>
-                            <span class="site-score">88分</span>
+                    <div class="load-info">
+                        <div class="load-header">
+                            <span class="area-name">云山街道</span>
+                            <span class="area-load">85%</span>
                         </div>
                         <div class="progress-container">
-                            <div class="progress-bar" style="width: 88%"></div>
+                            <div class="progress-bar high" style="width: 85%"></div>
                         </div>
                     </div>
                 </div>
-                <div class="score-item">
+                <div class="load-item">
                     <div class="rank-number">3</div>
-                    <div class="score-info">
-                        <div class="score-header">
-                            <span class="site-name">西区站点</span>
-                            <span class="site-score">85分</span>
+                    <div class="load-info">
+                        <div class="load-header">
+                            <span class="area-name">永昌街道</span>
+                            <span class="area-load">76%</span>
                         </div>
                         <div class="progress-container">
-                            <div class="progress-bar" style="width: 85%"></div>
+                            <div class="progress-bar medium" style="width: 76%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="load-item">
+                    <div class="rank-number">4</div>
+                    <div class="load-info">
+                        <div class="load-header">
+                            <span class="area-name">赤溪街道</span>
+                            <span class="area-load">68%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar medium" style="width: 68%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="load-item">
+                    <div class="rank-number">5</div>
+                    <div class="load-info">
+                        <div class="load-header">
+                            <span class="area-name">游埠镇</span>
+                            <span class="area-load">52%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar low" style="width: 52%"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 站点多维度对比 -->
+        <!-- 区域负荷趋势 -->
         <div class="card">
             <div class="section-header">
-                <span class="section-title">站点多维度对比</span>
-                <button class="section-action">切换指标</button>
+                <span class="section-title">区域负荷趋势</span>
+                <button class="section-action">切换区域</button>
             </div>
             <div class="chart-container">
-                <canvas id="siteComparisonChart"></canvas>
+                <canvas id="loadTrendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 负荷多维度对比 -->
+        <div class="card">
+            <div class="section-header">
+                <span class="section-title">负荷多维度对比</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="loadComparisonChart"></canvas>
+            </div>
+            <div class="legend-container">
+                <div class="legend-item">
+                    <span class="legend-color normal"></span>
+                    <span>正常负荷(≤70%)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color warning"></span>
+                    <span>中等负荷(70%-85%)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color danger"></span>
+                    <span>高负荷(>85%)</span>
+                </div>
             </div>
         </div>
     </main>
@@ -312,36 +462,96 @@
         
         // 初始化图表
         document.addEventListener('DOMContentLoaded', function() {
-            // 站点多维度对比图表
-            const siteComparisonCtx = document.getElementById('siteComparisonChart').getContext('2d');
-            new Chart(siteComparisonCtx, {
-                type: 'radar',
+            // 区域负荷趋势图表
+            const loadTrendCtx = document.getElementById('loadTrendChart').getContext('2d');
+            new Chart(loadTrendCtx, {
+                type: 'line',
                 data: {
-                    labels: ['工单处理', '设备运行', '人员出勤', '故障解决', '能耗控制'],
+                    labels: ['0:00', '4:00', '8:00', '12:00', '16:00', '20:00', '24:00'],
                     datasets: [{
-                        label: '东区站点',
-                        data: [90, 95, 92, 94, 88],
-                        backgroundColor: 'rgba(0, 122, 255, 0.2)',
-                        borderColor: '#007AFF',
-                        pointBackgroundColor: '#007AFF'
+                        label: '兰江街道',
+                        data: [45, 38, 62, 88, 92, 76, 52],
+                        borderColor: '#FF3B30',
+                        backgroundColor: 'rgba(255, 59, 48, 0.1)',
+                        fill: true,
+                        tension: 0.4
                     }, {
-                        label: '北区站点',
-                        data: [75, 70, 82, 68, 78],
-                        backgroundColor: 'rgba(255, 149, 0, 0.2)',
+                        label: '云山街道',
+                        data: [38, 32, 55, 76, 85, 72, 48],
                         borderColor: '#FF9500',
-                        pointBackgroundColor: '#FF9500'
+                        backgroundColor: 'rgba(255, 149, 0, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: '永昌街道',
+                        data: [32, 28, 48, 65, 76, 68, 42],
+                        borderColor: '#007AFF',
+                        backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                        fill: true,
+                        tension: 0.4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        r: {
-                            angleLines: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
                                 color: 'rgba(0, 0, 0, 0.05)'
                             },
-                            suggestedMin: 50,
-                            suggestedMax: 100
+                            title: {
+                                display: true,
+                                text: '负荷率(%)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 负荷多维度对比图表
+            const loadComparisonCtx = document.getElementById('loadComparisonChart').getContext('2d');
+            new Chart(loadComparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['兰江街道', '云山街道', '永昌街道', '赤溪街道', '游埠镇'],
+                    datasets: [{
+                        label: '当前负荷率',
+                        data: [92, 85, 76, 68, 52],
+                        backgroundColor: [
+                            '#FF3B30',
+                            '#FF9500',
+                            '#007AFF',
+                            '#007AFF',
+                            '#34C759'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            title: {
+                                display: true,
+                                text: '负荷率(%)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
                         }
                     }
                 }
