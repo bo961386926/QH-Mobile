@@ -160,6 +160,36 @@
             color: var(--danger-color);
         }
         
+        /* 新增应维护、已维护、未维护的专用颜色类 */
+        .stat-value.should-maintain {
+            color: var(--primary-color); /* 蓝色 */
+        }
+        
+        .stat-value.completed-maintain {
+            color: var(--primary-color); /* 蓝色，与巡检页面保持一致 */
+        }
+        
+        .stat-value.pending-maintain {
+            color: var(--warning-color); /* 黄色 */
+        }
+        
+        /* 维护完成率不同区间的颜色类 */
+        .completion-rate.excellent {
+            color: var(--secondary-color); /* 绿色 >=90% */
+        }
+        
+        .completion-rate.good {
+            color: var(--secondary-color); /* 绿色 60%-90% */
+        }
+        
+        .completion-rate.poor {
+            color: var(--danger-color); /* 红色 <60% */
+        }
+        
+        .completion-rate.blue {
+            color: var(--primary-color); /* 蓝色 */
+        }
+        
         .stat-label {
             font-size: 12px;
             color: var(--gray-text);
@@ -273,8 +303,11 @@
             font-size: 14px;
             font-weight: bold;
             margin-right: 12px;
+            background-color: var(--light-bg);
+            color: var(--gray-text);
         }
         
+        /* 移除原有的排名颜色区分
         .rank-1 {
             background-color: var(--primary-color);
             color: white;
@@ -294,6 +327,7 @@
             background-color: var(--light-bg);
             color: var(--gray-text);
         }
+        */
         
         .company-info {
             flex: 1;
@@ -339,7 +373,7 @@
         }
         
         .progress-bar.maintenance {
-            background-color: var(--secondary-color);
+            background-color: var(--primary-color);
         }
     </style>
 </head>
@@ -378,20 +412,20 @@
         <!-- 核心指标 -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-value text-secondary">88%</div>
+                <div class="stat-value completion-rate blue">88%</div>
                 <div class="stat-label">维护完成率</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value text-warning">25</div>
-                <div class="stat-label">应维护站点</div>
+                <div class="stat-value should-maintain">25</div>
+                <div class="stat-label">应维护任务</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value text-primary">22</div>
-                <div class="stat-label">已维护站点</div>
+                <div class="stat-value completed-maintain">22</div>
+                <div class="stat-label">已维护任务</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value text-danger">3</div>
-                <div class="stat-label">未维护站点</div>
+                <div class="stat-value pending-maintain">3</div>
+                <div class="stat-label">未维护任务</div>
             </div>
         </div>
 
@@ -403,7 +437,7 @@
             <div class="ranking-list">
                 <!-- 排名第1 -->
                 <div class="ranking-item">
-                    <div class="rank-number rank-1">1</div>
+                    <div class="rank-number">1</div>
                     <div class="company-info">
                         <div class="company-name">A企业</div>
                         <div class="company-details">负责区域：兰江片区</div>
@@ -416,7 +450,7 @@
                 
                 <!-- 排名第2 -->
                 <div class="ranking-item">
-                    <div class="rank-number rank-2">2</div>
+                    <div class="rank-number">2</div>
                     <div class="company-info">
                         <div class="company-name">B企业</div>
                         <div class="company-details">负责区域：城区</div>
@@ -429,9 +463,9 @@
                 
                 <!-- 排名第3 -->
                 <div class="ranking-item">
-                    <div class="rank-number rank-3">3</div>
+                    <div class="rank-number">3</div>
                     <div class="company-info">
-                        <div class="company-name">D企业</div>
+                        <div class="company-name">C企业</div>
                         <div class="company-details">负责区域：赤溪片区</div>
                         <div class="progress-container">
                             <div class="progress-bar maintenance" style="width: 82%"></div>
@@ -439,45 +473,10 @@
                         <div class="company-details">维护完成率: 82%</div>
                     </div>
                 </div>
-                
-                <!-- 排名第4 -->
-                <div class="ranking-item">
-                    <div class="rank-number rank-other">4</div>
-                    <div class="company-info">
-                        <div class="company-name">E企业</div>
-                        <div class="company-details">负责区域：永昌片区</div>
-                        <div class="progress-container">
-                            <div class="progress-bar maintenance" style="width: 80%"></div>
-                        </div>
-                        <div class="company-details">维护完成率: 80%</div>
-                    </div>
-                </div>
-                
-                <!-- 排名第5 -->
-                <div class="ranking-item">
-                    <div class="rank-number rank-other">5</div>
-                    <div class="company-info">
-                        <div class="company-name">C企业</div>
-                        <div class="company-details">负责区域：游埠片区</div>
-                        <div class="progress-container">
-                            <div class="progress-bar maintenance" style="width: 70%"></div>
-                        </div>
-                        <div class="company-details">维护完成率: 70%</div>
-                    </div>
-                </div>
             </div>
         </div>
 
-        <!-- 各区域对比 -->
-        <div class="card">
-            <div class="section-header">
-                <span class="section-title">各区域维护完成情况对比</span>
-                <!-- <button class="section-action">详情</button> -->
-            </div>
-            <div class="chart-container">
-                <canvas id="regionComparisonChart"></canvas>
-            </div>
-        </div>
+   
 
         <!-- 完成率趋势 -->
         <div class="card">
@@ -524,7 +523,26 @@
                 });
             });
             
-            // 初始化图表
+            // 根据维护完成率设置颜色
+            function setCompletionRateColor() {
+                const rateElement = document.querySelector('.completion-rate');
+                const rate = parseInt(rateElement.textContent);
+                
+                // 移除所有颜色类
+                rateElement.classList.remove('excellent', 'good', 'poor', 'blue');
+                
+                // 根据数值添加相应的颜色类
+                if (rate >= 90) {
+                    rateElement.classList.add('excellent');
+                } else if (rate >= 60) {
+                    rateElement.classList.add('blue'); // 60%-90%使用蓝色
+                } else {
+                    rateElement.classList.add('poor');
+                }
+            }
+            
+            // 初始化图表和完成率颜色
+            setCompletionRateColor();
             initCharts();
         });
         
@@ -540,8 +558,8 @@
                         {
                             label: '维护完成率',
                             data: [82, 84, 86, 87, 88, 88],
-                            borderColor: '#34C759',
-                            backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                            borderColor: '#007AFF',
+                            backgroundColor: 'rgba(0, 122, 255, 0.1)',
                             fill: true,
                             tension: 0.4
                         }
@@ -582,7 +600,7 @@
                         {
                             label: '维护完成率',
                             data: [92, 85, 82, 80, 70],
-                            backgroundColor: '#34C759',
+                            backgroundColor: '#007AFF',
                         }
                     ]
                 },

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全部告警 - 农饮水运维移动端</title>
+    <!-- 引入Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+            --card-bg: #FFFFFF;
+            --border-color: #E5E5EA;
+        }
+        
+        /* 告警列表页面特定样式 */
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            padding-top: 48px;
+            padding-bottom: 60px;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #111111;
+            margin: 0;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #666666;
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .main-content {
+            padding: 16px;
+        }
+        
+        .card-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #111111;
+            margin: 0;
+        }
+        
+        .card-body {
+            padding: 16px;
+        }
+        
+        /* 告警列表项样式 */
+        .alert-item {
+            padding: 16px 0;
+            border-bottom: 1px solid #f5f5f5;
+            background-color: white;
+        }
+
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .alert-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111111;
+        }
+
+        .alert-badge {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: #ffffff;
+        }
+
+        .badge-warning {
+            background-color: #FF9500;
+        }
+
+        .badge-danger {
+            background-color: #FF3B30;
+        }
+
+        .badge-info {
+            background-color: #007AFF;
+        }
+
+        .alert-description {
+            font-size: 12px;
+            color: #666666;
+            margin-bottom: 12px;
+        }
+
+        .alert-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alert-time {
+            font-size: 12px;
+            color: #666666;
+        }
+
+        .detail-btn {
+            padding: 6px 12px;
+            border-radius: 16px;
+            background-color: #f5f5f5;
+            color: #007AFF;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* 新增告警状态样式 */
+        .alert-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-emergency {
+            background-color: #FF3B30;
+        }
+
+        .status-important {
+            background-color: #FF9500;
+        }
+
+        .status-normal {
+            background-color: #666666;
+        }
+
+        .status-handled {
+            background-color: #34C759;
+        }
+
+        /* 告警详情卡片样式 */
+        .alert-card {
+            margin-bottom: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .alert-card-header {
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e5e5ea;
+        }
+
+        .alert-card-body {
+            padding: 16px;
+        }
+
+        /* 处理按钮样式 */
+        .handle-btn {
+            padding: 6px 12px;
+            border-radius: 16px;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .btn-emergency {
+            background-color: #FF3B30;
+            color: white;
+        }
+
+        .btn-important {
+            background-color: #FF9500;
+            color: white;
+        }
+
+        .btn-normal {
+            background-color: #666666;
+            color: white;
+        }
+
+        .btn-handled {
+            background-color: #34C759;
+            color: white;
+        }
+
+        /* 查看详情按钮样式 */
+        .detail-btn {
+            padding: 6px 12px;
+            border-radius: 16px;
+            background-color: #f5f5f5;
+            color: #007AFF;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* 标记全部已读按钮样式 */
+        .mark-all-read {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 12px;
+            color: #007AFF;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        /* 最近告警标题样式 */
+        .recent-alerts-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111111;
+            margin: 0;
+        }
+
+        /* 告警时间样式 */
+        .alert-time {
+            font-size: 12px;
+            color: #666666;
+        }
+
+        /* 地点图标样式 */
+        .location-icon {
+            color: #666666;
+            margin-right: 4px;
+        }
+
+        /* 水位图标样式 */
+        .water-level-icon {
+            color: #666666;
+            margin-right: 4px;
+        }
+
+        /* 压力图标样式 */
+        .pressure-icon {
+            color: #666666;
+            margin-right: 4px;
+        }
+
+        /* 数据异常图标样式 */
+        .data-anomaly-icon {
+            color: #666666;
+            margin-right: 4px;
+        }
+
+        /* 处理人图标样式 */
+        .handler-icon {
+            color: #666666;
+            margin-right: 4px;
+        }
+
+        /* 已解决图标样式 */
+        .resolved-icon {
+            color: #34C759;
+            margin-right: 4px;
+        }
+
+        /* 持续时间样式 */
+        .duration {
+            font-size: 12px;
+            color: #666666;
+            margin-left: 8px;
+        }
+
+        /* 告警类型标签样式 */
+        .alert-type-label {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        .type-emergency {
+            background-color: #FFECEC;
+            color: #FF3B30;
+        }
+
+        .type-important {
+            background-color: #FFF2E5;
+            color: #FF9500;
+        }
+
+        .type-normal {
+            background-color: #F5F5F5;
+            color: #666666;
+        }
+
+        .type-handled {
+            background-color: #E8F5E8;
+            color: #34C759;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #ccc;
+        }
+        
+        .empty-state p {
+            margin: 0;
+        }
+        
+        /* 底部导航栏样式 */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray-text);
+            font-size: 12px;
+        }
+        
+        .tab-item.active {
+            color: var(--primary-color);
+        }
+        
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <button class="action-btn" onclick="window.history.back()">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h1 class="header-title">全部告警</h1>
+        <div class="header-actions">
+            <button class="action-btn">
+                <i class="bi bi-filter"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="main-content">
+        <!-- 告警列表 -->
+        <div class="card-container">
+            <div class="card-header">
+                <h2 class="card-title">告警列表</h2>
+            </div>
+            <div class="card-body">
+                <div id="alertListContainer">
+                    <!-- 告警项将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部导航栏 -->
+    <nav class="tab-bar">
+        <a href="../../home/home.html" class="tab-item" data-page="home">
+            <span class="tab-icon"><i class="bi bi-house"></i></span>
+            <span class="tab-text">首页</span>
+        </a>
+        <a href="../monitor.html" class="tab-item" data-page="monitor">
+            <span class="tab-icon"><i class="bi bi-tv"></i></span>
+            <span class="tab-text">监控</span>
+        </a>
+        <a href="../../operation/operation.html" class="tab-item" data-page="operation">
+            <span class="tab-icon"><i class="bi bi-tools"></i></span>
+            <span class="tab-text">运维</span>
+        </a>
+        <a href="../../report/report.html" class="tab-item" data-page="report">
+            <span class="tab-icon"><i class="bi bi-bar-chart"></i></span>
+            <span class="tab-text">报表</span>
+        </a>
+        <a href="../../profile/profile.html" class="tab-item" data-page="profile">
+            <span class="tab-icon"><i class="bi bi-person"></i></span>
+            <span class="tab-text">我的</span>
+        </a>
+    </nav>
+
+    <script>
+        // 模拟告警数据
+        const alertData = [
+            {
+                id: 1,
+                title: "二号泵站压力异常",
+                type: "警告",
+                description: "出水压力超过阈值5.5MPa，当前值5.8MPa",
+                time: "2023-06-15 14:32",
+                severity: "warning"
+            },
+            {
+                id: 2,
+                title: "三号泵站故障停机",
+                type: "紧急",
+                description: "电机过载保护触发，设备自动停机",
+                time: "2023-06-15 10:15",
+                severity: "danger"
+            },
+            {
+                id: 3,
+                title: "一号泵站水位过高",
+                type: "警告",
+                description: "集水池水位超过安全线，当前值2.8米",
+                time: "2023-06-15 09:20",
+                severity: "warning"
+            },
+            {
+                id: 4,
+                title: "四号泵站电机过热",
+                type: "紧急",
+                description: "电机温度达到85℃，超过安全阈值",
+                time: "2023-06-14 16:45",
+                severity: "danger"
+            },
+            {
+                id: 5,
+                title: "五号泵站流量异常",
+                type: "一般",
+                description: "瞬时流量超出正常范围±10%",
+                time: "2023-06-14 14:10",
+                severity: "info"
+            }
+        ];
+
+        // 渲染告警列表
+        function renderAlertList() {
+            const container = document.getElementById('alertListContainer');
+            
+            if (alertData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-bell-slash"></i>
+                        <p>暂无告警信息</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            alertData.forEach(alert => {
+                let badgeClass = '';
+                switch(alert.severity) {
+                    case 'danger':
+                        badgeClass = 'badge-danger';
+                        break;
+                    case 'warning':
+                        badgeClass = 'badge-warning';
+                        break;
+                    case 'info':
+                        badgeClass = 'badge-info';
+                        break;
+                    default:
+                        badgeClass = 'badge-warning';
+                }
+                
+                html += `
+                    <div class="alert-item">
+                        <div class="alert-header">
+                            <div class="alert-title">${alert.title}</div>
+                            <span class="alert-badge ${badgeClass}">${alert.type}</span>
+                        </div>
+                        <div class="alert-description">${alert.description}</div>
+                        <div class="alert-footer">
+                            <div class="alert-time">${alert.time}</div>
+                            <button class="detail-btn" onclick="viewAlertDetail(${alert.id})">查看详情</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // 查看告警详情
+        function viewAlertDetail(alertId) {
+            // 在实际应用中，这里会跳转到告警详情页面
+            console.log('查看告警详情:', alertId);
+            // window.location.href = `alert-detail.html?id=${alertId}`;
+            alert('查看告警详情: ' + alertId);
+        }
+
+        // 页面加载完成后渲染告警列表
+        document.addEventListener('DOMContentLoaded', function() {
+            renderAlertList();
+        });
+    </script>
+</body>
+</html>

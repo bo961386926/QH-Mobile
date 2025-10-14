@@ -6,6 +6,8 @@
     <title>人工考勤报表</title>
     <!-- 引入Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <!-- 引入Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
@@ -250,12 +252,29 @@
                 <i class="fa fa-arrow-left"></i>
             </button>
         </div>
-        <h1 class="header-title">人工考勤报表</h1>
+        <h1 class="header-title">人员考勤报表</h1>
         <div></div>
     </header>
 
     <!-- 主内容区 -->
     <main class="main-content">
+
+        <!-- 日期筛选器 -->
+        <div class="card">
+            <div class="date-filter-container">
+                <div class="date-filter-header">
+                    <span class="date-filter-label">数据周期</span>
+                    <div class="date-filters">
+                        <button class="date-filter active">今日</button>
+                        <button class="date-filter">近7天</button>
+                        <button class="date-filter">本月</button>
+                        <button class="date-filter">
+                            <i class="bi bi-calendar"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- 考勤概览 -->
         <div class="card">
@@ -264,24 +283,24 @@
             </div>
             <div class="attendance-overview">
                 <div class="overview-grid">
-                    <div class="overview-item">
+                    <!-- <div class="overview-item">
                         <div class="overview-value">42</div>
                         <div class="overview-label">应到人数</div>
                     </div>
                     <div class="overview-item">
-                        <div class="overview-value text-secondary">39</div>
+                        <div class="overview-value">39</div>
                         <div class="overview-label">实到人数</div>
                     </div>
                     <div class="overview-item">
                         <div class="overview-value">92.9%</div>
                         <div class="overview-label">出勤率</div>
-                    </div>
+                    </div> -->
                     <div class="overview-item">
-                        <div class="overview-value text-warning">5.2</div>
+                        <div class="overview-value">5.2</div>
                         <div class="overview-label">人均考勤次数</div>
                     </div>
                     <div class="overview-item">
-                        <div class="overview-value text-danger">7.8</div>
+                        <div class="overview-value">7.8</div>
                         <div class="overview-label">人均考勤时长(小时)</div>
                     </div>
                 </div>
@@ -333,6 +352,17 @@
             // 返回按钮功能
             document.getElementById('back-button').addEventListener('click', function() {
                 window.location.href = './report.html';
+            });
+            
+            // 日期筛选器功能
+            const dateFilters = document.querySelectorAll('.date-filter');
+            dateFilters.forEach(filter => {
+                filter.addEventListener('click', function() {
+                    dateFilters.forEach(f => {
+                        f.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
             });
             
             // Tab切换功能
@@ -447,21 +477,39 @@
                         data: chartData.personnelTop.duration,
                         backgroundColor: 'rgba(0, 122, 255, 0.7)',
                         borderColor: 'rgba(0, 122, 255, 1)',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        yAxisID: 'y'
                     },
                     {
                         label: '考勤次数',
                         data: chartData.personnelTop.count,
                         backgroundColor: 'rgba(52, 199, 89, 0.7)',
                         borderColor: 'rgba(52, 199, 89, 1)',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        yAxisID: 'y1'
                     }
                 ]
             },
             options: {
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: '考勤时长(小时)'
+                        }
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: '考勤次数'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
                     }
                 },
                 plugins: {
@@ -496,21 +544,39 @@
                         data: chartData.siteTop.duration,
                         backgroundColor: 'rgba(0, 122, 255, 0.7)',
                         borderColor: 'rgba(0, 122, 255, 1)',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        yAxisID: 'y'
                     },
                     {
                         label: '考勤次数',
                         data: chartData.siteTop.count,
                         backgroundColor: 'rgba(52, 199, 89, 0.7)',
                         borderColor: 'rgba(52, 199, 89, 1)',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        yAxisID: 'y1'
                     }
                 ]
             },
             options: {
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: '考勤时长(小时)'
+                        }
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: '考勤次数'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
                     }
                 },
                 plugins: {

@@ -528,19 +528,19 @@
                         </a>
                     </div>
                     <div class="module-item">
-                      
+                        <a href="../monitor/alert/alert-list.html" class="module-link">
                             <div class="module-icon danger-bg">
                                 <i class="bi bi-exclamation-triangle"></i>
                             </div>
                             <div class="module-text">告警</div>
-                       
+                        </a>
                     </div>
                     <div class="module-item">
                        
                             <div class="module-icon primary-bg">
                                 <i class="bi bi-card-list"></i>
                             </div>
-                            <div class="module-text">工单</div>
+                            <div class="module-text" style="color: rgb(9, 255, 0);">工单</div>
                        
                     </div>
                     <div class="module-item">
@@ -683,13 +683,6 @@
             setInterval(nextSlide, 5000);
         });
         
-        // 功能模块点击事件
-        document.querySelectorAll('.module-icon').forEach(icon => {
-            icon.addEventListener('click', function() {
-                const moduleName = this.nextElementSibling.textContent;
-                console.log('点击模块:', moduleName);
-            });
-        });
         
         // 全局搜索功能
         function performSearch() {

@@ -303,7 +303,7 @@
                     <span class="date-filter-label">数据周期</span>
                     <div class="date-filters">
                         <button class="date-filter active">今日</button>
-                        <button class="date-filter">本周</button>
+                        <button class="date-filter">近7天</button>
                         <button class="date-filter">本月</button>
                         <button class="date-filter">
                             <i class="bi bi-calendar"></i>
@@ -314,22 +314,18 @@
         </div>
 
         <!-- 工单核心指标 -->
-        <div class="stats-grid">
+        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
             <div class="stat-card">
-                <div class="stat-value">24</div>
-                <div class="stat-label">新增工单</div>
+                <div class="stat-value">8</div>
+                <div class="stat-label">待处理工单</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value text-warning">8</div>
-                <div class="stat-label">待处理工单</div>
+                <div class="stat-value text-warning">12</div>
+                <div class="stat-label">处理中工单</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value text-secondary">16</div>
                 <div class="stat-label">已完成工单</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value text-danger">2</div>
-                <div class="stat-label">逾期未处理</div>
             </div>
         </div>
 
@@ -353,10 +349,6 @@
                 <div class="legend-item">
                     <span class="legend-color secondary"></span>
                     <span>已完成</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color danger"></span>
-                    <span>已逾期</span>
                 </div>
             </div>
         </div>
@@ -382,11 +374,6 @@
         document.getElementById('back-button').addEventListener('click', function() {
             window.history.back();
         });
-        
-        // 查看详情按钮功能
-        // document.getElementById('view-details-btn').addEventListener('click', function() {
-        //     window.location.href = './work-order-details.html';
-        // });
         
         // 日期筛选器功能
         const dateFilters = document.querySelectorAll('.date-filter');
@@ -459,14 +446,13 @@
         new Chart(workorderStatusCtx, {
             type: 'doughnut',
             data: {
-                labels: ['待处理', '处理中', '已完成', '已逾期'],
+                labels: ['待处理', '处理中', '已完成'],
                 datasets: [{
-                    data: [12, 25, 48, 5],
+                    data: [8, 12, 16],
                     backgroundColor: [
                         '#007AFF',
                         '#FF9500',
-                        '#34C759',
-                        '#FF3B30'
+                        '#34C759'
                     ],
                     borderWidth: 0
                 }]
