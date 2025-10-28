@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../../assets/libs/bootstrap-icons-1.13.1/fonts/bootstrap-icons.css">
     <!-- 已移除Font Awesome CDN引用，使用本地Bootstrap Icons替代 -->
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         :root {
             --primary-color: #007AFF;
@@ -255,9 +256,9 @@
 <body>
     <!-- 巡检填报页面 -->
     <div id="inspection-form-page">
-    <header class="bg-white text-primary p-4 shadow-md flex justify-between items-center sticky top-0 z-10">
-            <button onclick="window.location.href='inspection-template.html'" class="text-primary back-button">
-                <i class="fa fa-arrow-left"></i>
+    <header class="bg-white p-4 shadow-md flex justify-between items-center sticky top-0 z-10">
+            <button onclick="window.location.href='inspection-template.html'" class="back-button">
+                <i class="bi bi-arrow-left"></i>
             </button>
             <h1 class="text-lg font-bold">东河村污水站 - 巡检记录</h1>
             <button class="text-primary">
@@ -288,7 +289,7 @@
             <div class="card-shadow mb-4">
                 <div class="bg-gray-50 p-3 border-b border-gray-100">
                     <h3 class="font-bold flex items-center">
-                        <i class="fa fa-tint text-primary mr-2"></i>
+                        <i class="bi bi-droplet text-primary mr-2"></i>
                         1. 净水设施
                     </h3>
                 </div>
@@ -315,7 +316,7 @@
                             <label class="font-medium block mb-1">异常情况照片 <span class="text-danger">*</span></label>
                             <div class="photo-upload-area" id="operation-status-photo-container">
                                 <div class="upload-placeholder" onclick="document.getElementById('operation-status-photo-input').click()">
-                                    <i class="fa fa-plus"></i>
+                                    <i class="bi bi-plus"></i>
                                     <span class="text-xs">添加</span>
                                 </div>
                                 <input type="file" id="operation-status-photo-input" accept="image/*" multiple style="display: none;" onchange="handlePhotoUpload(this, 'operation-status')">
@@ -327,7 +328,7 @@
                             <label class="font-medium block mb-1">异常情况视频 <span class="text-danger">*</span></label>
                             <div class="video-upload-area" id="operation-status-video-container">
                                 <div class="video-placeholder" onclick="document.getElementById('operation-status-video-input').click()">
-                                    <i class="fa fa-plus"></i>
+                                    <i class="bi bi-plus"></i>
                                     <span class="text-xs">添加视频</span>
                                 </div>
                                 <input type="file" id="operation-status-video-input" accept="video/*" style="display: none;" onchange="handleVideoUpload(this, 'operation-status')">
@@ -359,7 +360,7 @@
                             <label class="font-medium block mb-1">异常情况照片 <span class="text-danger">*</span></label>
                             <div class="photo-upload-area" id="electromechanical-photo-container">
                                 <div class="upload-placeholder" onclick="document.getElementById('electromechanical-photo-input').click()">
-                                    <i class="fa fa-plus"></i>
+                                    <i class="bi bi-plus"></i>
                                     <span class="text-xs">添加</span>
                                 </div>
                                 <input type="file" id="electromechanical-photo-input" accept="image/*" multiple style="display: none;" onchange="handlePhotoUpload(this, 'electromechanical')">
@@ -371,7 +372,7 @@
                             <label class="font-medium block mb-1">异常情况视频 <span class="text-danger">*</span></label>
                             <div class="video-upload-area" id="electromechanical-video-container">
                                 <div class="video-placeholder" onclick="document.getElementById('electromechanical-video-input').click()">
-                                    <i class="fa fa-plus"></i>
+                                    <i class="bi bi-plus"></i>
                                     <span class="text-xs">添加视频</span>
                                 </div>
                                 <input type="file" id="electromechanical-video-input" accept="video/*" style="display: none;" onchange="handleVideoUpload(this, 'electromechanical')">
@@ -403,7 +404,7 @@
                             <label class="font-medium block mb-1">异常情况照片 <span class="text-danger">*</span></label>
                             <div class="photo-upload-area" id="backwash-photo-container">
                                 <div class="upload-placeholder" onclick="document.getElementById('backwash-photo-input').click()">
-                                    <i class="fa fa-plus"></i>
+                                    <i class="bi bi-plus"></i>
                                     <span class="text-xs">添加</span>
                                 </div>
                                 <input type="file" id="backwash-photo-input" accept="image/*" multiple style="display: none;" onchange="handlePhotoUpload(this, 'backwash')">
@@ -415,7 +416,7 @@
                             <label class="font-medium block mb-1">异常情况视频 <span class="text-danger">*</span></label>
                             <div class="video-upload-area" id="backwash-video-container">
                                 <div class="video-placeholder" onclick="document.getElementById('backwash-video-input').click()">
-                                    <i class="fa fa-plus"></i>
+                                    <i class="bi bi-plus"></i>
                                     <span class="text-xs">添加视频</span>
                                 </div>
                                 <input type="file" id="backwash-video-input" accept="video/*" style="display: none;" onchange="handleVideoUpload(this, 'backwash')">
@@ -430,7 +431,7 @@
             <div class="card-shadow mb-4">
                 <div class="bg-gray-50 p-3 border-b border-gray-100">
                     <h3 class="font-bold flex items-center">
-                        <i class="fa fa-tint text-primary mr-2"></i>
+                        <i class="bi bi-droplet text-primary mr-2"></i>
                         2. 清水池
                     </h3>
                 </div>
@@ -508,7 +509,7 @@
             <div class="card-shadow mb-4">
                 <div class="bg-gray-50 p-3 border-b border-gray-100">
                     <h3 class="font-bold flex items-center">
-                        <i class="fa fa-flask text-primary mr-2"></i>
+                        <i class="bi bi-beaker text-primary mr-2"></i>
                         3. 加药设备
                     </h3>
                 </div>
@@ -551,7 +552,7 @@
             <div class="card-shadow mb-4">
                 <div class="bg-gray-50 p-3 border-b border-gray-100">
                     <h3 class="font-bold flex items-center">
-                        <i class="fa fa-file-text-o text-primary mr-2"></i>
+                        <i class="bi bi-file-text text-primary mr-2"></i>
                         4. 加药记录
                     </h3>
                 </div>
@@ -617,7 +618,7 @@
             <div class="card-shadow mb-4">
                 <div class="bg-gray-50 p-3 border-b border-gray-100">
                     <h3 class="font-bold flex items-center">
-                        <i class="fa fa-building-o text-primary mr-2"></i>
+                        <i class="bi bi-building text-primary mr-2"></i>
                         5. 厂区环境
                     </h3>
                 </div>
@@ -723,7 +724,7 @@
             <div class="card-shadow mb-4">
                 <div class="bg-gray-50 p-3 border-b border-gray-100">
                     <h3 class="font-bold flex items-center">
-                        <i class="fa fa-check-circle text-primary mr-2"></i>
+                        <i class="bi bi-check-circle text-primary mr-2"></i>
                         6. 出厂水质
                     </h3>
                 </div>
@@ -784,7 +785,7 @@
             <div class="card-shadow mb-4">
                 <div class="bg-gray-50 p-3 border-b border-gray-100">
                     <h3 class="font-bold flex items-center">
-                        <i class="fa fa-camera text-primary mr-2"></i>
+                        <i class="bi bi-camera text-primary mr-2"></i>
                         现场照片
                     </h3>
                 </div>
@@ -794,7 +795,7 @@
                         <label class="font-medium block mb-1">现场照片</label>
                         <div class="photo-upload-area" id="general-photo-container">
                             <div class="upload-placeholder" onclick="document.getElementById('general-photo-input').click()">
-                                <i class="fa fa-plus"></i>
+                                <i class="bi bi-plus"></i>
                                 <span class="text-xs">添加照片</span>
                             </div>
                             <input type="file" id="general-photo-input" accept="image/*" multiple style="display: none;" onchange="handlePhotoUpload(this, 'general')">
@@ -808,7 +809,7 @@
             <div class="card-shadow mb-6">
                 <div class="bg-gray-50 p-3 border-b border-gray-100">
                     <h3 class="font-bold flex items-center">
-                        <i class="fa fa-video-camera text-primary mr-2"></i>
+                        <i class="bi bi-camera-video text-primary mr-2"></i>
                         现场视频记录
                     </h3>
                 </div>
@@ -818,7 +819,7 @@
                         <label class="font-medium block mb-1">现场视频</label>
                         <div class="video-upload-area" id="video-container">
                             <div class="video-placeholder" onclick="document.getElementById('video-input').click()">
-                                <i class="fa fa-plus"></i>
+                                <i class="bi bi-plus"></i>
                                 <span class="text-xs">添加视频</span>
                             </div>
                             <input type="file" id="video-input" accept="video/*" style="display: none;" onchange="handleVideoUpload(this)">
@@ -858,7 +859,7 @@
                         <div class="relative">
                             <textarea id="overall-evaluation" class="w-full border border-gray-300 rounded-md p-2 text-sm h-24" placeholder="请输入总体评价、处理建议或其他需要说明的事项..."></textarea>
                             <button id="voice-input-btn" class="absolute bottom-2 right-2 bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center">
-                                <i class="fa fa-microphone"></i>
+                                <i class="bi bi-mic"></i>
                             </button>
                         </div>
                     </div>
@@ -920,7 +921,7 @@
                     // 开始语音识别
                     voiceBtn.addEventListener('click', function() {
                         recognition.start();
-                        voiceBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+                        voiceBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
                         voiceBtn.classList.add('bg-warning');
                         voiceBtn.classList.remove('bg-primary');
                     });
@@ -937,7 +938,7 @@
                     
                     // 识别结束处理
                     recognition.onend = function() {
-                        voiceBtn.innerHTML = '<i class="fa fa-microphone"></i>';
+                        voiceBtn.innerHTML = '<i class="bi bi-mic"></i>';
                         voiceBtn.classList.remove('bg-warning');
                         voiceBtn.classList.add('bg-primary');
                     };
@@ -945,7 +946,7 @@
                     // 识别错误处理
                     recognition.onerror = function(event) {
                         console.error('语音识别错误:', event.error);
-                        voiceBtn.innerHTML = '<i class="fa fa-microphone"></i>';
+                        voiceBtn.innerHTML = '<i class="bi bi-mic"></i>';
                         voiceBtn.classList.remove('bg-warning');
                         voiceBtn.classList.add('bg-primary');
                         

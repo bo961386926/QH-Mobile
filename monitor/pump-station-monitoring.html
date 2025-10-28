@@ -74,15 +74,35 @@
         }
         
         .main-content {
-            padding: 16px;
+            padding: 4px; /* 减小padding */
+            padding-top:80px; /* 调整顶部padding，为固定的tabs区域留出空间 */
+        }
+        
+        /* 固定的tabs区域 */
+        .fixed-tabs {
+            position: fixed;
+            top: 48px; /* header高度 */
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            z-index: 99;
+            padding: 4px 8px; /* 进一步减小padding */
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* 可滚动的列表区域 */
+        .scrollable-list {
+            max-height: calc(100vh - 180px); /* 调整减去的高度 */
+            overflow-y: auto;
         }
         
         .card-container {
             background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            margin-bottom: 24px;
+            border-radius: 8px; /* 减小圆角 */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* 减小阴影 */
+            margin-bottom: 16px; /* 减小margin */
             overflow: hidden;
+            padding: 0 4px; /* 减小左右padding */
         }
         
         .card-header {
@@ -98,7 +118,7 @@
         }
         
         .card-body {
-            padding: 16px;
+            padding: 4px; /* 减小padding */
         }
         
         .map-placeholder {
@@ -113,16 +133,38 @@
         }
         
         .list-group {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr; /* 每行只显示一个块状区域 */
+            gap: 8px; /* 减小间距 */
+            padding: 4px; /* 减小内边距 */
         }
         
         .list-group-item {
             display: flex;
-            justify-content: space-between;
+            flex-direction: row; /* 水平排列 */
+            border: 1px solid var(--border-color);
+            border-radius: 8px; /* 减小圆角 */
+            padding: 8px; /* 减小内边距 */
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* 减小阴影 */
+        }
+        
+        .item-image {
+            width: 120px; /* 固定宽度 */
+            height: 100px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f5f5f5;
+            justify-content: center;
+            margin-right: 12px; /* 右边距 */
+            color: #999;
+            font-size: 12px;
+            flex-shrink: 0; /* 防止压缩 */
+        }
+        
+        .item-content {
+            flex: 1;
         }
         
         .list-group-item:last-child {
@@ -133,11 +175,17 @@
             flex: 1;
         }
         
+        .item-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
         .item-title {
             font-size: 14px;
             font-weight: 500;
             color: #111111;
-            margin-bottom: 4px;
+            margin-bottom: 0;
         }
         
         .item-subtitle {
@@ -145,6 +193,58 @@
             color: #666666;
         }
         
+        .item-address {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+        }
+        
+        .address-icon {
+            color: var(--primary-color);
+            margin-right: 4px;
+            font-size: 14px;
+        }
+        
+        .address-text {
+            font-size: 10px;
+            color: #666666;
+        }
+        
+        .item-data-time-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .item-data-time {
+            font-size: 10px;
+            color: var(--gray-text);
+            margin: 4px 0;
+        }
+        
+        .iot-status {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+        }
+        
+        .iot-status i {
+            font-size: 12px;
+            margin-right: 4px;
+        }
+        
+        .iot-status .bi-wifi {
+            color: var(--secondary-color);
+        }
+        
+        .iot-status .bi-wifi-off {
+            color: var(--gray-text);
+        }
+        
+        .iot-text {
+            font-size: 10px;
+            color: var(--gray-text);
+        }
         .status-container {
             display: flex;
             align-items: center;
@@ -198,46 +298,63 @@
             cursor: pointer;
         }
         
-        .data-grid {
+        /* 数据统计样式 */
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
-        /* @media (min-width: 768px) {
-            .data-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        } */
-        
-        .pump-data-card {
+        .stats-card {
             text-align: center;
-            padding: 12px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
+            padding: 8px;
+            min-width: 60px;
         }
         
-        .data-label {
+        .stats-value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .stats-value.text-normal {
+            color: var(--secondary-color); /* 绿色字体 */
+        }
+        
+        .stats-value.text-warning {
+            color: var(--warning-color); /* 黄色字体 */
+        }
+        
+        .stats-value.text-danger {
+            color: var(--danger-color); /* 红色字体 */
+        }
+        
+        .stats-label {
             font-size: 12px;
             color: #666666;
-            margin-bottom: 4px;
         }
         
-        .data-value {
-            font-size: 18px;
-            font-weight: bold;
-            color: #111111;
-            margin-bottom: 4px;
-        }
-        
-        .data-range {
-            font-size: 10px;
-            color: #666666;
-        }
-        
-        .data-range.warning {
-            color: #FF9500;
+        /* 确保在小屏幕上也能一行显示4个 */
+        @media (max-width: 414px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            
+            .stats-card {
+                padding: 6px;
+                min-width: 50px;
+            }
+            
+            .stats-value {
+                font-size: 18px;
+            }
+            
+            .stats-label {
+                font-size: 10px;
+            }
         }
         
         .chart-container {
@@ -280,6 +397,21 @@
         
         .badge-danger {
             background-color: #FF3B30;
+        }
+        
+        .alert-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+        
+        .alert-level,
+        .alert-urgency,
+        .alert-duration,
+        .alert-count {
+            color: #333;
         }
         
         .alert-description {
@@ -336,321 +468,327 @@
             color: #666666;
         }
         
-        /* 底部导航栏样式 */
-        .tab-bar {
-            position: fixed;
+        /* 状态Tab样式 - 带有底部激活指示条 */
+        .status-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 8px; /* 减小margin */
+            background-color: var(--card-bg);
+        }
+        
+        .status-tab {
+            flex: 1;
+            padding: 4px 2px; /* 进一步减小padding */
+            text-align: center;
+            font-size: 14px;
+            color: var(--gray-text);
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .status-tab.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .status-tab.active::after {
+            content: '';
+            position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 60px;
-            background-color: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 100;
+            height: 3px;
+            background-color: var(--primary-color);
         }
         
-        .tab-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: var(--gray-text);
+        .tab-count {
+            display: inline-block;
+            background-color: #e0e0e0;
+            color: #666;
+            border-radius: 10px;
+            padding: 2px 6px;
             font-size: 12px;
+            margin-left: 4px;
         }
         
-        .tab-item.active {
-            color: var(--primary-color);
+        .status-tab.active .tab-count {
+            background-color: var(--primary-color);
+            color: white;
         }
         
-        .tab-icon {
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-        
-        /* 筛选按钮样式 */
-        .filter-buttons {
+        /* 泵站类型筛选样式 - 更低调的按钮 */
+        .pump-type-filters {
             display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 4px; /* 进一步减小gap */
+            margin-bottom: 0; /* 移除margin-bottom */
         }
         
-        .filter-button {
-            flex: 1;
-            padding: 10px 16px;
+        .pump-type-filter {
+            padding: 2px 8px; /* 进一步减小padding */
             border: 1px solid var(--border-color);
             background-color: var(--card-bg);
             color: var(--gray-text);
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
+            border-radius: 8px; /* 进一步减小border-radius */
+            font-size: 12px;
             cursor: pointer;
-            transition: all 0.2s;
         }
         
-        .filter-button.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+        .pump-type-filter.active {
+            background-color: #e0e0e0;
+            color: #333;
+            border-color: var(--border-color);
         }
         
-        .filter-button:hover:not(.active) {
+        .pump-type-filter:hover:not(.active) {
             background-color: #f5f5f5;
         }
         
-        /* Tab按钮样式 */
-        .tab-buttons {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
+        .pump-type-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 8px;
+            background-color: #e0e0e0;
+            color: #666;
         }
         
-        .tab-button {
-            flex: 1;
-            padding: 10px 16px;
-            border: 1px solid var(--border-color);
-            background-color: var(--card-bg);
-            color: var(--gray-text);
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
+        
+        .station-link {
+            color: var(--primary-color); /* 蓝色字体 */
+            text-decoration: none;
         }
         
-        .tab-button.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+        .station-link:hover {
+            text-decoration: underline;
+        }
+        /* 响应式优化 */
+        @media (max-width: 375px) {
+            .filter-button, .tab-button {
+                padding: 6px 8px;
+                font-size: 12px;
+                border-radius: 4px;
+            }
+            
+            .filter-buttons, .tab-buttons {
+                gap: 4px;
+            }
         }
         
-        .tab-button:hover:not(.active) {
-            background-color: #f5f5f5;
+        @media (min-width: 414px) {
+            .filter-button, .tab-button {
+                padding: 10px 16px;
+                font-size: 14px;
+                border-radius: 8px;
+            }
+            
+            .filter-buttons, .tab-buttons {
+                gap: 8px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 顶部导航栏 -->
-    <header class="header">
-        <button class="action-btn" onclick="window.location.href='../home/home.html'">
-            <i class="bi bi-arrow-left"></i>
-        </button>
-        <h1 class="header-title">泵站监测</h1>
+    <div class="header">
+        <button class="action-btn" onclick="history.back()"><i class="bi bi-arrow-left"></i></button>
+        <div class="header-title" style="flex: 1; text-align: center;">泵站监测</div>
         <div class="header-actions">
-            <button class="action-btn">
-                <i class="bi bi-funnel"></i>
-            </button>
-            <button class="action-btn">
-                <i class="bi bi-search"></i>
-            </button>
+            <button class="action-btn"><i class="bi bi-search"></i></button>
         </div>
-    </header>
-
-    <!-- 主要内容区 -->
-    <main class="main-content">
-        <!-- 泵站地图 -->
-        
-        <!-- 统计信息 -->
+    </div>
+    <!-- 固定的tabs区域 -->
+    <div class="fixed-tabs">
+        <div class="status-tabs">
+            <div class="status-tab active">全部 <span class="tab-count">150</span></div>
+            <div class="status-tab">正常 <span class="tab-count">120</span></div>
+            <div class="status-tab">预警 <span class="tab-count">5</span></div>
+            <div class="status-tab">故障 <span class="tab-count">2</span></div>
+        </div>
+        <div class="pump-type-filters">
+            <div class="pump-type-filter active">全部</div>
+            <div class="pump-type-filter">污水泵站</div>
+            <div class="pump-type-filter">雨水泵站</div>
+        </div>
+    </div>
+    
+    
+    
+    <!-- 可滚动的内容区域 -->
+    <div class="main-content">
         <div class="card-container">
-            <div class="card-header">
-                <h2 class="card-title">监测统计</h2>
-            </div>
             <div class="card-body">
-                <div class="data-grid">
-                    <div class="pump-data-card">
-                        <div class="data-label">总泵站数</div>
-                        <div class="data-value">18</div>
-                    </div>
-                    <div class="pump-data-card">
-                        <div class="data-label">正常运行</div>
-                        <div class="data-value" style="color: #34C759;">15</div>
-                    </div>
-                    <div class="pump-data-card">
-                        <div class="data-label">预警状态</div>
-                        <div class="data-value" style="color: #FF9500;">2</div>
-                    </div>
-                    <div class="pump-data-card">
-                        <div class="data-label">故障停机</div>
-                        <div class="data-value" style="color: #FF3B30;">1</div>
+                <div class="scrollable-list">
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title"><a href="#" class="station-link">高新区污水泵站</a> <span class="pump-type-tag">污水</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">高新区科技路123号</span>
+                                </div>
+                                <div class="item-subtitle">运行时长: 156小时</div>
+                                <div class="item-subtitle">液位数据: 3.2米</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:10:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常运行</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title"><a href="#" class="station-link">老城区雨水泵站</a> <span class="pump-type-tag">雨水</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">老城区人民路45号</span>
+                                </div>
+                                <div class="item-subtitle">停机时长: 2小时</div>
+                                <div class="item-subtitle">液位数据: 1.8米</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:25:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-danger"></span>
+                                        <span class="status-text">故障维修</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi-off"></i>
+                                        <span class="iot-text">未联网</span>
+                                    </div>
+                                    <div class="item-title"><a href="#" class="station-link">新城区污水泵站</a> <span class="pump-type-tag">污水</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">新城区创新路78号</span>
+                                </div>
+                                <div class="item-subtitle">运行时长: 208小时</div>
+                                <div class="item-subtitle">液位数据: 2.7米</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:20:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-warning"></span>
+                                        <span class="status-text">压力偏高</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 更多模拟数据 -->
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title"><a href="#" class="station-link">市中心污水泵站</a> <span class="pump-type-tag">污水</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">市中心解放路36号</span>
+                                </div>
+                                <div class="item-subtitle">运行时长: 180小时</div>
+                                <div class="item-subtitle">液位数据: 2.9米</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:15:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常运行</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi-off"></i>
+                                        <span class="iot-text">未联网</span>
+                                    </div>
+                                    <div class="item-title"><a href="#" class="station-link">开发区雨水泵站</a> <span class="pump-type-tag">雨水</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">开发区发展路99号</span>
+                                </div>
+                                <div class="item-subtitle">运行时长: 95小时</div>
+                                <div class="item-subtitle">液位数据: 2.1米</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:10:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常运行</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- 泵站列表 -->
-        <div class="card-container">
-            <div class="card-header">
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h2 class="card-title">泵站列表</h2>
-                        <div class="filter-buttons" style="display: flex; gap: 8px;">
-                            <button class="filter-button active" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">全部</button>
-                            <button class="filter-button" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">正常</button>
-                            <button class="filter-button" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">预警</button>
-                            <button class="filter-button" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">异常</button>
-                        </div>
-                    </div>
-                    <div class="tab-buttons" style="display: flex; gap: 8px;">
-                        <button class="tab-button active" data-tab="all" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">全部泵站</button>
-                        <button class="tab-button" data-tab="sewage" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">污水泵站</button>
-                        <button class="tab-button" data-tab="rainwater" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">雨水泵站</button>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="list-group">
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">城南污水泵站</div>
-                            <div class="item-subtitle">运行时长: 128小时</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-normal"></span>
-                            <span class="status-text">正常运行</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">城北雨水泵站</div>
-                            <div class="item-subtitle">运行时长: 96小时</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-warning"></span>
-                            <span class="status-text">压力偏高</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">城东污水泵站</div>
-                            <div class="item-subtitle">停机时长: 4小时</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-danger"></span>
-                            <span class="status-text">故障维修</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">城西雨水泵站</div>
-                            <div class="item-subtitle">运行时长: 210小时</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-normal"></span>
-                            <span class="status-text">正常运行</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">市中心污水泵站</div>
-                            <div class="item-subtitle">运行时长: 180小时</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-normal"></span>
-                            <span class="status-text">正常运行</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">开发区雨水泵站</div>
-                            <div class="item-subtitle">运行时长: 75小时</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-warning"></span>
-                            <span class="status-text">温度偏高</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 查看更多 -->
-        <div style="text-align: center; padding: 16px;">
-            <button id="loadMoreBtn" style="padding: 10px 24px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;">
-                查看更多
-            </button>
-        </div>
-        
-    </main>
-
-
+    </div>
+    
     <script>
         // 为筛选按钮添加点击事件
         document.addEventListener('DOMContentLoaded', function() {
-            // 状态筛选按钮
-            const filterButtons = document.querySelectorAll('.filter-button');
-            filterButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    // 移除所有按钮的active类
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
+            // 状态Tab按钮
+            const statusTabs = document.querySelectorAll('.status-tab');
+            statusTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 移除所有tab的active类
+                    statusTabs.forEach(t => t.classList.remove('active'));
+                    // 添加当前tab的active类
+                    this.classList.add('active');
+                });
+            });
+            
+            // 泵站类型筛选按钮
+            const pumpTypeFilters = document.querySelectorAll('.pump-type-filter');
+            pumpTypeFilters.forEach(filter => {
+                filter.addEventListener('click', function() {
+                    // 移除所有筛选按钮的active类
+                    pumpTypeFilters.forEach(f => f.classList.remove('active'));
                     // 添加当前按钮的active类
                     this.classList.add('active');
                 });
             });
             
-            // 泵站类型Tab按钮
-            const tabButtons = document.querySelectorAll('.tab-button');
-            tabButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    // 移除所有按钮的active类
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    // 添加当前按钮的active类
-                    this.classList.add('active');
+            // 为地址图标添加点击事件
+            const addressIcons = document.querySelectorAll('.address-icon');
+            addressIcons.forEach(icon => {
+                icon.addEventListener('click', function() {
+                    // 获取地址文本
+                    const addressText = this.nextElementSibling.textContent;
+                    // 这里可以跳转到地图定位页面，传递地址参数
+                    alert('点击了地址图标，地址：' + addressText + '，将跳转到地图定位页面');
+                    // 实际应用中可以使用以下代码跳转到地图页面：
+                    // window.location.href = 'map-location.html?address=' + encodeURIComponent(addressText);
                 });
             });
-            
-            // 为"查看更多"按钮添加点击事件
-            const loadMoreBtn = document.getElementById('loadMoreBtn');
-            if (loadMoreBtn) {
-                loadMoreBtn.addEventListener('click', function() {
-                    // 模拟加载更多数据
-                    const listGroup = document.querySelector('.list-group');
-                    if (listGroup) {
-                        // 创建新的泵站项
-                        const newItems = [
-                            {
-                                title: "高新区污水泵站",
-                                subtitle: "运行时长: 156小时",
-                                status: "normal",
-                                statusText: "正常运行"
-                            },
-                            {
-                                title: "老城区雨水泵站",
-                                subtitle: "停机时长: 2小时",
-                                status: "danger",
-                                statusText: "故障维修"
-                            },
-                            {
-                                title: "新城区污水泵站",
-                                subtitle: "运行时长: 208小时",
-                                status: "warning",
-                                statusText: "压力偏高"
-                            }
-                        ];
-                        
-                        // 添加新项到列表
-                        newItems.forEach(item => {
-                            const newItem = document.createElement('div');
-                            newItem.className = 'list-group-item';
-                            newItem.innerHTML = `
-                                <div class="item-content">
-                                    <div class="item-title">${item.title}</div>
-                                    <div class="item-subtitle">${item.subtitle}</div>
-                                </div>
-                                <div class="status-container">
-                                    <span class="status-indicator status-${item.status}"></span>
-                                    <span class="status-text">${item.statusText}</span>
-                                </div>
-                            `;
-                            listGroup.appendChild(newItem);
-                        });
-                        
-                        // 更新按钮文本
-                        this.textContent = '已加载全部';
-                        this.disabled = true;
-                    }
-                });
-            }
         });
     </script>
 </body>

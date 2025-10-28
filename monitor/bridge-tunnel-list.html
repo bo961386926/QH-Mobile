@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>污水厂监测 -智慧排水运维移动端</title>
+    <title>桥隧监测 -智慧排水运维移动端</title>
     <!-- 引入Bootstrap Icons -->
     <link rel="stylesheet" href="../assets/libs/bootstrap-icons-1.13.1/fonts/bootstrap-icons.css">
     <script src="../assets/libs/chart.js/chart.umd.min.js"></script>
@@ -20,7 +20,7 @@
             --border-color: #E5E5EA;
         }
         
-        /* 污水厂监测特定样式 */
+        /* 桥隧监测特定样式 */
         body {
             background-color: var(--light-bg);
             color: var(--dark-text);
@@ -366,24 +366,21 @@
         /* 筛选按钮样式 */
         .filter-buttons {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             margin-bottom: 16px;
         }
         
         .filter-button {
             flex: 1;
-            padding: 8px 12px;
+            padding: 10px 16px;
             border: 1px solid var(--border-color);
             background-color: var(--card-bg);
             color: var(--gray-text);
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 8px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
         
         .filter-button.active {
@@ -395,31 +392,6 @@
         .filter-button:hover:not(.active) {
             background-color: #f5f5f5;
         }
-        
-        /* 响应式优化 */
-        @media (max-width: 375px) {
-            .filter-button {
-                padding: 6px 8px;
-                font-size: 12px;
-                border-radius: 4px;
-            }
-            
-            .filter-buttons {
-                gap: 4px;
-            }
-        }
-        
-        @media (min-width: 414px) {
-            .filter-button {
-                padding: 10px 16px;
-                font-size: 14px;
-                border-radius: 8px;
-            }
-            
-            .filter-buttons {
-                gap: 8px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -428,7 +400,7 @@
         <button class="action-btn" onclick="window.location.href='monitor.html'">
             <i class="bi bi-arrow-left"></i>
         </button>
-        <h1 class="header-title">污水厂监测</h1>
+        <h1 class="header-title">桥隧监测</h1>
         <div class="header-actions">
             <button class="action-btn">
                 <i class="bi bi-funnel"></i>
@@ -449,30 +421,30 @@
             <div class="card-body">
                 <div class="data-grid">
                     <div class="pump-data-card">
-                        <div class="data-label">总监测厂</div>
-                        <div class="data-value">3</div>
+                        <div class="data-label">总监测点</div>
+                        <div class="data-value">11</div>
                     </div>
                     <div class="pump-data-card">
-                        <div class="data-label">正常厂</div>
-                        <div class="data-value" style="color: #34C759;">2</div>
+                        <div class="data-label">正常点</div>
+                        <div class="data-value" style="color: #34C759;">9</div>
                     </div>
                     <div class="pump-data-card">
-                        <div class="data-label">预警厂</div>
-                        <div class="data-value" style="color: #FF9500;">1</div>
+                        <div class="data-label">预警点</div>
+                        <div class="data-value" style="color: #FF9500;">2</div>
                     </div>
                     <div class="pump-data-card">
-                        <div class="data-label">异常厂</div>
+                        <div class="data-label">异常点</div>
                         <div class="data-value" style="color: #FF3B30;">0</div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- 污水厂列表 -->
+        <!-- 桥梁列表 -->
         <div class="card-container">
             <div class="card-header">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2 class="card-title">污水厂列表</h2>
+                    <h2 class="card-title">桥梁列表</h2>
                     <div class="filter-buttons" style="display: flex; gap: 8px;">
                         <button class="filter-button active">全部</button>
                         <button class="filter-button">正常</button>
@@ -485,8 +457,8 @@
                 <div class="list-group">
                     <div class="list-group-item">
                         <div class="item-content">
-                            <div class="item-title">城南污水处理厂</div>
-                            <div class="item-subtitle">处理量: 12000m³/d</div>
+                            <div class="item-title">中山路大桥</div>
+                            <div class="item-subtitle">结构应力: 15.2MPa</div>
                         </div>
                         <div class="status-container">
                             <span class="status-indicator status-normal"></span>
@@ -495,8 +467,8 @@
                     </div>
                     <div class="list-group-item">
                         <div class="item-content">
-                            <div class="item-title">城北污水处理厂</div>
-                            <div class="item-subtitle">处理量: 9500m³/d</div>
+                            <div class="item-title">人民路立交桥</div>
+                            <div class="item-subtitle">结构应力: 18.5MPa</div>
                         </div>
                         <div class="status-container">
                             <span class="status-indicator status-warning"></span>
@@ -505,8 +477,107 @@
                     </div>
                     <div class="list-group-item">
                         <div class="item-content">
-                            <div class="item-title">城东污水处理厂</div>
-                            <div class="item-subtitle">处理量: 15000m³/d</div>
+                            <div class="item-title">火车站高架桥</div>
+                            <div class="item-subtitle">结构应力: 14.8MPa</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-normal"></span>
+                            <span class="status-text">正常</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">东湖公园人行桥</div>
+                            <div class="item-subtitle">结构应力: 12.3MPa</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-normal"></span>
+                            <span class="status-text">正常</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">商业街天桥</div>
+                            <div class="item-subtitle">结构应力: 16.7MPa</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-normal"></span>
+                            <span class="status-text">正常</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">人民医院通道桥</div>
+                            <div class="item-subtitle">结构应力: 13.9MPa</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-normal"></span>
+                            <span class="status-text">正常</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">文化路跨线桥</div>
+                            <div class="item-subtitle">结构应力: 17.1MPa</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-warning"></span>
+                            <span class="status-text">预警</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">体育中心高架</div>
+                            <div class="item-subtitle">结构应力: 15.8MPa</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-normal"></span>
+                            <span class="status-text">正常</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 隧道列表 -->
+        <div class="card-container">
+            <div class="card-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 class="card-title">隧道列表</h2>
+                    <div class="filter-buttons" style="display: flex; gap: 8px;">
+                        <button class="filter-button active">全部</button>
+                        <button class="filter-button">正常</button>
+                        <button class="filter-button">预警</button>
+                        <button class="filter-button">异常</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">火车站地下隧道</div>
+                            <div class="item-subtitle">渗水情况: 正常</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-normal"></span>
+                            <span class="status-text">正常</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">商业街地下通道</div>
+                            <div class="item-subtitle">渗水情况: 正常</div>
+                        </div>
+                        <div class="status-container">
+                            <span class="status-indicator status-normal"></span>
+                            <span class="status-text">正常</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="item-content">
+                            <div class="item-title">人民医院地下通道</div>
+                            <div class="item-subtitle">渗水情况: 正常</div>
                         </div>
                         <div class="status-container">
                             <span class="status-indicator status-normal"></span>
@@ -548,17 +619,17 @@
                     // 模拟加载更多数据
                     const listGroup = document.querySelector('.list-group');
                     if (listGroup) {
-                        // 创建新的污水厂项
+                        // 创建新的桥隧项
                         const newItems = [
                             {
-                                title: "城西污水处理厂",
-                                subtitle: "处理量: 8000m³/d",
+                                title: "大学城地下通道",
+                                subtitle: "渗水情况: 正常",
                                 status: "normal",
                                 statusText: "正常"
                             },
                             {
-                                title: "开发区污水处理厂",
-                                subtitle: "处理量: 11000m³/d",
+                                title: "开发区高架桥",
+                                subtitle: "结构应力: 14.2MPa",
                                 status: "normal",
                                 statusText: "正常"
                             }

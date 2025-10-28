@@ -366,21 +366,24 @@
         /* 筛选按钮样式 */
         .filter-buttons {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             margin-bottom: 16px;
         }
         
         .filter-button {
             flex: 1;
-            padding: 10px 16px;
+            padding: 8px 12px;
             border: 1px solid var(--border-color);
             background-color: var(--card-bg);
             color: var(--gray-text);
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .filter-button.active {
@@ -391,6 +394,31 @@
         
         .filter-button:hover:not(.active) {
             background-color: #f5f5f5;
+        }
+        
+        /* 响应式优化 */
+        @media (max-width: 375px) {
+            .filter-button {
+                padding: 6px 8px;
+                font-size: 12px;
+                border-radius: 4px;
+            }
+            
+            .filter-buttons {
+                gap: 4px;
+            }
+        }
+        
+        @media (min-width: 414px) {
+            .filter-button {
+                padding: 10px 16px;
+                font-size: 14px;
+                border-radius: 8px;
+            }
+            
+            .filter-buttons {
+                gap: 8px;
+            }
         }
     </style>
 </head>
@@ -446,10 +474,10 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h2 class="card-title">排口列表</h2>
                     <div class="filter-buttons" style="display: flex; gap: 8px;">
-                        <button class="filter-button active" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">全部</button>
-                        <button class="filter-button" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">正常</button>
-                        <button class="filter-button" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">预警</button>
-                        <button class="filter-button" style="padding: 6px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">异常</button>
+                        <button class="filter-button active">全部</button>
+                        <button class="filter-button">正常</button>
+                        <button class="filter-button">预警</button>
+                        <button class="filter-button">异常</button>
                     </div>
                 </div>
             </div>
