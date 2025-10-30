@@ -33,18 +33,19 @@
         /* Tab按钮样式 */
         .tab-buttons {
             display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 6px;
+            margin-bottom: 12px;
+            padding: 0 8px;
         }
         
         .tab-button {
             flex: 1;
-            padding: 10px 16px;
+            padding: 6px 12px;
             border: 1px solid var(--border-color);
             background-color: var(--card-bg);
             color: var(--gray-text);
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
@@ -104,26 +105,26 @@
         }
         
         .main-content {
-            padding: 16px;
+            padding: 0;
         }
         
         .card-container {
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            margin-bottom: 24px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            margin: 16px;
             overflow: hidden;
         }
         
         .card-header {
             padding: 16px;
-            border-bottom: 1px solid #f5f5f5;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .card-title {
             font-size: 16px;
-            font-weight: bold;
-            color: #111111;
+            font-weight: 600;
+            color: var(--dark-text);
             margin: 0;
         }
         
@@ -131,32 +132,69 @@
             padding: 16px;
         }
         
-        .map-placeholder {
-            height: 200px;
-            background-color: #f0f0f0;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 12px 8px;
             border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        
+        .stats-value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .text-primary {
+            color: var(--primary-color);
+        }
+        
+        .stats-label {
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+        
+        .section-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-            color: #999;
+            margin-bottom: 12px;
+        }
+        
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin: 0;
         }
         
         .list-group {
             display: flex;
             flex-direction: column;
+            gap: 8px;
         }
         
         .list-group-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f5f5f5;
+            padding: 12px;
+            background-color: var(--card-bg);
+            border-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+            cursor: pointer;
         }
         
-        .list-group-item:last-child {
-            border-bottom: none;
+        .list-group-item:hover {
+            border-color: #d0d0d0;
         }
         
         .item-content {
@@ -166,56 +204,42 @@
         .item-title {
             font-size: 14px;
             font-weight: 500;
-            color: #111111;
-            margin-bottom: 4px;
+            color: var(--dark-text);
+            margin-bottom: 2px;
         }
         
         .item-subtitle {
             font-size: 12px;
-            color: #666666;
+            color: var(--gray-text);
         }
         
         .status-container {
             display: flex;
             align-items: center;
+            gap: 4px;
         }
         
         .status-indicator {
-            width: 10px;
-            height: 10px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            margin-right: 6px;
         }
         
         .status-normal {
-            background-color: #34C759;
+            background-color: var(--secondary-color);
         }
         
         .status-warning {
-            background-color: #FF9500;
+            background-color: var(--warning-color);
         }
         
         .status-danger {
-            background-color: #FF3B30;
+            background-color: var(--danger-color);
         }
         
         .status-text {
-            font-size: 12px;
-            color: #111111;
-        }
-        
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        
-        .section-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #111111;
-            margin: 0;
+            font-size: 13px;
+            color: var(--gray-text);
         }
         
         .history-btn {
@@ -228,54 +252,13 @@
             cursor: pointer;
         }
         
-        /* 运维数据概览样式 */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .stats-card {
-            text-align: center;
-            padding: 12px;
-        }
-        
-        .stats-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-        
-        .stats-value.text-primary {
-            color: #007AFF;
-        }
-        
-        .stats-value.text-warning {
-            color: #FF9500;
-        }
-        
-        .stats-value.text-secondary {
-            color: #34C759;
-        }
-        
-        .stats-value.text-success {
-            color: #34C759;
-        }
-        
-        .stats-label {
-            font-size: 12px;
-            color: #666666;
-        }
-        
         .chart-container {
             height: 200px;
             margin-top: 16px;
         }
         
         .alert-item {
-            padding: 12px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #f5f5f5;
         }
         
@@ -287,7 +270,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .alert-title {
@@ -297,9 +280,9 @@
         }
         
         .alert-badge {
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 12px;
+            font-size: 11px;
+            padding: 3px 6px;
+            border-radius: 10px;
             color: #ffffff;
         }
         
@@ -312,9 +295,9 @@
         }
         
         .alert-description {
-            font-size: 12px;
+            font-size: 11px;
             color: #666666;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         
         .alert-footer {
@@ -324,17 +307,17 @@
         }
         
         .alert-time {
-            font-size: 12px;
+            font-size: 11px;
             color: #666666;
         }
         
         .detail-btn {
-            padding: 6px 12px;
-            border-radius: 16px;
+            padding: 4px 10px;
+            border-radius: 14px;
             background-color: #f5f5f5;
             color: #007AFF;
             border: none;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
         }
         
@@ -417,7 +400,7 @@
     <main class="main-content">
         <!-- 站点统计 -->
         <div class="card-container">
-            <div class="card-header" style="padding: 16px;">
+            <div class="card-header">
                 <h2 class="card-title">监测点位统计</h2>
             </div>
             <div class="card-body">
@@ -444,15 +427,15 @@
         
         <!-- 站点监控数据 -->
         <div class="card-container">
-                <div class="card-header" style="padding: 16px;">
-                    <div class="section-header">
-                        <h2 class="card-title">实时监控</h2>
-                    </div>
+            <div class="card-header">
+                <div class="section-header">
+                    <h2 class="card-title">实时监控</h2>
                 </div>
+            </div>
             <div class="card-body">
                 <!-- Tab 导航 -->
-                <div class="tab-navigation" style="margin-bottom: 16px;">
-                    <div class="tab-buttons" style="display: flex; gap: 8px; margin-bottom: 16px;">
+                <div class="tab-navigation">
+                    <div class="tab-buttons">
                         <button class="tab-button active" data-tab="rainwater">雨水系统</button>
                         <button class="tab-button" data-tab="sewage">污水系统</button>
                         <button class="tab-button" data-tab="bridge">桥隧</button>
@@ -460,10 +443,8 @@
                 </div>
                 
                 <!-- 雨水管网内容 -->
-                <div id="rainwater-content" class="tab-content active" style="display: block;">
-                    <div class="section-header" style="margin-bottom: 16px;">
-                        <h3 class="section-title">雨水管网</h3>
-                    </div>
+                <div id="rainwater-content" class="tab-content active">
+                   
                     <div class="list-group">
                         <div class="list-group-item" onclick="window.location.href='rainwater-well-list.html'">
                             <div class="item-content">
@@ -510,10 +491,7 @@
                 
                 <!-- 污水管网内容 -->
                 <div id="sewage-content" class="tab-content" style="display: none;">
-                    <div class="section-header" style="margin-bottom: 16px;">
-                        <h3 class="section-title">污水管网</h3>
-                    </div>
-                    <div class="list-group">
+                   
                         <div class="list-group-item" onclick="window.location.href='sewage-enterprise-list.html'">
                             <div class="item-content">
                                 <div class="item-title">排污企业</div>
@@ -579,9 +557,7 @@
                 
                 <!-- 桥隧内容 -->
                 <div id="bridge-content" class="tab-content" style="display: none;">
-                    <div class="section-header" style="margin-bottom: 16px;">
-                        <h3 class="section-title">桥隧</h3>
-                    </div>
+                   
                     <div class="list-group">
                         <div class="list-group-item" onclick="window.location.href='bridge-tunnel-list.html'">
                             <div class="item-content">
@@ -610,7 +586,7 @@
         
         <!-- 告警信息 -->
         <div class="card-container">
-            <div class="card-header" style="padding: 16px;">
+            <div class="card-header">
                 <div class="section-header">
                     <h2 class="section-title">告警信息</h2>
                     <button class="history-btn" onclick="window.location.href='alert/alert-list.html'">查看全部</button>
@@ -703,29 +679,34 @@
     </nav>
 
     <script>
-        // 为标签按钮添加点击事件
+        // 实时监控模块Tab切换功能
         document.addEventListener('DOMContentLoaded', function() {
+            // 获取所有tab按钮和内容区域
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabContents = document.querySelectorAll('.tab-content');
-            
+
+            // 为每个tab按钮添加点击事件监听器
             tabButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    // 获取要激活的标签页
+                    // 获取目标tab
                     const targetTab = this.getAttribute('data-tab');
-                    
+
                     // 移除所有按钮的active类
                     tabButtons.forEach(btn => btn.classList.remove('active'));
-                    // 添加当前按钮的active类
-                    this.classList.add('active');
                     
                     // 隐藏所有内容区域
                     tabContents.forEach(content => {
+                        content.classList.remove('active');
                         content.style.display = 'none';
                     });
+
+                    // 为当前点击的按钮添加active类
+                    this.classList.add('active');
                     
-                    // 显示对应的标签页内容
-                    const targetContent = document.getElementById(targetTab + '-content');
+                    // 显示对应的内容区域
+                    const targetContent = document.getElementById(`${targetTab}-content`);
                     if (targetContent) {
+                        targetContent.classList.add('active');
                         targetContent.style.display = 'block';
                     }
                 });

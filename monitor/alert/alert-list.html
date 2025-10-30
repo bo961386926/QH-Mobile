@@ -3,187 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>全部告警 -智慧排水运维移动端</title>
+    <title>未处理告警 - 智慧排水运维移动端</title>
     <!-- 引入Bootstrap Icons -->
     <link rel="stylesheet" href="../../assets/libs/bootstrap-icons-1.13.1/fonts/bootstrap-icons.css">
-    <!-- 引入自定义样式 -->
-    <link rel="stylesheet" href="alert-list.css">
+    <!-- 引入优化后的自定义样式 -->
+    <link rel="stylesheet" href="alert-styles.css">
 </head>
 <body>
-    <script>
-        // 页面加载完成后初始化模块
-        document.addEventListener('DOMContentLoaded', function() {
-            // 动态计算并设置主要内容区域的上边距
-            function adjustMainContentMargin() {
-                try {
-                    const header = document.querySelector('.header');
-                    const sortContainer = document.querySelector('.sort-filter-container');
-                    const filterPanel = document.getElementById('filterPanel');
-                    
-                    // 确保所有元素都存在再进行计算
-                    if (!header || !sortContainer) return;
-                    
-                    // 计算固定元素的总高度 (header + tab-navigation高度固定为46px + sortContainer)
-                    let totalHeight = header.offsetHeight + 46 + sortContainer.offsetHeight;
-                    
-                    // 如果筛选面板可见，加上它的高度
-                    if (filterPanel && filterPanel.style.display !== 'none') {
-                        totalHeight += filterPanel.offsetHeight;
-                    }
-                    
-                    const mainContent = document.querySelector('.main-content');
-                    if (mainContent) {
-                        mainContent.style.marginTop = totalHeight + 'px';
-                    }
-                } catch (error) {
-                    console.error('调整主内容区域边距时出错:', error);
-                }
-            }
-            
-            // 初始调整
-            requestAnimationFrame(adjustMainContentMargin);
-            
-            // 当窗口大小改变时重新调整
-            let resizeTimeout;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(adjustMainContentMargin, 100);
-            });
-            
-            // 监听筛选面板显示/隐藏事件
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                        adjustMainContentMargin();
-                    }
-                });
-            });
-            
-            const filterPanel = document.getElementById('filterPanel');
-            if (filterPanel) {
-                observer.observe(filterPanel, { attributes: true, attributeFilter: ['style'] });
-            }
-            
-            // 初始化告警列表模块
-            AlertListModule.init();
-        });
-    </script>
-    <div class="header">
-        <button class="action-btn" onclick="history.back()">
-            <i class="bi bi-arrow-left"></i>
-        </button>
-        <div class="header-title">全部告警</div>
-        <div class="header-actions">
-            <button class="action-btn" onclick="window.location.href='search.html'">
-                <i class="bi bi-search"></i>
+    <!-- 引入模块化JavaScript文件 -->
+    <script src="alert-data.js"></script>
+    <script src="alert-filter.js"></script>
+    <script src="alert-render.js"></script>
+    <script src="alert-main.js"></script>
+    <!-- 页面标题区域 -->
+    <div class="alert-header-section">
+        <div class="page-header">
+            <button class="back-btn" id="backBtn">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+            <div class="page-title">告警列表</div>
+            <div class="header-placeholder"></div>
+        </div>
+        
+        <!-- 搜索区域 -->
+        <div class="search-section">
+            <input type="text" id="searchInput" class="search-input" placeholder="搜索告警名称或站点名称...">
+            <button class="search-btn">搜索</button>
+        </div>
+        
+        <!-- 标签导航区域 -->
+        <div class="tab-section">
+            <button class="tab-btn" data-tab="all">
+                全部 <span class="tab-count">6</span>
+            </button>
+            <button class="tab-btn" data-tab="unhandled">
+                未处理 <span class="tab-count">3</span>
+            </button>
+            <button class="tab-btn" data-tab="processing">
+                处理中 <span class="tab-count">1</span>
+            </button>
+            <button class="tab-btn" data-tab="handled">
+                已处理 <span class="tab-count">2</span>
             </button>
         </div>
-    </div>
-
-    <div class="search-container">
-        <div class="search-input-wrapper">
-            <i class="bi bi-search search-icon"></i>
-            <input type="text" class="search-input" placeholder="搜索告警..." oninput="AlertListModule.searchAlerts(this.value)">
-        </div>
-    </div>
-
-    <div class="tab-navigation">
-        <div class="tab-item active" data-status="all" onclick="AlertListModule.switchTab('all', event)">
-            全部告警 <span class="tab-count">12</span>
-        </div>
-        <div class="tab-item" data-status="unhandled" onclick="AlertListModule.switchTab('unhandled', event)">
-            未处理 <span class="tab-count">5</span>
-        </div>
-        <div class="tab-item" data-status="processing" onclick="AlertListModule.switchTab('processing', event)">
-            处理中 <span class="tab-count">3</span>
-        </div>
-        <div class="tab-item" data-status="handled" onclick="AlertListModule.switchTab('handled', event)">
-            已处理 <span class="tab-count">4</span>
-        </div>
-    </div>
-
-    <div class="sort-filter-container">
-        <div class="sort-selector">
-            <button class="sort-trigger" onclick="AlertListModule.toggleSortDropdown()">
-                <span>按紧急程度排序</span>
-                <i class="bi bi-chevron-down sort-icon"></i>
+        
+        <!-- 排序和筛选区域 -->
+        <div class="filter-sort-section">
+            <button class="sort-btn" id="sortToggle">
+                <i class="bi bi-sort-down"></i>排序
+            </button>
+            <button class="area-btn" id="areaToggle">
+                <i class="bi bi-pin-map"></i>区域
+            </button>
+            <button class="filter-btn" id="filterToggle">
+                <i class="bi bi-funnel"></i>筛选
             </button>
         </div>
-        <button class="action-btn" onclick="AlertListModule.toggleAreaSelector()">
-            <i class="bi bi-pin-map"></i>
-        </button>
-        <button class="action-btn" onclick="AlertListModule.toggleFilterPanel()">
-            <i class="bi bi-funnel"></i>
-        </button>
     </div>
 
     <div id="sortDropdown" class="sort-dropdown">
-        <button class="sort-option active" data-sort="time-desc" onclick="AlertListModule.sortAlerts('time-desc')">
+        <button class="sort-option active" data-sort="time-desc" id="sortTimeDesc">
             紧急程度优先
+            <i class="bi bi-check sort-check"></i>
         </button>
-        <button class="sort-option active" data-sort="time-desc" onclick="AlertListModule.sortAlerts('time-desc')">
+        <button class="sort-option" data-sort="level-desc" id="sortLevelDesc">
             告警级别优先
+            <i class="bi bi-check sort-check"></i>
         </button>
-        <button class="sort-option" data-sort="time-asc" onclick="AlertListModule.sortAlerts('time-asc')">
+        <button class="sort-option" data-sort="time-asc" id="sortTimeAsc">
             告警时长优先
+            <i class="bi bi-check sort-check"></i>
         </button>
-        <button class="sort-option" data-sort="level-desc" onclick="AlertListModule.sortAlerts('level-desc')">
+        <button class="sort-option" data-sort="occurrence-desc" id="sortOccurrenceDesc">
             发生次数优先
+            <i class="bi bi-check sort-check"></i>
         </button>
-    
     </div>
 
-    <div id="filter-panel" class="filter-panel">
+    <div id="filter-panel" class="filter-panel" style="display: none;">
         <div class="filter-group">
-            <label class="filter-label">片区区域</label>
+            <label class="filter-label">数据时间</label>
             <div class="filter-options">
-                <div class="filter-option active" data-area="all" onclick="AlertListModule.selectFilterOption(this, 'area', 'all')">全部</div>
-                <div class="filter-option" data-area="area1" onclick="AlertListModule.selectFilterOption(this, 'area', 'area1')">一片区</div>
-                <div class="filter-option" data-area="area2" onclick="AlertListModule.selectFilterOption(this, 'area', 'area2')">二片区</div>
-                <div class="filter-option" data-area="area3" onclick="AlertListModule.selectFilterOption(this, 'area', 'area3')">三片区</div>
+               
+                <div class="filter-option active" data-time="today" id="filterTimeToday">今日</div>
+                <div class="filter-option" data-time="7days" id="filterTime7Days">近7日</div>
+                <div class="filter-option" data-time="30days" id="filterTime30Days">近30日</div>
+                <div class="filter-option" data-time="90days" id="filterTime90Days">近90日</div>
+                <!-- 将自定义时间选项替换为时间输入框 -->
+                <div class="date-range-inputs">
+                    <input type="date" id="customStartDate" class="date-input-small" placeholder="开始时间">
+                    <span class="date-separator">至</span>
+                    <input type="date" id="customEndDate" class="date-input-small" placeholder="结束时间">
+            
+                </div>
+            </div>
+        </div>
+        
+        <!-- 隐藏原来的日期范围选择器 -->
+        <div class="date-range-picker" id="dateRangePicker" style="display: none;">
+            <div class="date-inputs">
+                <div class="date-input-group">
+                    <label>开始时间</label>
+                    <input type="date" id="startDate" class="date-input">
+                </div>
+                <div class="date-input-group">
+                    <label>结束时间</label>
+                    <input type="date" id="endDate" class="date-input">
+                </div>
+            </div>
+            <button class="date-confirm-btn" id="applyDateRangeBtn">确定</button>
+        </div>
+
+        <div class="filter-group">
+            <label class="filter-label">运维片区</label>
+            <div class="filter-options">
+                <div class="filter-option active" data-area="all" id="filterAreaAll">全部</div>
+                <div class="filter-option" data-area="area1" id="filterArea1">一片区</div>
+                <div class="filter-option" data-area="area2" id="filterArea2">二片区</div>
+                <div class="filter-option" data-area="area3" id="filterArea3">三片区</div>
             </div>
         </div>
 
         <div class="filter-group">
             <label class="filter-label">告警级别</label>
             <div class="filter-options">
-                <div class="filter-option active" data-level="all" onclick="AlertListModule.selectFilterOption(this, 'level', 'all')">全部</div>
-                <div class="filter-option" data-level="level1" onclick="AlertListModule.selectFilterOption(this, 'level', 'level1')">一级</div>
-                <div class="filter-option" data-level="level2" onclick="AlertListModule.selectFilterOption(this, 'level', 'level2')">二级</div>
-                <div class="filter-option" data-level="level3" onclick="AlertListModule.selectFilterOption(this, 'level', 'level3')">三级</div>
-                <div class="filter-option" data-level="level4" onclick="AlertListModule.selectFilterOption(this, 'level', 'level4')">四级</div>
+                <div class="filter-option active" data-level="all" id="filterLevelAll">全部</div>
+                <div class="filter-option" data-level="level1" id="filterLevel1">一级</div>
+                <div class="filter-option" data-level="level2" id="filterLevel2">二级</div>
+                <div class="filter-option" data-level="level3" id="filterLevel3">三级</div>
+                <div class="filter-option" data-level="level4" id="filterLevel4">四级</div>
             </div>
         </div>
 
         <div class="filter-group">
             <label class="filter-label">紧急程度</label>
             <div class="filter-options">
-                <div class="filter-option active" data-urgency="all" onclick="AlertListModule.selectFilterOption(this, 'urgency', 'all')">全部</div>
-                <div class="filter-option" data-urgency="critical" onclick="AlertListModule.selectFilterOption(this, 'urgency', 'critical')">紧急</div>
-                <div class="filter-option" data-urgency="important" onclick="AlertListModule.selectFilterOption(this, 'urgency', 'important')">重要</div>
-                <div class="filter-option" data-urgency="normal" onclick="AlertListModule.selectFilterOption(this, 'urgency', 'normal')">普通</div>
+                <div class="filter-option active" data-urgency="all" id="filterUrgencyAll">全部</div>
+                <div class="filter-option" data-urgency="critical" id="filterUrgencyCritical">紧急</div>
+                <div class="filter-option" data-urgency="important" id="filterUrgencyImportant">重要</div>
+                <div class="filter-option" data-urgency="normal" id="filterUrgencyNormal">普通</div>
+            </div>
+        </div>
+        
+        <div class="filter-group">
+            <label class="filter-label">告警持续时长</label>
+            <div class="filter-options">
+                <div class="filter-option active" data-duration="all" id="filterDurationAll">全部</div>
+                <div class="filter-option" data-duration="lt1h" id="filterDurationLt1h">1小时内</div>
+                <div class="filter-option" data-duration="1-3h" id="filterDuration1-3h">1-3小时</div>
+                <div class="filter-option" data-duration="3-12h" id="filterDuration3-12h">3-12小时</div>
+                <div class="filter-option" data-duration="12-24h" id="filterDuration12-24h">12-24小时</div>
+                <div class="filter-option" data-duration="gt24h" id="filterDurationGt24h">超过24小时</div>
+            </div>
+        </div>
+        
+        <div class="filter-group">
+            <label class="filter-label">告警发生次数</label>
+            <div class="range-slider-container" data-value="100">
+                <input type="range" min="1" max="100" value="100" class="range-slider" id="occurrenceRangeSlider">
+                <span class="range-value" id="occurrenceRangeValue">1-100次</span>
             </div>
         </div>
 
         <div class="filter-actions">
-            <button class="filter-reset-btn" onclick="AlertListModule.resetFilters()">重置</button>
-            <button class="filter-apply-btn" onclick="AlertListModule.applyFilters()">确定</button>
+            <button class="filter-reset-btn" id="resetFiltersBtn">重置</button>
+            <button class="filter-apply-btn" id="applyFiltersBtn">确定</button>
         </div>
     </div>
 
-    <div class="overlay" id="overlay" onclick="AlertListModule.closeDropdowns()"></div>
+    <div class="overlay" id="overlay"></div>
 
     <!-- 区域选择面板 -->
     <div id="areaSelector" class="area-selector-panel">
         <div class="area-panel-header">
             <div class="area-panel-title">选择区域</div>
-            <button class="area-panel-close" onclick="AlertListModule.closeAreaSelector()">
+            <button class="area-panel-close" id="closeAreaSelectorBtn">
                 <i class="bi bi-x"></i>
             </button>
         </div>
         <div class="area-selector">
             <div class="area-column">
-                <div class="area-option" data-level="0" data-value="lanxi">
+                <div class="area-option active" data-level="0" data-value="all" id="areaAll">
+                    <span class="area-option-text">全部区域</span>
+                </div>
+                <div class="area-option" data-level="0" data-value="lanxi" id="areaLanxi">
                     <span class="area-option-text">兰溪市</span>
                     <i class="bi bi-chevron-right area-option-arrow"></i>
                 </div>
@@ -194,13 +197,20 @@
         </div>
     </div>
 
+    <!-- 告警列表容器 -->
     <div class="main-content">
         <div class="card-container">
             <div class="card-body" id="alertListContainer">
-                <!-- 告警列表将通过JavaScript动态生成 -->
+                <div id="alertList">
+                    <!-- 告警列表将通过JavaScript动态生成 -->
+                </div>
             </div>
         </div>
     </div>
+
+  
+    <!-- 提示信息容器 -->
+    <div id="toastContainer" class="toast-container"></div>
 
     <script>
         // 页面跳转函数
@@ -215,796 +225,250 @@
             console.log('点击站点名称，跳转到站点详情页，名称:', stationName);
             // 实际应用中应该使用：window.location.href = '../station-perspective.html?station=' + stationName;
         }
-        
-        // 告警列表模块
-        const AlertListModule = (function() {
-            // 模拟告警数据
-            const alertData = [
-                {
-                    id: 1,
-                    title: "二号泵站压力异常",
-                    type: "警告",
-                    description: "出水压力超过阈值5.5MPa，当前值5.8MPa",
-                    time: "2023-06-15 14:32",
-                    severity: "warning",
-                    area: "area1",
-                    status: "unhandled",
-                    level: "level2",
-                    urgency: "important",
-                    occurrence: "多次发生",
-                    station: "二号泵站"
-                },
-                {
-                    id: 2,
-                    title: "三号泵站故障停机",
-                    type: "紧急",
-                    description: "电机过载保护触发，设备自动停机",
-                    time: "2023-06-15 10:15",
-                    severity: "danger",
-                    area: "area2",
-                    status: "handled",
-                    level: "level1",
-                    urgency: "critical",
-                    occurrence: "单次发生",
-                    station: "三号泵站"
-                },
-                {
-                    id: 3,
-                    title: "一号泵站水位过高",
-                    type: "警告",
-                    description: "集水池水位超过安全线，当前值2.8米",
-                    time: "2023-06-15 09:20",
-                    severity: "warning",
-                    area: "area1",
-                    status: "unhandled",
-                    level: "level2",
-                    urgency: "important",
-                    occurrence: "多次发生",
-                    station: "一号泵站"
-                },
-                {
-                    id: 4,
-                    title: "四号泵站电机过热",
-                    type: "紧急",
-                    description: "电机温度达到85℃，超过安全阈值",
-                    time: "2023-06-14 16:45",
-                    severity: "danger",
-                    area: "area3",
-                    status: "unhandled",
-                    level: "level1",
-                    urgency: "critical",
-                    occurrence: "多次发生",
-                    station: "四号泵站"
-                },
-                {
-                    id: 5,
-                    title: "五号泵站流量异常",
-                    type: "一般",
-                    description: "瞬时流量超出正常范围±10%",
-                    time: "2023-06-14 14:10",
-                    severity: "info",
-                    area: "area2",
-                    status: "handled",
-                    level: "level4",
-                    urgency: "normal",
-                    occurrence: "单次发生",
-                    station: "五号泵站"
-                },
-                {
-                    id: 6,
-                    title: "六号泵站设备维护",
-                    type: "一般",
-                    description: "定期维护检查中",
-                    time: "2023-06-16 09:00",
-                    severity: "info",
-                    area: "area3",
-                    status: "processing",
-                    level: "level4",
-                    urgency: "normal",
-                    occurrence: "多次发生",
-                    station: "六号泵站"
-                }
-            ];
 
-            // 状态管理对象
-            const state = {
-                currentAlerts: [...alertData],
-                currentFilters: {
-                    area: 'all',
-                    level: 'all',
-                    urgency: 'all'
-                },
-                currentSort: 'time-desc',
-                currentStatus: 'all',
-                currentSearch: '',
-                isInitialized: false
-            };
+        // 返回监控页面
+        function goBackToMonitor() {
+            window.location.href = '../monitor.html';
+        }
 
-            // 初始化模块
-            function init() {
-                try {
-                    renderAlertList(state.currentAlerts);
-                    updateTabCounts();
-                    state.isInitialized = true;
-                } catch (error) {
-                    console.error('初始化告警列表模块时出错:', error);
-                }
+        // 添加返回按钮事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            const backBtn = document.getElementById('backBtn');
+            if (backBtn) {
+                backBtn.addEventListener('click', function() {
+                    // 返回到监控主页面
+                    window.location.href = '../monitor.html';
+                });
             }
+        });
 
-            // 转义HTML特殊字符
-            function escapeHtml(text) {
-                const map = {
-                    '&': '&',
-                    '<': '<',
-                    '>': '>',
-                    '"': '"',
-                    "'": '&#039;'
-                };
-                return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        // 说明：初始化与事件监听已在 alert-main.js 中统一处理，这里不再重复绑定，避免双触发
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 返回按钮事件
+            const backBtn = document.getElementById('backBtn');
+            if (backBtn) {
+                backBtn.addEventListener('click', goBackToMonitor);
             }
-
-            // 渲染告警列表
-            function renderAlertList(alerts) {
-                try {
-                    const container = document.getElementById('alertListContainer');
-                    if (!container) {
-                        console.warn('告警列表容器未找到');
-                        return;
+            
+            // 搜索输入框事件
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.searchAlerts(e.target.value);
                     }
+                });
+            }
 
-                    if (alerts.length === 0) {
-                        container.innerHTML = '<div class="no-data">暂无告警数据</div>';
-                        return;
+            // 搜索按钮事件
+            const searchBtn = document.querySelector('.search-btn');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', function() {
+                    if (typeof AlertListModule !== 'undefined' && searchInput) {
+                        AlertListModule.searchAlerts(searchInput.value);
                     }
-
-                    let html = '';
-                    alerts.forEach(alert => {
-                        // 根据告警级别确定样式类
-                        let levelClass = '';
-                        let levelText = '';
-                        switch (alert.level) {
-                            case 'level1':
-                                levelClass = 'level-1';
-                                levelText = '一级告警';
-                                break;
-                            case 'level2':
-                                levelClass = 'level-2';
-                                levelText = '二级告警';
-                                break;
-                            case 'level3':
-                                levelClass = 'level-3';
-                                levelText = '三级告警';
-                                break;
-                            case 'level4':
-                                levelClass = 'level-4';
-                                levelText = '四级告警';
-                                break;
-                            default:
-                                levelClass = 'level-4';
-                                levelText = '四级告警';
-                        }
-
-                        // 根据紧急程度确定样式类
-                        let urgencyClass = '';
-                        let urgencyText = '';
-                        switch (alert.urgency) {
-                            case 'critical':
-                                urgencyClass = 'urgency-critical';
-                                urgencyText = '紧急';
-                                break;
-                            case 'important':
-                                urgencyClass = 'urgency-important';
-                                urgencyText = '重要';
-                                break;
-                            case 'normal':
-                                urgencyClass = 'urgency-normal';
-                                urgencyText = '普通';
-                                break;
-                            default:
-                                urgencyClass = 'urgency-normal';
-                                urgencyText = '普通';
-                        }
-
-                        // 根据类型确定徽章样式
-                        let badgeClass = '';
-                        switch (alert.severity) {
-                            case 'danger':
-                                badgeClass = 'badge-danger';
-                                break;
-                            case 'warning':
-                                badgeClass = 'badge-warning';
-                                break;
-                            case 'info':
-                                badgeClass = 'badge-info';
-                                break;
-                            default:
-                                badgeClass = 'badge-info';
-                        }
-
-                        // 计算持续时长（模拟数据）
-                        const durationText = '2小时35分钟';
-
-                        // 发生次数
-                        const occurrenceText = alert.occurrence;
-
-                        html += `
-                            <div class="alert-item">
-                                <div class="alert-level-urgency">
-                                    <span class="alert-level ${levelClass}">${escapeHtml(levelText)}</span>
-                                    <span class="alert-urgency ${urgencyClass}">${escapeHtml(urgencyText)}</span>
-                                </div>
-                                <div class="alert-title-container">
-                                    <div class="alert-title clickable" onclick="onAlertTitleClick(${alert.id})">${escapeHtml(alert.title)}</div>
-                                    <span class="alert-badge ${badgeClass}">${escapeHtml(alert.type)}</span>
-                                </div>
-                                <div class="alert-station">
-                                    <i class="bi bi-geo-alt"></i>
-                                    <span class="station-name clickable" onclick="onStationNameClick('${encodeURIComponent(alert.station)}')">${escapeHtml(alert.station)}</span>
-                                </div>
-                                <div class="alert-description">${escapeHtml(alert.description)}</div>
-                                <div class="alert-details">
-                                    <div class="alert-duration">持续时长: ${escapeHtml(durationText)}</div>
-                                    <div class="alert-count">发生次数: ${escapeHtml(occurrenceText)}</div>
-                                </div>
-                                <div class="alert-footer">
-                                    <div class="alert-time">${escapeHtml(alert.time)}</div>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    container.innerHTML = html;
-                } catch (error) {
-                    console.error('渲染告警列表时出错:', error);
-                }
+                });
             }
 
-            // 更新标签页计数
-            function updateTabCounts() {
-                try {
-                    const allCount = alertData.length;
-                    const unhandledCount = alertData.filter(alert => alert.status === 'unhandled').length;
-                    const processingCount = alertData.filter(alert => alert.status === 'processing').length;
-                    const handledCount = alertData.filter(alert => alert.status === 'handled').length;
-
-                    document.querySelector('.tab-item[data-status="all"] .tab-count').textContent = allCount;
-                    document.querySelector('.tab-item[data-status="unhandled"] .tab-count').textContent = unhandledCount;
-                    document.querySelector('.tab-item[data-status="processing"] .tab-count').textContent = processingCount;
-                    document.querySelector('.tab-item[data-status="handled"] .tab-count').textContent = handledCount;
-                } catch (error) {
-                    console.error('更新标签页计数时出错:', error);
-                }
-            }
-
-            // 切换标签页
-            function switchTab(status, event) {
-                try {
-                    state.currentStatus = status;
-                    
-                    // 更新标签页样式
-                    document.querySelectorAll('.tab-item').forEach(item => {
-                        item.classList.remove('active');
-                    });
-                    event.currentTarget.classList.add('active');
-                    
-                    // 过滤告警数据
-                    filterAndSortAlerts();
-                } catch (error) {
-                    console.error('切换标签页时出错:', error);
-                }
-            }
-
-            // 搜索告警
-            function searchAlerts(keyword) {
-                try {
-                    state.currentSearch = keyword.toLowerCase();
-                    filterAndSortAlerts();
-                } catch (error) {
-                    console.error('搜索告警时出错:', error);
-                }
-            }
-
-            // 切换排序下拉菜单
-            function toggleSortDropdown() {
-                try {
-                    const dropdown = document.getElementById('sortDropdown');
-                    const overlay = document.getElementById('overlay');
-                    
-                    if (dropdown.style.display === 'block') {
-                        dropdown.style.display = 'none';
-                        overlay.style.display = 'none';
-                        document.body.classList.remove('no-scroll');
-                    } else {
-                        dropdown.style.display = 'block';
-                        overlay.style.display = 'block';
-                        document.body.classList.add('no-scroll');
-                        
-                        // 更新排序选项的激活状态
-                        document.querySelectorAll('.sort-option').forEach(option => {
-                            option.classList.remove('active');
-                            const sortType = option.getAttribute('data-sort');
-                            if (sortType === state.currentSort) {
-                                option.classList.add('active');
-                            }
-                        });
+            // 标签页切换事件
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = this.getAttribute('data-tab');
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.switchTab(tab);
                     }
-                } catch (error) {
-                    console.error('切换排序下拉菜单时出错:', error);
-                }
-            }
-
-            // 切换筛选面板
-            function toggleFilterPanel() {
-                try {
-                    const panel = document.getElementById('filterPanel');
-                    const overlay = document.getElementById('overlay');
                     
-                    if (panel.style.display === 'block') {
-                        panel.style.display = 'none';
-                        overlay.style.display = 'none';
-                        document.body.classList.remove('no-scroll');
-                    } else {
-                        panel.style.display = 'block';
-                        overlay.style.display = 'block';
-                        document.body.classList.add('no-scroll');
+                    // 更新标签页激活状态
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // 注意：筛选/排序/区域的点击事件已在 alert-main.js 绑定，这里不再重复绑定
+
+            // 筛选重置事件
+            const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+            if (resetFiltersBtn) {
+                resetFiltersBtn.addEventListener('click', function() {
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.resetFilters();
                     }
-                } catch (error) {
-                    console.error('切换筛选面板时出错:', error);
-                }
+                });
             }
 
-            // 选择筛选选项
-            function selectFilterOption(element, type, value) {
-                try {
-                    // 更新同组选项的激活状态
-                    element.parentElement.querySelectorAll('.filter-option').forEach(option => {
-                        option.classList.remove('active');
-                    });
-                    element.classList.add('active');
-                    
-                    // 更新当前筛选条件
-                    state.currentFilters[type] = value;
-                } catch (error) {
-                    console.error('选择筛选选项时出错:', error);
-                }
+            // 筛选应用事件
+            const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+            if (applyFiltersBtn) {
+                applyFiltersBtn.addEventListener('click', function() {
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.applyFilters();
+                    }
+                });
             }
 
-            // 重置筛选条件
-            function resetFilters() {
-                try {
-                    state.currentFilters = {
-                        area: 'all',
-                        level: 'all',
-                        urgency: 'all'
-                    };
+            // 区域选择面板关闭事件
+            const closeAreaSelectorBtn = document.getElementById('closeAreaSelectorBtn');
+            if (closeAreaSelectorBtn) {
+                closeAreaSelectorBtn.addEventListener('click', function() {
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.closeAreaSelector();
+                    }
+                });
+            }
+
+            // 模态框关闭事件
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', function() {
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.closeModal();
+                    }
+                });
+            }
+
+            const closeModalBtn2 = document.getElementById('closeModalBtn2');
+            if (closeModalBtn2) {
+                closeModalBtn2.addEventListener('click', function() {
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.closeModal();
+                    }
+                });
+            }
+
+            // 处理告警事件
+            const handleAlertBtn = document.getElementById('handleAlertBtn');
+            if (handleAlertBtn) {
+                handleAlertBtn.addEventListener('click', function() {
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.handleAlert();
+                    }
+                });
+            }
+
+            // 遮罩层点击事件在 alert-main.js 内已处理
+
+            // 排序选项点击事件
+            const sortOptions = document.querySelectorAll('.sort-option');
+            sortOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const sortType = this.getAttribute('data-sort');
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.sortAlerts(sortType);
+                    }
                     
-                    // 重置UI
-                    document.querySelectorAll('.filter-option').forEach(option => {
-                        option.classList.remove('active');
-                        const dataType = Object.keys(option.dataset)[0];
-                        if (option.dataset[dataType] === 'all') {
-                            option.classList.add('active');
+                    // 更新排序选项激活状态
+                    sortOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // 筛选选项点击事件
+            setupFilterOptionListeners('filterTimeAll', 'time', 'all');
+            setupFilterOptionListeners('filterTimeToday', 'time', 'today');
+            setupFilterOptionListeners('filterTime7Days', 'time', '7days');
+            setupFilterOptionListeners('filterTime30Days', 'time', '30days');
+            setupFilterOptionListeners('filterTime90Days', 'time', '90days');
+            setupFilterOptionListeners('filterTimeCustom', 'time', 'custom');
+            
+            setupFilterOptionListeners('filterAreaAll', 'area', 'all');
+            setupFilterOptionListeners('filterArea1', 'area', 'area1');
+            setupFilterOptionListeners('filterArea2', 'area', 'area2');
+            setupFilterOptionListeners('filterArea3', 'area', 'area3');
+            
+            setupFilterOptionListeners('filterLevelAll', 'level', 'all');
+            setupFilterOptionListeners('filterLevel1', 'level', 'level1');
+            setupFilterOptionListeners('filterLevel2', 'level', 'level2');
+            setupFilterOptionListeners('filterLevel3', 'level', 'level3');
+            setupFilterOptionListeners('filterLevel4', 'level', 'level4');
+            
+            setupFilterOptionListeners('filterUrgencyAll', 'urgency', 'all');
+            setupFilterOptionListeners('filterUrgencyCritical', 'urgency', 'critical');
+            setupFilterOptionListeners('filterUrgencyImportant', 'urgency', 'important');
+            setupFilterOptionListeners('filterUrgencyNormal', 'urgency', 'normal');
+            
+            setupFilterOptionListeners('filterDurationAll', 'duration', 'all');
+            setupFilterOptionListeners('filterDurationLt1h', 'duration', 'lt1h');
+            setupFilterOptionListeners('filterDuration1-3h', 'duration', '1-3h');
+            setupFilterOptionListeners('filterDuration3-12h', 'duration', '3-12h');
+            setupFilterOptionListeners('filterDuration12-24h', 'duration', '12-24h');
+            setupFilterOptionListeners('filterDurationGt24h', 'duration', 'gt24h');
+            
+            setupFilterOptionListeners('filterOccurrenceAll', 'occurrence', 'all');
+            setupFilterOptionListeners('filterOccurrence1-5', 'occurrence', '1-5');
+            setupFilterOptionListeners('filterOccurrence6-20', 'occurrence', '6-20');
+            setupFilterOptionListeners('filterOccurrence21-50', 'occurrence', '21-50');
+            setupFilterOptionListeners('filterOccurrenceGt50', 'occurrence', 'gt50');
+            
+            setupFilterOptionListeners('filterStatusAll', 'status', 'all');
+            setupFilterOptionListeners('filterStatusActive', 'status', 'active');
+            setupFilterOptionListeners('filterStatusResolved', 'status', 'resolved');
+            setupFilterOptionListeners('filterStatusAcknowledged', 'status', 'acknowledged');
+
+            // 自定义时间筛选显示事件
+            const filterTimeCustom = document.getElementById('filterTimeCustom');
+            if (filterTimeCustom) {
+                filterTimeCustom.addEventListener('click', function() {
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.showDateRangePicker();
+                    }
+                });
+            }
+
+            // 日期范围滑块事件
+            const occurrenceRangeSlider = document.getElementById('occurrenceRangeSlider');
+            if (occurrenceRangeSlider) {
+                occurrenceRangeSlider.addEventListener('input', function() {
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.updateOccurrenceRange(this.value);
+                    }
+                });
+            }
+
+            // 区域选择事件
+            const areaLanxi = document.getElementById('areaLanxi');
+            if (areaLanxi) {
+                areaLanxi.addEventListener('click', function() {
+                    if (typeof AlertListModule !== 'undefined') {
+                        // AlertListModule.selectArea(this, 'lanxi');
+                        populateAreaChildren('lanxi');
+                    }
+                });
+            }
+            
+            // 全部区域选择事件
+            const areaAll = document.getElementById('areaAll');
+            if (areaAll) {
+                areaAll.addEventListener('click', function() {
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.selectArea(this, 'all');
+                        AlertListModule.closeAreaSelector();
+                    }
+                });
+            }
+
+            // 筛选选项事件监听器设置函数
+            function setupFilterOptionListeners(elementId, filterType, filterValue) {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.addEventListener('click', function() {
+                        if (typeof AlertListModule !== 'undefined') {
+                            AlertListModule.selectFilterOption(this, filterType, filterValue);
                         }
                     });
-                } catch (error) {
-                    console.error('重置筛选条件时出错:', error);
                 }
             }
-
-            // 应用筛选条件
-            function applyFilters() {
-                try {
-                    filterAndSortAlerts();
-                    closeDropdowns();
-                } catch (error) {
-                    console.error('应用筛选条件时出错:', error);
-                }
-            }
-
-            // 排序告警
-            function sortAlerts(sortType) {
-                try {
-                    state.currentSort = sortType;
-                    
-                    // 更新排序选项的激活状态
-                    document.querySelectorAll('.sort-option').forEach(option => {
-                        option.classList.remove('active');
-                        const optionSortType = option.getAttribute('data-sort');
-                        if (optionSortType === sortType) {
-                            option.classList.add('active');
-                            
-                            // 更新排序图标
-                            const sortIcons = option.querySelector('.sort-icons');
-                            if (sortType.endsWith('-desc')) {
-                                sortIcons.querySelector('.sort-desc').classList.add('active');
-                                sortIcons.querySelector('.sort-asc').classList.remove('active');
-                            } else {
-                                sortIcons.querySelector('.sort-desc').classList.remove('active');
-                                sortIcons.querySelector('.sort-asc').classList.add('active');
-                            }
-                        }
-                    });
-                    
-                    filterAndSortAlerts();
-                } catch (error) {
-                    console.error('排序告警时出错:', error);
-                }
-            }
-
-            // 过滤和排序告警
-            function filterAndSortAlerts() {
-                try {
-                    let filtered = [...alertData];
-                    
-                    // 应用状态筛选
-                    if (state.currentStatus !== 'all') {
-                        filtered = filtered.filter(alert => alert.status === state.currentStatus);
+            
+            // 自定义日期范围应用按钮事件
+            const applyCustomDateBtn = document.getElementById('applyCustomDateBtn');
+            if (applyCustomDateBtn) {
+                applyCustomDateBtn.addEventListener('click', function() {
+                    if (typeof AlertListModule !== 'undefined') {
+                        AlertListModule.applyCustomDateRange();
                     }
-                    
-                    // 应用搜索关键词
-                    if (state.currentSearch) {
-                        filtered = filtered.filter(alert => 
-                            alert.title.toLowerCase().includes(state.currentSearch) ||
-                            alert.description.toLowerCase().includes(state.currentSearch) ||
-                            alert.station.toLowerCase().includes(state.currentSearch)
-                        );
-                    }
-                    
-                    // 应用其他筛选条件
-                    if (state.currentFilters.area !== 'all') {
-                        filtered = filtered.filter(alert => alert.area === state.currentFilters.area);
-                    }
-                    
-                    if (state.currentFilters.level !== 'all') {
-                        filtered = filtered.filter(alert => alert.level === state.currentFilters.level);
-                    }
-                    
-                    if (state.currentFilters.urgency !== 'all') {
-                        filtered = filtered.filter(alert => alert.urgency === state.currentFilters.urgency);
-                    }
-                    
-                    // 应用排序
-                    filtered.sort((a, b) => {
-                        switch (state.currentSort) {
-                            case 'time-desc':
-                                return new Date(b.time) - new Date(a.time);
-                            case 'time-asc':
-                                return new Date(a.time) - new Date(b.time);
-                            case 'level-desc':
-                                return parseInt(b.level.replace('level', '')) - parseInt(a.level.replace('level', ''));
-                            case 'level-asc':
-                                return parseInt(a.level.replace('level', '')) - parseInt(b.level.replace('level', ''));
-                            default:
-                                return 0;
-                        }
-                    });
-                    
-                    state.currentAlerts = filtered;
-                    renderAlertList(state.currentAlerts);
-                } catch (error) {
-                    console.error('过滤和排序告警时出错:', error);
-                }
+                });
             }
-
-            // 关闭下拉菜单和面板
-            function closeDropdowns() {
-                try {
-                    document.getElementById('sortDropdown').style.display = 'none';
-                    document.getElementById('filterPanel').style.display = 'none';
-                    document.getElementById('overlay').style.display = 'none';
-                    document.body.classList.remove('no-scroll');
-                } catch (error) {
-                    console.error('关闭下拉菜单和面板时出错:', error);
-                }
-            }
-
-            // 查看告警详情
-            function viewAlertDetail(alertId) {
-                try {
-                    const alert = alertData.find(item => item.id == alertId);
-                    if (!alert) {
-                        console.warn(`未找到ID为${alertId}的告警`);
-                        return;
-                    }
-                    
-                    const modal = document.getElementById('alertDetailModal');
-                    const modalTitle = document.getElementById('modalTitle');
-                    const modalBody = document.getElementById('modalBody');
-                    
-                    modalTitle.textContent = alert.title;
-                    
-                    // 根据告警级别确定样式类
-                    let levelClass = '';
-                    let levelText = '';
-                    switch (alert.level) {
-                        case 'level1':
-                            levelClass = 'level-1';
-                            levelText = '一级告警';
-                            break;
-                        case 'level2':
-                            levelClass = 'level-2';
-                            levelText = '二级告警';
-                            break;
-                        case 'level3':
-                            levelClass = 'level-3';
-                            levelText = '三级告警';
-                            break;
-                        case 'level4':
-                            levelClass = 'level-4';
-                            levelText = '四级告警';
-                            break;
-                        default:
-                            levelClass = 'level-4';
-                            levelText = '四级告警';
-                    }
-
-                    // 根据紧急程度确定样式类
-                    let urgencyClass = '';
-                    let urgencyText = '';
-                    switch (alert.urgency) {
-                        case 'critical':
-                            urgencyClass = 'urgency-critical';
-                            urgencyText = '紧急';
-                            break;
-                        case 'important':
-                            urgencyClass = 'urgency-important';
-                            urgencyText = '重要';
-                            break;
-                        case 'normal':
-                            urgencyClass = 'urgency-normal';
-                            urgencyText = '普通';
-                            break;
-                        default:
-                            urgencyClass = 'urgency-normal';
-                            urgencyText = '普通';
-                    }
-
-                    // 根据类型确定徽章样式
-                    let badgeClass = '';
-                    switch (alert.severity) {
-                        case 'danger':
-                            badgeClass = 'badge-danger';
-                            break;
-                        case 'warning':
-                            badgeClass = 'badge-warning';
-                            break;
-                        case 'info':
-                            badgeClass = 'badge-info';
-                            break;
-                        default:
-                            badgeClass = 'badge-info';
-                    }
-
-                    modalBody.innerHTML = `
-                        <div class="alert-detail-content">
-                            <div class="alert-detail-header">
-                                <div class="alert-level-urgency">
-                                    <span class="alert-level ${levelClass}">${escapeHtml(levelText)}</span>
-                                    <span class="alert-urgency ${urgencyClass}">${escapeHtml(urgencyText)}</span>
-                                </div>
-                                <div class="alert-title-container">
-                                    <h4 class="alert-title">${escapeHtml(alert.title)}</h4>
-                                    <span class="alert-badge ${badgeClass}">${escapeHtml(alert.type)}</span>
-                                </div>
-                                <div class="alert-station">
-                                    <i class="bi bi-geo-alt"></i>
-                                    <span class="station-name">${escapeHtml(alert.station)}</span>
-                                </div>
-                            </div>
-                            <div class="alert-detail-section">
-                                <h5>告警描述</h5>
-                                <p>${escapeHtml(alert.description)}</p>
-                            </div>
-                            <div class="alert-detail-section">
-                                <h5>详细信息</h5>
-                                <div class="detail-grid">
-                                    <div class="detail-item">
-                                        <span class="detail-label">告警时间</span>
-                                        <span class="detail-value">${escapeHtml(alert.time)}</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">持续时长</span>
-                                        <span class="detail-value">2小时35分钟</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">发生次数</span>
-                                        <span class="detail-value">${escapeHtml(alert.occurrence)}</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">告警区域</span>
-                                        <span class="detail-value">区域${alert.area.replace('area', '')}</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">当前状态</span>
-                                        <span class="detail-value">${getStatusText(alert.status)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="alert-detail-section">
-                                <h5>处理建议</h5>
-                                <p>请立即检查相关设备运行状态，确认是否需要现场处理。如需现场处理，请派遣维护人员前往处理。</p>
-                            </div>
-                        </div>
-                    `;
-                    
-                    modal.style.display = 'block';
-                    document.body.classList.add('no-scroll');
-                } catch (error) {
-                    console.error('查看告警详情时出错:', error);
-                }
-            }
-
-            // 获取状态文本
-            function getStatusText(status) {
-                try {
-                    switch (status) {
-                        case 'unhandled':
-                            return '未处理';
-                        case 'processing':
-                            return '处理中';
-                        case 'handled':
-                            return '已处理';
-                        default:
-                            return '未知';
-                    }
-                } catch (error) {
-                    console.error('获取状态文本时出错:', error);
-                    return '未知';
-                }
-            }
-
-            // 关闭模态框
-            function closeModal() {
-                try {
-                    document.getElementById('alertDetailModal').style.display = 'none';
-                    document.body.classList.remove('no-scroll');
-                } catch (error) {
-                    console.error('关闭模态框时出错:', error);
-                }
-            }
-
-            // 处理告警
-            function handleAlert() {
-                try {
-                    // 这里应该实现真正的告警处理逻辑
-                    // 为了演示，我们仍然显示提示，但可以扩展为实际的API调用
-                    alert('告警处理请求已发送');
-                    closeModal();
-                    
-                    // 实际应用中，这里应该调用API来更新告警状态
-                    // fetch('/api/alerts/' + alertId + '/handle', {
-                    //     method: 'POST',
-                    //     headers: {
-                    //         'Content-Type': 'application/json'
-                    //     }
-                    // })
-                    // .then(response => response.json())
-                    // .then(data => {
-                    //     // 更新UI显示处理成功
-                    //     console.log('告警已处理:', data);
-                    // })
-                    // .catch(error => {
-                    //     console.error('处理告警时出错:', error);
-                    // });
-                } catch (error) {
-                    console.error('处理告警时出错:', error);
-                }
-            }
-
-            // 切换区域选择面板
-            function toggleAreaSelector() {
-                try {
-                    const panel = document.getElementById('areaSelector');
-                    const overlay = document.getElementById('overlay');
-                    
-                    if (panel.style.display === 'block') {
-                        panel.style.display = 'none';
-                        overlay.style.display = 'none';
-                        document.body.classList.remove('no-scroll');
-                    } else {
-                        panel.style.display = 'block';
-                        overlay.style.display = 'block';
-                        document.body.classList.add('no-scroll');
-                    }
-                } catch (error) {
-                    console.error('切换区域选择面板时出错:', error);
-                }
-            }
-
-            // 关闭区域选择面板
-            function closeAreaSelector() {
-                try {
-                    document.getElementById('areaSelector').style.display = 'none';
-                    document.getElementById('overlay').style.display = 'none';
-                    document.body.classList.remove('no-scroll');
-                } catch (error) {
-                    console.error('关闭区域选择面板时出错:', error);
-                }
-            }
-
-            // 区域选择处理
-            function selectArea(level, value) {
-                try {
-                    // 根据层级和值加载对应的子区域
-                    if (level === 0) {
-                        // 选择兰溪市，加载下一级区域
-                        loadAreaLevel(1, value);
-                    } else if (level === 1) {
-                        // 选择下一级区域，可以在这里添加更多逻辑
-                        // 例如：更新筛选条件中的区域值
-                        const areaOption = document.querySelector(`.area-option[data-level="${level}"][data-value="${value}"]`);
-                        if (areaOption) {
-                            // 设置为激活状态
-                            document.querySelectorAll('.area-option').forEach(opt => {
-                                opt.classList.remove('active');
-                            });
-                            areaOption.classList.add('active');
-                        }
-                        // 这里可以添加实际的区域筛选逻辑
-                        console.log('选择了区域:', value);
-                        // 关闭面板
-                        closeAreaSelector();
-                    }
-                } catch (error) {
-                    console.error('处理区域选择时出错:', error);
-                }
-            }
-
-            // 加载指定层级的区域
-            function loadAreaLevel(level, parentValue) {
-                try {
-                    const column = document.getElementById(`areaColumn${level}`);
-                    if (!column) return;
-                    
-                    // 模拟区域数据 - 以兰溪市为例
-                    const areaData = {
-                        0: [{value: 'lanxi', text: '兰溪市'}],
-                        1: [
-                            {value: 'lanxi-1', text: '兰溪市-区域一'},
-                            {value: 'lanxi-2', text: '兰溪市-区域二'},
-                            {value: 'lanxi-3', text: '兰溪市-区域三'}
-                        ],
-                        2: [
-                            {value: 'lanxi-1-1', text: '兰溪市-区域一-片区A'},
-                            {value: 'lanxi-1-2', text: '兰溪市-区域一-片区B'},
-                            {value: 'lanxi-2-1', text: '兰溪市-区域二-片区C'},
-                            {value: 'lanxi-2-2', text: '兰溪市-区域二-片区D'}
-                        ]
-                    };
-                    
-                    const areas = areaData[level] || [];
-                    let html = '';
-                    areas.forEach(area => {
-                        html += `
-                            <div class="area-option" data-level="${level}" data-value="${area.value}" onclick="AlertListModule.selectArea(${level}, '${area.value}')">
-                                <span class="area-option-text">${area.text}</span>
-                                <i class="bi bi-chevron-right area-option-arrow"></i>
-                            </div>
-                        `;
-                    });
-                    column.innerHTML = html;
-                } catch (error) {
-                    console.error('加载区域数据时出错:', error);
-                }
-            }
-
-            // 公共方法
-            return {
-                init,
-                switchTab,
-                searchAlerts,
-                toggleSortDropdown,
-                toggleFilterPanel,
-                selectFilterOption,
-                resetFilters,
-                applyFilters,
-                sortAlerts,
-                closeDropdowns,
-                toggleAreaSelector,
-                closeAreaSelector,
-                selectArea
-            };
-        })();
+        }
     </script>
-</body>
-</html>

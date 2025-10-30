@@ -74,15 +74,82 @@
         }
         
         .main-content {
-            padding: 16px;
+            padding: 4px;
+            padding-top: 80px;
+        }
+        
+        /* 固定的tabs区域 */
+        .fixed-tabs {
+            position: fixed;
+            top: 48px;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            z-index: 99;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .status-tabs {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .status-tab {
+            padding: 16px 0;
+            text-align: center;
+            font-size: 14px;
+            color: var(--gray-text);
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .status-tab.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .status-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .tab-count {
+            display: inline-block;
+            background-color: #e0e0e0;
+            color: #666;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+        
+        .status-tab.active .tab-count {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* 可滚动的列表区域 */
+        .scrollable-list {
+            max-height: calc(100vh - 180px);
+            overflow-y: auto;
         }
         
         .card-container {
             background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            margin-bottom: 24px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            margin-bottom: 16px;
             overflow: hidden;
+            padding: 0 4px;
         }
         
         .card-header {
@@ -98,7 +165,7 @@
         }
         
         .card-body {
-            padding: 16px;
+            padding: 4px;
         }
         
         .map-placeholder {
@@ -113,36 +180,89 @@
         }
         
         .list-group {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            padding: 4px;
         }
         
         .list-group-item {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f5f5f5;
+            flex-direction: row;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
         
-        .list-group-item:last-child {
-            border-bottom: none;
+        .item-image {
+            width: 120px;
+            height: 100px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: #999;
+            font-size: 12px;
+            flex-shrink: 0;
         }
         
         .item-content {
             flex: 1;
         }
         
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
         .item-title {
             font-size: 14px;
             font-weight: 500;
             color: #111111;
-            margin-bottom: 4px;
+            margin-bottom: 0;
         }
         
         .item-subtitle {
             font-size: 12px;
             color: #666666;
+        }
+        
+        .item-address {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+        }
+        
+        .address-icon {
+            font-size: 12px;
+            margin-right: 4px;
+            color: #999;
+        }
+        
+        .address-text {
+            font-size: 12px;
+            color: #666666;
+        }
+        
+        .item-data-time-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+        
+        .item-data-time {
+            font-size: 10px;
+            color: #999999;
         }
         
         .status-container {
@@ -151,10 +271,10 @@
         }
         
         .status-indicator {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            margin-right: 6px;
+            margin-right: 4px;
         }
         
         .status-normal {
@@ -396,27 +516,48 @@
             background-color: #f5f5f5;
         }
         
+        .iot-status {
+            display: flex;
+            align-items: center;
+            margin-right: 8px;
+            font-size: 12px;
+            color: #34C759;
+        }
+        
+        .iot-text {
+            margin-left: 2px;
+        }
+        
+        .station-link {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .station-link:hover {
+            text-decoration: underline;
+        }
+        
         /* 响应式优化 */
         @media (max-width: 375px) {
-            .filter-button {
+            .filter-button, .tab-button {
                 padding: 6px 8px;
                 font-size: 12px;
                 border-radius: 4px;
             }
             
-            .filter-buttons {
+            .filter-buttons, .tab-buttons {
                 gap: 4px;
             }
         }
         
         @media (min-width: 414px) {
-            .filter-button {
+            .filter-button, .tab-button {
                 padding: 10px 16px;
                 font-size: 14px;
                 border-radius: 8px;
             }
             
-            .filter-buttons {
+            .filter-buttons, .tab-buttons {
                 gap: 8px;
             }
         }
@@ -439,127 +580,442 @@
         </div>
     </header>
 
+    <!-- 固定的tabs区域 -->
+    <div class="fixed-tabs">
+        <div class="status-tabs">
+            <div class="status-tab active">全部 <span class="tab-count">15</span></div>
+            <div class="status-tab">正常 <span class="tab-count">13</span></div>
+            <div class="status-tab">预警 <span class="tab-count">1</span></div>
+            <div class="status-tab">异常 <span class="tab-count">1</span></div>
+        </div>
+    </div>
+
     <!-- 主要内容区 -->
     <main class="main-content">
-        <!-- 统计信息 -->
         <div class="card-container">
-            <div class="card-header">
-                <h2 class="card-title">监测统计</h2>
-            </div>
             <div class="card-body">
-                <div class="data-grid">
-                    <div class="pump-data-card">
-                        <div class="data-label">总监测企业</div>
-                        <div class="data-value">15</div>
-                    </div>
-                    <div class="pump-data-card">
-                        <div class="data-label">正常企业</div>
-                        <div class="data-value" style="color: #34C759;">13</div>
-                    </div>
-                    <div class="pump-data-card">
-                        <div class="data-label">预警企业</div>
-                        <div class="data-value" style="color: #FF9500;">1</div>
-                    </div>
-                    <div class="pump-data-card">
-                        <div class="data-label">异常企业</div>
-                        <div class="data-value" style="color: #FF3B30;">1</div>
+                <div class="scrollable-list">
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">华兴化工有限公司</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区化工路123号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 120m³/d</div>
+                                <div class="item-subtitle">COD: 45mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:30:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">东方纺织厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区纺织路45号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 85m³/d</div>
+                                <div class="item-subtitle">COD: 52mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:28:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-warning"></span>
+                                        <span class="status-text">预警</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi-off"></i>
+                                        <span class="iot-text">未联网</span>
+                                    </div>
+                                    <div class="item-title">华峰印染厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区印染路78号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 210m³/d</div>
+                                <div class="item-subtitle">COD: 68mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:25:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-danger"></span>
+                                        <span class="status-text">异常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">金龙食品厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区食品路101号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 95m³/d</div>
+                                <div class="item-subtitle">COD: 38mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:32:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">华泰造纸厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区造纸路23号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 78m³/d</div>
+                                <div class="item-subtitle">COD: 41mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:29:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">华美制衣厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区制衣路56号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 110m³/d</div>
+                                <div class="item-subtitle">COD: 48mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:31:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">华强电子厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区电子路89号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 92m³/d</div>
+                                <div class="item-subtitle">COD: 43mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:27:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">华兴机械厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区机械路34号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 88m³/d</div>
+                                <div class="item-subtitle">COD: 46mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:33:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">华泰钢铁厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区钢铁路67号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 75m³/d</div>
+                                <div class="item-subtitle">COD: 39mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:26:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">华美塑料厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区塑料路111号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 105m³/d</div>
+                                <div class="item-subtitle">COD: 51mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:34:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">华强陶瓷厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区陶瓷路222号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 135m³/d</div>
+                                <div class="item-subtitle">COD: 55mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:24:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">华兴玻璃厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区玻璃路333号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 98m³/d</div>
+                                <div class="item-subtitle">COD: 42mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:35:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">华美家具厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区家具路444号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 82m³/d</div>
+                                <div class="item-subtitle">COD: 40mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:36:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">华泰建材厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区建材路555号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 115m³/d</div>
+                                <div class="item-subtitle">COD: 49mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:37:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">企业图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">华强皮革厂</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">工业区皮革路666号</span>
+                                </div>
+                                <div class="item-subtitle">排放量: 125m³/d</div>
+                                <div class="item-subtitle">COD: 53mg/L</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:38:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- 排污企业列表 -->
-        <div class="card-container">
-            <div class="card-header">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2 class="card-title">排污企业列表</h2>
-                    <div class="filter-buttons" style="display: flex; gap: 8px;">
-                        <button class="filter-button active">全部</button>
-                        <button class="filter-button">正常</button>
-                        <button class="filter-button">预警</button>
-                        <button class="filter-button">异常</button>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="list-group">
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">华兴化工有限公司</div>
-                            <div class="item-subtitle">排放量: 120m³/d</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-normal"></span>
-                            <span class="status-text">正常</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">东方纺织厂</div>
-                            <div class="item-subtitle">排放量: 85m³/d</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-normal"></span>
-                            <span class="status-text">正常</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">华泰钢铁集团</div>
-                            <div class="item-subtitle">排放量: 320m³/d</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-danger"></span>
-                            <span class="status-text">异常</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">华美食品厂</div>
-                            <div class="item-subtitle">排放量: 45m³/d</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-warning"></span>
-                            <span class="status-text">预警</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">蓝天制药公司</div>
-                            <div class="item-subtitle">排放量: 65m³/d</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-normal"></span>
-                            <span class="status-text">正常</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">宏达电子厂</div>
-                            <div class="item-subtitle">排放量: 75m³/d</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-normal"></span>
-                            <span class="status-text">正常</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 查看更多 -->
-        <div style="text-align: center; padding: 16px;">
-            <button id="loadMoreBtn" style="padding: 10px 24px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;">
-                查看更多
-            </button>
-        </div>
-        
     </main>
 
+    <!-- 底部导航栏 -->
+    <nav class="tab-bar">
+        <a href="../home/home.html" class="tab-item" data-page="home">
+            <span class="tab-icon"><i class="bi bi-house"></i></span>
+            <span class="tab-text">首页</span>
+        </a>
+        <a href="monitor.html" class="tab-item active" data-page="monitor">
+            <span class="tab-icon"><i class="bi bi-tv"></i></span>
+            <span class="tab-text">监控</span>
+        </a>
+        <a href="../operation/operation.html" class="tab-item" data-page="operation">
+            <span class="tab-icon"><i class="bi bi-tools"></i></span>
+            <span class="tab-text">运维</span>
+        </a>
+        <a href="../report/report.html" class="tab-item" data-page="report">
+            <span class="tab-icon"><i class="bi bi-bar-chart"></i></span>
+            <span class="tab-text">报表</span>
+        </a>
+        <a href="../profile/profile.html" class="tab-item" data-page="profile">
+            <span class="tab-icon"><i class="bi bi-person"></i></span>
+            <span class="tab-text">我的</span>
+        </a>
+    </nav>
 
     <script>
-        // 为筛选按钮添加点击事件
+        // 实现tab切换功能
         document.addEventListener('DOMContentLoaded', function() {
+            // 状态tab切换
+            const statusTabs = document.querySelectorAll('.status-tab');
+            statusTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 移除所有tab的active类
+                    statusTabs.forEach(t => t.classList.remove('active'));
+                    // 为当前点击的tab添加active类
+                    this.classList.add('active');
+                });
+            });
+
+            // 为筛选按钮添加点击事件
             const filterButtons = document.querySelectorAll('.filter-button');
             
             filterButtons.forEach(button => {

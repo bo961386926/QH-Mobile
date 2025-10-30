@@ -74,15 +74,82 @@
         }
         
         .main-content {
-            padding: 16px;
+            padding: 4px;
+            padding-top: 80px;
+        }
+        
+        /* 固定的tabs区域 */
+        .fixed-tabs {
+            position: fixed;
+            top: 48px;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            z-index: 99;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .status-tabs {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .status-tab {
+            padding: 16px 0;
+            text-align: center;
+            font-size: 14px;
+            color: var(--gray-text);
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .status-tab.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .status-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .tab-count {
+            display: inline-block;
+            background-color: #e0e0e0;
+            color: #666;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+        
+        .status-tab.active .tab-count {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* 可滚动的列表区域 */
+        .scrollable-list {
+            max-height: calc(100vh - 180px);
+            overflow-y: auto;
         }
         
         .card-container {
             background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            margin-bottom: 24px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            margin-bottom: 16px;
             overflow: hidden;
+            padding: 0 4px;
         }
         
         .card-header {
@@ -98,51 +165,93 @@
         }
         
         .card-body {
-            padding: 16px;
+            padding: 4px;
         }
         
-        .map-placeholder {
-            height: 200px;
+        .list-group {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            padding: 4px;
+        }
+        
+        .list-group-item {
+            display: flex;
+            flex-direction: row;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .item-image {
+            width: 120px;
+            height: 100px;
             background-color: #f0f0f0;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 16px;
+            margin-right: 12px;
             color: #999;
-        }
-        
-        .list-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .list-group-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f5f5f5;
-        }
-        
-        .list-group-item:last-child {
-            border-bottom: none;
+            font-size: 12px;
+            flex-shrink: 0;
         }
         
         .item-content {
             flex: 1;
         }
         
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
         .item-title {
             font-size: 14px;
             font-weight: 500;
             color: #111111;
-            margin-bottom: 4px;
+            margin-bottom: 0;
         }
         
         .item-subtitle {
             font-size: 12px;
             color: #666666;
+        }
+        
+        .item-address {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+        }
+        
+        .address-icon {
+            font-size: 12px;
+            margin-right: 4px;
+            color: #999;
+        }
+        
+        .address-text {
+            font-size: 12px;
+            color: #666666;
+        }
+        
+        .item-data-time-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+        
+        .item-data-time {
+            font-size: 10px;
+            color: #999999;
         }
         
         .status-container {
@@ -151,10 +260,10 @@
         }
         
         .status-indicator {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            margin-right: 6px;
+            margin-right: 4px;
         }
         
         .status-normal {
@@ -396,27 +505,49 @@
             background-color: #f5f5f5;
         }
         
+        
+        .iot-status {
+            display: flex;
+            align-items: center;
+            margin-right: 8px;
+            font-size: 12px;
+            color: #34C759;
+        }
+        
+        .iot-text {
+            margin-left: 2px;
+        }
+        
+        .station-link {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .station-link:hover {
+            text-decoration: underline;
+        }
+        
         /* 响应式优化 */
         @media (max-width: 375px) {
-            .filter-button {
+            .filter-button, .tab-button {
                 padding: 6px 8px;
                 font-size: 12px;
                 border-radius: 4px;
             }
             
-            .filter-buttons {
+            .filter-buttons, .tab-buttons {
                 gap: 4px;
             }
         }
         
         @media (min-width: 414px) {
-            .filter-button {
+            .filter-button, .tab-button {
                 padding: 10px 16px;
                 font-size: 14px;
                 border-radius: 8px;
             }
             
-            .filter-buttons {
+            .filter-buttons, .tab-buttons {
                 gap: 8px;
             }
         }
@@ -439,190 +570,366 @@
         </div>
     </header>
 
+    <!-- 固定的tabs区域 -->
+    <div class="fixed-tabs">
+        <div class="status-tabs">
+            <div class="status-tab active">全部 <span class="tab-count">12</span></div>
+            <div class="status-tab">正常 <span class="tab-count">10</span></div>
+            <div class="status-tab">预警 <span class="tab-count">1</span></div>
+            <div class="status-tab">异常 <span class="tab-count">1</span></div>
+        </div>
+    </div>
+
     <!-- 主要内容区 -->
     <main class="main-content">
-        <!-- 统计信息 -->
         <div class="card-container">
-            <div class="card-header">
-                <h2 class="card-title">监测统计</h2>
-            </div>
             <div class="card-body">
-                <div class="data-grid">
-                    <div class="pump-data-card">
-                        <div class="data-label">总监测点</div>
-                        <div class="data-value">12</div>
-                    </div>
-                    <div class="pump-data-card">
-                        <div class="data-label">正常点</div>
-                        <div class="data-value" style="color: #34C759;">10</div>
-                    </div>
-                    <div class="pump-data-card">
-                        <div class="data-label">预警点</div>
-                        <div class="data-value" style="color: #FF9500;">1</div>
-                    </div>
-                    <div class="pump-data-card">
-                        <div class="data-label">异常点</div>
-                        <div class="data-value" style="color: #FF3B30;">1</div>
+                <div class="scrollable-list">
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">城南路一号雨水井</div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">城南路123号</span>
+                                </div>
+                                <div class="item-subtitle">水位: 1.2m</div>
+                                <div class="item-subtitle">流量: 25m³/h</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:30:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">中山路雨水井 <span class="pump-type-tag">一类点</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">中山路45号</span>
+                                </div>
+                                <div class="item-subtitle">水位: 1.8m</div>
+                                <div class="item-subtitle">流量: 32m³/h</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:28:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-warning"></span>
+                                        <span class="status-text">预警</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi-off"></i>
+                                        <span class="iot-text">未联网</span>
+                                    </div>
+                                    <div class="item-title">人民路雨水井 <span class="pump-type-tag">二类点</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">人民路78号</span>
+                                </div>
+                                <div class="item-subtitle">水位: 2.5m</div>
+                                <div class="item-subtitle">流量: 45m³/h</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:25:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-danger"></span>
+                                        <span class="status-text">异常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">解放路雨水井 <span class="pump-type-tag">三类点</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">解放路101号</span>
+                                </div>
+                                <div class="item-subtitle">水位: 1.0m</div>
+                                <div class="item-subtitle">流量: 18m³/h</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:32:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">建设路雨水井 <span class="pump-type-tag">一类点</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">建设路23号</span>
+                                </div>
+                                <div class="item-subtitle">水位: 0.8m</div>
+                                <div class="item-subtitle">流量: 15m³/h</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:29:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">青年路雨水井 <span class="pump-type-tag">二类点</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">青年路56号</span>
+                                </div>
+                                <div class="item-subtitle">水位: 1.5m</div>
+                                <div class="item-subtitle">流量: 28m³/h</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:31:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">胜利路雨水井 <span class="pump-type-tag">三类点</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">胜利路89号</span>
+                                </div>
+                                <div class="item-subtitle">水位: 1.1m</div>
+                                <div class="item-subtitle">流量: 20m³/h</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:27:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">光明路雨水井 <span class="pump-type-tag">一类点</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">光明路34号</span>
+                                </div>
+                                <div class="item-subtitle">水位: 1.3m</div>
+                                <div class="item-subtitle">流量: 22m³/h</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:33:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">幸福路雨水井 <span class="pump-type-tag">二类点</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">幸福路67号</span>
+                                </div>
+                                <div class="item-subtitle">水位: 0.9m</div>
+                                <div class="item-subtitle">流量: 17m³/h</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:26:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">长江路雨水井 <span class="pump-type-tag">一类点</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">长江路111号</span>
+                                </div>
+                                <div class="item-subtitle">水位: 1.4m</div>
+                                <div class="item-subtitle">流量: 26m³/h</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:34:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">黄河路雨水井 <span class="pump-type-tag">三类点</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">黄河路222号</span>
+                                </div>
+                                <div class="item-subtitle">水位: 1.6m</div>
+                                <div class="item-subtitle">流量: 30m³/h</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:24:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="item-image">点位图片</div>
+                            <div class="item-content">
+                                <div class="item-header">
+                                    <div class="iot-status">
+                                        <i class="bi bi-wifi"></i>
+                                        <span class="iot-text">已联网</span>
+                                    </div>
+                                    <div class="item-title">泰山南路雨水井 <span class="pump-type-tag">一类点</span></div>
+                                </div>
+                                <div class="item-address">
+                                    <i class="bi bi-geo-alt address-icon"></i>
+                                    <span class="address-text">泰山南路333号</span>
+                                </div>
+                                <div class="item-subtitle">水位: 1.7m</div>
+                                <div class="item-subtitle">流量: 35m³/h</div>
+                                <div class="item-data-time-container">
+                                    <span class="item-data-time">最后更新: 2025-10-28 15:35:00</span>
+                                    <div class="status-container">
+                                        <span class="status-indicator status-normal"></span>
+                                        <span class="status-text">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- 雨水井列表 -->
-        <div class="card-container">
-            <div class="card-header">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2 class="card-title">雨水井列表</h2>
-                    <div class="filter-buttons" style="display: flex; gap: 8px;">
-                        <button class="filter-button active">全部</button>
-                        <button class="filter-button">正常</button>
-                        <button class="filter-button">预警</button>
-                        <button class="filter-button">异常</button>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="list-group">
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">城南路一号雨水井</div>
-                            <div class="item-subtitle">水位: 1.2m</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-normal"></span>
-                            <span class="status-text">正常</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">中山路雨水井</div>
-                            <div class="item-subtitle">水位: 1.8m</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-warning"></span>
-                            <span class="status-text">预警</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">火车站广场雨水井</div>
-                            <div class="item-subtitle">水位: 2.5m</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-danger"></span>
-                            <span class="status-text">异常</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">东湖公园东门雨水井</div>
-                            <div class="item-subtitle">水位: 0.8m</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-normal"></span>
-                            <span class="status-text">正常</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">商业街南段雨水井</div>
-                            <div class="item-subtitle">水位: 1.1m</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-normal"></span>
-                            <span class="status-text">正常</span>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="item-content">
-                            <div class="item-title">人民医院门口雨水井</div>
-                            <div class="item-subtitle">水位: 0.5m</div>
-                        </div>
-                        <div class="status-container">
-                            <span class="status-indicator status-normal"></span>
-                            <span class="status-text">正常</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 查看更多 -->
-        <div style="text-align: center; padding: 16px;">
-            <button id="loadMoreBtn" style="padding: 10px 24px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--gray-text); border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;">
-                查看更多
-            </button>
-        </div>
-        
     </main>
 
+    <!-- 底部导航栏 -->
+    <nav class="tab-bar">
+        <a href="../home/home.html" class="tab-item" data-page="home">
+            <span class="tab-icon"><i class="bi bi-house"></i></span>
+            <span class="tab-text">首页</span>
+        </a>
+        <a href="monitor.html" class="tab-item active" data-page="monitor">
+            <span class="tab-icon"><i class="bi bi-tv"></i></span>
+            <span class="tab-text">监控</span>
+        </a>
+        <a href="../operation/operation.html" class="tab-item" data-page="operation">
+            <span class="tab-icon"><i class="bi bi-tools"></i></span>
+            <span class="tab-text">运维</span>
+        </a>
+        <a href="../report/report.html" class="tab-item" data-page="report">
+            <span class="tab-icon"><i class="bi bi-bar-chart"></i></span>
+            <span class="tab-text">报表</span>
+        </a>
+        <a href="../profile/profile.html" class="tab-item" data-page="profile">
+            <span class="tab-icon"><i class="bi bi-person"></i></span>
+            <span class="tab-text">我的</span>
+        </a>
+    </nav>
 
     <script>
-        // 为筛选按钮添加点击事件
+        // 实现tab切换功能
         document.addEventListener('DOMContentLoaded', function() {
-            const filterButtons = document.querySelectorAll('.filter-button');
-            
-            filterButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    // 移除所有按钮的active类
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
-                    // 添加当前按钮的active类
+            // 状态tab切换
+            const statusTabs = document.querySelectorAll('.status-tab');
+            statusTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 移除所有tab的active类
+                    statusTabs.forEach(t => t.classList.remove('active'));
+                    // 为当前点击的tab添加active类
                     this.classList.add('active');
                 });
             });
-            
-            // 为"查看更多"按钮添加点击事件
-            const loadMoreBtn = document.getElementById('loadMoreBtn');
-            if (loadMoreBtn) {
-                loadMoreBtn.addEventListener('click', function() {
-                    // 模拟加载更多数据
-                    const listGroup = document.querySelector('.list-group');
-                    if (listGroup) {
-                        // 创建新的雨水井项
-                        const newItems = [
-                            {
-                                title: "文化路雨水井",
-                                subtitle: "水位: 1.3m",
-                                status: "normal",
-                                statusText: "正常"
-                            },
-                            {
-                                title: "体育中心南门雨水井",
-                                subtitle: "水位: 0.9m",
-                                status: "normal",
-                                statusText: "正常"
-                            },
-                            {
-                                title: "大学城东门雨水井",
-                                subtitle: "水位: 2.1m",
-                                status: "warning",
-                                statusText: "预警"
-                            }
-                        ];
-                        
-                        // 添加新项到列表
-                        newItems.forEach(item => {
-                            const newItem = document.createElement('div');
-                            newItem.className = 'list-group-item';
-                            newItem.innerHTML = `
-                                <div class="item-content">
-                                    <div class="item-title">${item.title}</div>
-                                    <div class="item-subtitle">${item.subtitle}</div>
-                                </div>
-                                <div class="status-container">
-                                    <span class="status-indicator status-${item.status}"></span>
-                                    <span class="status-text">${item.statusText}</span>
-                                </div>
-                            `;
-                            listGroup.appendChild(newItem);
-                        });
-                        
-                        // 更新按钮文本
-                        this.textContent = '已加载全部';
-                        this.disabled = true;
-                    }
-                });
-            }
+
         });
     </script>
 </body>
