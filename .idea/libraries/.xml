@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="整合版">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/doc/整合版.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
