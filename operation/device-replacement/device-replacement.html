@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备更换</title>
+    <link rel="stylesheet" href="../../assets/libs/bootstrap-icons-1.13.1/fonts/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+            --card-bg: #FFFFFF;
+            --border-color: #E5E5EA;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--light-bg); color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh; padding-top: 48px; padding-bottom: 90px;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color); z-index: 100;
+            height: 48px; display: flex; align-items: center;
+            justify-content: space-between; padding: 0 16px;
+        }
+        .header-title { font-size: 18px; font-weight: bold; color: #111; flex: 1; text-align: left; }
+        .header-back {
+            background: none; border: none; font-size: 20px; color: #666;
+            cursor: pointer; width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .main-content { padding: 16px; }
+        
+        /* 待完成提示条 */
+        .pending-banner {
+            display: none; align-items: center; gap: 10px;
+            padding: 12px 14px; background: rgba(255, 149, 0, 0.08);
+            border: 1px solid rgba(255, 149, 0, 0.25); border-radius: 10px;
+            margin-bottom: 14px; cursor: pointer; transition: all 0.2s;
+        }
+        .pending-banner:active { background: rgba(255, 149, 0, 0.14); }
+        .pending-banner.show { display: flex; }
+        .pending-banner i { font-size: 20px; color: var(--warning-color); flex-shrink: 0; }
+        .pending-banner-text { flex: 1; }
+        .pending-banner-title { font-size: 14px; font-weight: 500; color: var(--dark-text); }
+        .pending-banner-sub { font-size: 12px; color: var(--gray-text); margin-top: 2px; }
+        .pending-banner-chevron { color: var(--warning-color); font-size: 16px; }
+        
+        /* 模式切换 */
+        .mode-switch {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; background: white; border-radius: 10px;
+            border: 1px solid var(--border-color); margin-bottom: 16px;
+        }
+        .mode-switch-label { flex: 1; font-size: 14px; color: var(--dark-text); }
+        .mode-switch-hint { font-size: 12px; color: var(--gray-text); }
+        .toggle-switch {
+            width: 46px; height: 26px; border-radius: 13px;
+            background: #E5E5EA; position: relative; cursor: pointer;
+            transition: background 0.3s; flex-shrink: 0;
+        }
+        .toggle-switch.on { background: var(--primary-color); }
+        .toggle-switch::after {
+            content: ''; width: 22px; height: 22px; border-radius: 50%;
+            background: white; position: absolute; top: 2px; left: 2px;
+            transition: left 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .toggle-switch.on::after { left: 22px; }
+        
+        /* 区域卡片 */
+        .section-card {
+            background: white; border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px; overflow: hidden;
+        }
+        .section-header {
+            display: flex; align-items: center; gap: 8px;
+            padding: 14px 16px; border-bottom: 1px solid var(--border-color);
+            background: #fafafa;
+        }
+        .section-icon {
+            width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        .section-icon.removal { background: rgba(255, 149, 0, 0.1); color: var(--warning-color); }
+        .section-icon.install { background: rgba(52, 199, 89, 0.1); color: var(--secondary-color); }
+        .section-title { font-size: 15px; font-weight: 600; color: var(--dark-text); }
+        .section-badge {
+            font-size: 11px; padding: 2px 8px; border-radius: 4px;
+            margin-left: auto; font-weight: 500;
+        }
+        .section-badge.required { background: rgba(255, 59, 48, 0.08); color: var(--danger-color); }
+        .section-badge.optional { background: rgba(142, 142, 147, 0.1); color: var(--gray-text); }
+        .section-badge.done { background: rgba(52, 199, 89, 0.1); color: var(--secondary-color); }
+        .section-body { padding: 16px; }
+        
+        /* 续做模式下的只读区域 */
+        .section-body.readonly { background: #fafafa; }
+        .readonly-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px;
+        }
+        .readonly-row:last-child { border-bottom: none; }
+        .readonly-label { color: var(--gray-text); }
+        .readonly-value { color: var(--dark-text); font-weight: 500; text-align: right; max-width: 60%; }
+        
+        /* 表单元素 */
+        .form-item { margin-bottom: 14px; }
+        .form-item:last-child { margin-bottom: 0; }
+        .form-label {
+            font-size: 13px; color: var(--gray-text); margin-bottom: 6px; display: block;
+        }
+        .form-label.required::after { content: "*"; color: var(--danger-color); margin-left: 2px; }
+        .input-field {
+            width: 100%; padding: 10px 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 14px; color: var(--dark-text); background: white;
+        }
+        .input-field:focus { outline: none; border-color: var(--primary-color); }
+        .input-field::placeholder { color: #C7C7CC; }
+        select.input-field { cursor: pointer; appearance: auto; }
+        .textarea {
+            width: 100%; padding: 10px 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 14px; color: var(--dark-text);
+            font-family: inherit; resize: vertical; min-height: 80px; background: white;
+        }
+        .textarea:focus { outline: none; border-color: var(--primary-color); }
+        
+        .textarea-box {
+            border: 1px solid var(--border-color); border-radius: 8px; background: white;
+            position: relative;
+        }
+        .textarea-box:focus-within { border-color: var(--primary-color); }
+        .textarea-box .textarea-inner {
+            width: 100%; padding: 10px 44px 10px 12px; border: none; font-size: 14px;
+            color: var(--dark-text); font-family: inherit; resize: vertical;
+            min-height: 70px; background: transparent; display: block;
+        }
+        .textarea-box .textarea-inner:focus { outline: none; }
+        .textarea-box .voice-fab {
+            position: absolute; right: 8px; bottom: 8px;
+            width: 30px; height: 30px; border-radius: 50%; border: none;
+            background: #F0F0F0; color: var(--gray-text); font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .textarea-box .voice-fab.recording {
+            background: #FF3B30; color: white;
+            animation: voicePulse 1s ease-in-out infinite;
+        }
+        .textarea-box .voice-fab-status {
+            position: absolute; right: 44px; bottom: 14px;
+            font-size: 11px; color: #FF3B30; white-space: nowrap;
+        }
+        
+        /* 语音输入 */
+        .voice-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+        .voice-btn {
+            display: flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 14px; border: 1px solid var(--border-color);
+            background: white; font-size: 12px; color: var(--gray-text);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .voice-btn i { font-size: 14px; }
+        .voice-btn.recording {
+            border-color: #FF3B30; color: #FF3B30; background: #FFF5F5;
+            animation: voicePulse 1s ease-in-out infinite;
+        }
+        .voice-btn.recording i { color: #FF3B30; }
+        .voice-status { font-size: 11px; color: var(--gray-text); }
+        .voice-status.active { color: #FF3B30; }
+        @keyframes voicePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.3); }
+            50% { box-shadow: 0 0 0 6px rgba(255,59,48,0); }
+        }
+        .audio-list { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+        .audio-chip {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 10px; border-radius: 8px; background: #F5F5F7;
+            font-size: 12px; color: var(--dark-text);
+        }
+        .audio-chip .audio-play {
+            width: 28px; height: 28px; border-radius: 50%; border: none;
+            background: var(--secondary-color); color: white; font-size: 12px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0;
+        }
+        .audio-chip .audio-play.playing { background: #FF9500; }
+        .audio-chip .audio-info { flex: 1; min-width: 0; }
+        .audio-chip .audio-name { font-size: 12px; color: var(--dark-text); }
+        .audio-chip .audio-dur { font-size: 10px; color: var(--gray-text); }
+        .audio-chip .audio-del {
+            width: 22px; height: 22px; border-radius: 50%; border: none;
+            background: transparent; color: var(--gray-text); font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0;
+        }
+        
+        /* 设备识别行 */
+        .device-id-row { display: flex; gap: 8px; align-items: center; }
+        .device-id-row .input-field { flex: 1; }
+        .scan-btn {
+            width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--border-color);
+            background: white; color: var(--primary-color); font-size: 18px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+        .scan-btn:active { background: rgba(0,122,255,0.06); }
+        .nfc-btn {
+            width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--border-color);
+            background: white; color: var(--primary-color); font-size: 18px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+        .nfc-btn:active { background: rgba(0,122,255,0.06); }
+        
+        /* NFC 覆盖层 */
+        .nfc-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85); z-index: 200;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center; color: white;
+        }
+        .nfc-overlay.show { display: flex; }
+        .nfc-anim {
+            width: 120px; height: 120px; border-radius: 50%;
+            border: 3px solid var(--primary-color); position: relative;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 24px;
+        }
+        .nfc-anim i { font-size: 48px; color: var(--primary-color); }
+        .nfc-anim::before, .nfc-anim::after {
+            content: ''; position: absolute; border-radius: 50%;
+            border: 2px solid rgba(0,122,255,0.3);
+            animation: nfcRipple 2s ease-out infinite;
+        }
+        .nfc-anim::before { inset: -15px; animation-delay: 0s; }
+        .nfc-anim::after { inset: -30px; animation-delay: 0.6s; }
+        @keyframes nfcRipple {
+            0% { opacity: 1; transform: scale(0.8); }
+            100% { opacity: 0; transform: scale(1.2); }
+        }
+        .nfc-hint { font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 20px; }
+        .nfc-cancel {
+            padding: 8px 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3);
+            background: transparent; color: white; font-size: 14px; cursor: pointer;
+        }
+        
+        /* 原因类型chips */
+        .reason-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+        .reason-chip {
+            padding: 7px 14px; border: 1px solid var(--border-color); border-radius: 18px;
+            font-size: 13px; color: var(--gray-text); background: white;
+            cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .reason-chip.active {
+            background: rgba(0, 122, 255, 0.08); border-color: var(--primary-color);
+            color: var(--primary-color); font-weight: 500;
+        }
+        
+        /* 媒体上传 */
+        .watermark-row {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 12px; font-size: 12px; color: var(--gray-text);
+        }
+        .wm-toggle {
+            width: 36px; height: 20px; background: #E5E5EA; border-radius: 10px;
+            position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+        }
+        .wm-toggle.on { background: var(--secondary-color); }
+        .wm-toggle::after {
+            content: ''; width: 16px; height: 16px; background: white; border-radius: 50%;
+            position: absolute; top: 2px; left: 2px; transition: transform 0.2s;
+        }
+        .wm-toggle.on::after { transform: translateX(16px); }
+        
+        .media-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+        }
+        .media-header-label { font-size: 13px; color: var(--dark-text); font-weight: 500; }
+        .media-counter { font-size: 12px; color: var(--gray-text); }
+        
+        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
+        .photo-item {
+            position: relative; padding-top: 100%; background: #f5f5f5;
+            border-radius: 6px; overflow: hidden;
+        }
+        .photo-item img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+        }
+        .photo-delete-btn {
+            position: absolute; top: 4px; right: 4px; width: 22px; height: 22px;
+            background: rgba(255, 59, 48, 0.85); border: none; border-radius: 50%;
+            color: white; font-size: 12px; cursor: pointer; z-index: 2;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .photo-item .watermark-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 4px 6px; background: linear-gradient(transparent, rgba(0,0,0,0.5));
+            color: white; font-size: 8px; line-height: 1.3;
+        }
+        
+        .media-upload-area {
+            border: 2px dashed var(--border-color); border-radius: 8px;
+            padding: 20px 16px; text-align: center; background: #fafafa;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 8px;
+        }
+        .media-upload-area:active { border-color: var(--primary-color); }
+        .media-upload-area.disabled { opacity: 0.4; cursor: not-allowed; }
+        .media-upload-icon { font-size: 28px; color: var(--gray-text); margin-bottom: 4px; }
+        .media-upload-text { font-size: 12px; color: var(--gray-text); }
+        
+        .video-card {
+            position: relative; border-radius: 8px; overflow: hidden;
+            background: #f5f5f5; border: 1px solid var(--border-color); margin-bottom: 8px;
+        }
+        .video-card video { width: 100%; display: block; max-height: 200px; }
+        .video-info {
+            padding: 8px 10px; font-size: 11px; color: var(--gray-text);
+            display: flex; justify-content: space-between; background: white;
+        }
+        .video-delete-btn {
+            position: absolute; top: 6px; right: 6px; width: 24px; height: 24px;
+            background: rgba(255, 59, 48, 0.85); border: none; border-radius: 50%;
+            color: white; font-size: 14px; cursor: pointer; z-index: 2;
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        /* 来源弹窗 */
+        .source-modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 300;
+            display: flex; align-items: flex-end; justify-content: center;
+        }
+        .source-sheet {
+            background: white; border-radius: 16px 16px 0 0; width: 100%;
+            padding: 20px 16px 32px;
+        }
+        .source-sheet-title {
+            font-size: 15px; font-weight: 600; text-align: center; margin-bottom: 16px;
+        }
+        .source-option {
+            display: flex; align-items: center; gap: 10px;
+            padding: 14px; border: 1px solid var(--border-color); border-radius: 10px;
+            margin-bottom: 8px; cursor: pointer; font-size: 14px; color: var(--dark-text);
+            transition: all 0.2s;
+        }
+        .source-option:active { background: rgba(0,122,255,0.04); border-color: var(--primary-color); }
+        .source-option i { font-size: 20px; color: var(--primary-color); }
+        .source-cancel {
+            width: 100%; padding: 12px; border: none; background: #f5f5f5;
+            border-radius: 10px; font-size: 14px; color: var(--gray-text);
+            cursor: pointer; margin-top: 4px;
+        }
+        
+        /* 底部按钮 */
+        .footer-buttons {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            padding: 10px 16px; background: white;
+            border-top: 1px solid var(--border-color);
+            display: flex; gap: 10px; z-index: 90;
+        }
+        .btn {
+            flex: 1; padding: 12px; border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary-color); color: white; }
+        .btn-warning { background: var(--warning-color); color: white; }
+        .btn-secondary { background: #f5f5f5; color: var(--gray-text); border: 1px solid var(--border-color); }
+        .btn-sm { padding: 8px 16px; font-size: 13px; flex: none; }
+        
+        /* 隐藏区域 */
+        .hidden { display: none !important; }
+        
+        /* 续做列表弹窗 */
+        .pending-list-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 200;
+            display: none; align-items: flex-end; justify-content: center;
+        }
+        .pending-list-overlay.show { display: flex; }
+        .pending-list-sheet {
+            background: white; border-radius: 16px 16px 0 0;
+            width: 100%; max-height: 70vh; overflow-y: auto;
+            padding: 20px 16px 32px;
+        }
+        .pending-list-title {
+            font-size: 16px; font-weight: 600; margin-bottom: 16px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .pending-list-close {
+            background: none; border: none; font-size: 20px;
+            color: var(--gray-text); cursor: pointer; padding: 4px;
+        }
+        .pending-item {
+            padding: 14px; border: 1px solid var(--border-color); border-radius: 10px;
+            margin-bottom: 10px; cursor: pointer; transition: all 0.2s;
+        }
+        .pending-item:active { border-color: var(--primary-color); background: rgba(0,122,255,0.02); }
+        .pending-item-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+        }
+        .pending-item-device { font-size: 14px; font-weight: 600; color: var(--dark-text); }
+        .pending-item-time { font-size: 11px; color: var(--gray-text); }
+        .pending-item-desc { font-size: 12px; color: var(--gray-text); line-height: 1.5; }
+        .pending-item-action {
+            margin-top: 8px; font-size: 13px; color: var(--primary-color); font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <button class="header-back" onclick="goBack()"><i class="bi bi-chevron-left"></i></button>
+        <h1 class="header-title" id="pageTitle">设备更换</h1>
+        <div style="width:36px;"></div>
+    </header>
+
+    <main class="main-content">
+        <!-- 待完成提示条 -->
+        <div class="pending-banner" id="pendingBanner" onclick="showPendingList()">
+            <i class="bi bi-clock-history"></i>
+            <div class="pending-banner-text">
+                <div class="pending-banner-title" id="pendingTitle">你有 0 条待完成安装</div>
+                <div class="pending-banner-sub">点击查看并继续安装</div>
+            </div>
+            <i class="bi bi-chevron-right pending-banner-chevron"></i>
+        </div>
+        
+        <!-- 模式切换 -->
+        <div class="mode-switch" id="modeSwitch">
+            <div>
+                <div class="mode-switch-label">仅新增安装</div>
+                <div class="mode-switch-hint">无需拆除旧设备，直接安装新设备</div>
+            </div>
+            <div class="toggle-switch" id="installOnlyToggle" onclick="toggleInstallOnly()"></div>
+        </div>
+        
+        <!-- ========== 旧设备拆除区 ========== -->
+        <div class="section-card" id="removalSection">
+            <div class="section-header">
+                <div class="section-icon removal"><i class="bi bi-box-arrow-up"></i></div>
+                <span class="section-title">旧设备拆除</span>
+                <span class="section-badge required" id="removalBadge">必填</span>
+            </div>
+            <div class="section-body" id="removalBody">
+                <!-- 设备识别 -->
+                <div class="form-item">
+                    <label class="form-label required">设备编号</label>
+                    <div class="device-id-row">
+                        <input type="text" class="input-field" id="oldDeviceId" placeholder="输入、扫描或NFC感应设备编号">
+                        <button class="scan-btn" onclick="simulateScan('oldDeviceId')"><i class="bi bi-qr-code-scan"></i></button>
+                        <button class="nfc-btn" onclick="startNfc('oldDeviceId')"><i class="bi bi-wifi"></i></button>
+                    </div>
+                </div>
+                <!-- 更换原因类型 -->
+                <div class="form-item">
+                    <label class="form-label required">更换类型</label>
+                    <div class="reason-chips" id="reasonTypeChips">
+                        <div class="reason-chip active" onclick="selectReason(this,'fault')" data-value="fault">故障更换</div>
+                        <div class="reason-chip" onclick="selectReason(this,'prevent')" data-value="prevent">预防更换</div>
+                        <div class="reason-chip" onclick="selectReason(this,'upgrade')" data-value="upgrade">升级更换</div>
+                    </div>
+                </div>
+                <!-- 更换原因 -->
+                <div class="form-item">
+                    <label class="form-label required">更换原因</label>
+                    <select class="input-field" id="replaceReason">
+                        <option value="">请选择</option>
+                        <option value="lifecycle">寿命到期</option>
+                        <option value="damage">故障损坏</option>
+                        <option value="drift">数据漂移/不准确</option>
+                        <option value="corrosion">腐蚀/老化</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <!-- 原因详情 -->
+                <div class="form-item">
+                    <label class="form-label">原因详情</label>
+                    <div class="textarea-box">
+                        <textarea class="textarea-inner" id="reasonDetail" placeholder="描述故障现象、拆除情况等"></textarea>
+                        <button class="voice-fab" id="voiceBtn_reasonDetail" onclick="toggleRecord('reasonDetail', this)">
+                            <i class="bi bi-mic-fill"></i>
+                        </button>
+                        <span class="voice-fab-status" id="voiceStatus_reasonDetail"></span>
+                    </div>
+                    <div class="audio-list" id="audioList_reasonDetail"></div>
+                </div>
+                <!-- 旧设备状态 -->
+                <div class="form-item">
+                    <label class="form-label">旧设备状态</label>
+                    <select class="input-field" id="oldDeviceStatus">
+                        <option value="repair">返厂维修</option>
+                        <option value="scrap">报废处理</option>
+                        <option value="stock">回库待检</option>
+                    </select>
+                </div>
+                <!-- 拆除照片 -->
+                <div class="form-item">
+                    <div class="watermark-row">
+                        <div class="wm-toggle on" data-wm="removal" onclick="toggleWatermark(this)"></div>
+                        <span>照片自动添加水印（时间+设备+定位）</span>
+                    </div>
+                    <div class="media-header">
+                        <span class="media-header-label">现场照片</span>
+                        <span class="media-counter" id="removalPhotoCounter">0/9</span>
+                    </div>
+                    <div class="photo-grid" id="removalPhotos"></div>
+                    <div class="media-upload-area" id="removalUploadArea" onclick="showPhotoSource('removal')">
+                        <div class="media-upload-icon"><i class="bi bi-camera"></i></div>
+                        <div class="media-upload-text">拍照或从相册选择</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ========== 新设备安装区 ========== -->
+        <div class="section-card" id="installSection">
+            <div class="section-header">
+                <div class="section-icon install"><i class="bi bi-box-arrow-in-down"></i></div>
+                <span class="section-title">新设备安装</span>
+                <span class="section-badge optional" id="installBadge">可选 · 可稍后填写</span>
+            </div>
+            <div class="section-body" id="installBody">
+                <!-- 新设备识别 -->
+                <div class="form-item">
+                    <label class="form-label" id="newDeviceLabel">新设备编号</label>
+                    <div class="device-id-row">
+                        <input type="text" class="input-field" id="newDeviceId" placeholder="输入、扫描或NFC感应新设备编号">
+                        <button class="scan-btn" onclick="simulateScan('newDeviceId')"><i class="bi bi-qr-code-scan"></i></button>
+                        <button class="nfc-btn" onclick="startNfc('newDeviceId')"><i class="bi bi-wifi"></i></button>
+                    </div>
+                </div>
+                <!-- 安装位置 -->
+                <div class="form-item">
+                    <label class="form-label">安装位置</label>
+                    <input type="text" class="input-field" id="installLocation" placeholder="安装位置（可与旧设备不同）">
+                </div>
+                <!-- 安装照片 -->
+                <div class="form-item">
+                    <div class="watermark-row">
+                        <div class="wm-toggle on" data-wm="install" onclick="toggleWatermark(this)"></div>
+                        <span>照片自动添加水印（时间+设备+定位）</span>
+                    </div>
+                    <div class="media-header">
+                        <span class="media-header-label">安装照片</span>
+                        <span class="media-counter" id="installPhotoCounter">0/9</span>
+                    </div>
+                    <div class="photo-grid" id="installPhotos"></div>
+                    <div class="media-upload-area" id="installUploadArea" onclick="showPhotoSource('install')">
+                        <div class="media-upload-icon"><i class="bi bi-camera"></i></div>
+                        <div class="media-upload-text">拍照或从相册选择</div>
+                    </div>
+                </div>
+                <!-- 安装视频 -->
+                <div class="form-item">
+                    <div class="media-header" style="margin-top:6px;">
+                        <span class="media-header-label">现场视频</span>
+                        <span class="media-counter" id="videoCounter">0/1</span>
+                    </div>
+                    <div id="videoPreview"></div>
+                    <div class="media-upload-area" id="videoUploadArea" onclick="startVideoRecord()">
+                        <div class="media-upload-icon"><i class="bi bi-camera-video"></i></div>
+                        <div class="media-upload-text">点击录制视频（请控制在60秒以内）</div>
+                    </div>
+                </div>
+                <!-- 安装备注 -->
+                <div class="form-item">
+                    <label class="form-label">安装备注</label>
+                    <div class="textarea-box">
+                        <textarea class="textarea-inner" id="installRemark" placeholder="安装参数配置、调试情况、注意事项等"></textarea>
+                        <button class="voice-fab" id="voiceBtn_installRemark" onclick="toggleRecord('installRemark', this)">
+                            <i class="bi bi-mic-fill"></i>
+                        </button>
+                        <span class="voice-fab-status" id="voiceStatus_installRemark"></span>
+                    </div>
+                    <div class="audio-list" id="audioList_installRemark"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="height:20px;"></div>
+    </main>
+    
+    <!-- 底部按钮 -->
+    <div class="footer-buttons" id="footerButtons">
+        <button class="btn btn-secondary" onclick="saveDraft()">存草稿</button>
+        <button class="btn btn-warning" id="submitRemovalBtn" onclick="submitRemoval()">提交拆除</button>
+        <button class="btn btn-primary" id="submitFullBtn" onclick="submitFull()">提交更换</button>
+    </div>
+    
+    <!-- 续做列表弹窗 -->
+    <div class="pending-list-overlay" id="pendingOverlay" onclick="closePendingList(event)">
+        <div class="pending-list-sheet" onclick="event.stopPropagation()">
+            <div class="pending-list-title">
+                <span>待完成安装</span>
+                <button class="pending-list-close" onclick="closePendingList()"><i class="bi bi-x"></i></button>
+            </div>
+            <div id="pendingListContent"></div>
+        </div>
+    </div>
+    
+    <!-- NFC 覆盖层 -->
+    <div class="nfc-overlay" id="nfcOverlay">
+        <div class="nfc-anim"><i class="bi bi-wifi"></i></div>
+        <div class="nfc-hint">请将手机靠近设备NFC标签</div>
+        <button class="nfc-cancel" onclick="cancelNfc()">取消</button>
+    </div>
+    
+    <!-- 隐藏文件输入 -->
+    <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)">
+    <input type="file" id="photoCameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoUpload(event)">
+    <input type="file" id="videoCameraInput" accept="video/*" capture="environment" style="display:none" onchange="handleVideoUpload(event)">
+    
+    <script>
+        // ========== 状态 ==========
+        var isInstallOnly = false;    // 仅新增安装模式
+        var isResumeMode = false;     // 续做模式
+        var resumeTaskId = null;      // 续做的工单ID
+        var currentReasonType = 'fault';
+        var photoTarget = '';         // 当前照片上传目标
+        var removalPhotoCount = 0;
+        var installPhotoCount = 0;
+        
+        // ========== 页面初始化 ==========
+        function initPage() {
+            // 检查待完成工单
+            checkPendingTasks();
+        }
+        
+        // ========== 待完成工单管理 ==========
+        function getPendingTasks() {
+            return JSON.parse(localStorage.getItem('replacementPending') || '[]');
+        }
+        
+        function savePendingTasks(tasks) {
+            localStorage.setItem('replacementPending', JSON.stringify(tasks));
+        }
+        
+        function checkPendingTasks() {
+            var tasks = getPendingTasks();
+            var banner = document.getElementById('pendingBanner');
+            if (tasks.length > 0) {
+                document.getElementById('pendingTitle').textContent =
+                    '你有 ' + tasks.length + ' 条待完成安装';
+                banner.classList.add('show');
+            } else {
+                banner.classList.remove('show');
+            }
+        }
+        
+        function showPendingList() {
+            var tasks = getPendingTasks();
+            var container = document.getElementById('pendingListContent');
+            if (tasks.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-text);">暂无待完成工单</div>';
+            } else {
+                var html = '';
+                tasks.forEach(function(t) {
+                    var time = new Date(t.removalTime).toLocaleDateString('zh-CN');
+                    html += '<div class="pending-item" onclick="resumeTask(\'' + t.id + '\')">' +
+                        '<div class="pending-item-header">' +
+                            '<span class="pending-item-device">' + t.oldDeviceId + '</span>' +
+                            '<span class="pending-item-time">' + time + '</span>' +
+                        '</div>' +
+                        '<div class="pending-item-desc">' +
+                            '原因：' + (t.reasonText || t.reasonType) +
+                            (t.oldDeviceStatus ? ' · 状态：' + t.oldDeviceStatus : '') +
+                            (t.removalPhotoCount ? ' · ' + t.removalPhotoCount + '张照片' : '') +
+                        '</div>' +
+                        '<div class="pending-item-action">点击继续安装 <i class="bi bi-chevron-right"></i></div>' +
+                    '</div>';
+                });
+                container.innerHTML = html;
+            }
+            document.getElementById('pendingOverlay').classList.add('show');
+        }
+        
+        function closePendingList(e) {
+            if (!e || e.target === document.getElementById('pendingOverlay')) {
+                document.getElementById('pendingOverlay').classList.remove('show');
+            }
+        }
+        
+        // ========== 续做模式 ==========
+        function resumeTask(taskId) {
+            var tasks = getPendingTasks();
+            var task = tasks.find(function(t) { return t.id === taskId; });
+            if (!task) return;
+            
+            isResumeMode = true;
+            resumeTaskId = taskId;
+            
+            // 关闭弹窗
+            document.getElementById('pendingOverlay').classList.remove('show');
+            
+            // 隐藏模式切换
+            document.getElementById('modeSwitch').classList.add('hidden');
+            
+            // 将旧设备区设为只读
+            var removalBody = document.getElementById('removalBody');
+            removalBody.classList.add('readonly');
+            removalBody.innerHTML =
+                '<div class="readonly-row"><span class="readonly-label">设备编号</span><span class="readonly-value">' + task.oldDeviceId + '</span></div>' +
+                '<div class="readonly-row"><span class="readonly-label">更换类型</span><span class="readonly-value">' + ({fault:'故障更换',prevent:'预防更换',upgrade:'升级更换'}[task.reasonType] || task.reasonType) + '</span></div>' +
+                '<div class="readonly-row"><span class="readonly-label">更换原因</span><span class="readonly-value">' + (task.reasonText || '--') + '</span></div>' +
+                '<div class="readonly-row"><span class="readonly-label">旧设备状态</span><span class="readonly-value">' + ({repair:'返厂维修',scrap:'报废处理',stock:'回库待检'}[task.oldDeviceStatus] || '--') + '</span></div>' +
+                '<div class="readonly-row"><span class="readonly-label">拆除时间</span><span class="readonly-value">' + new Date(task.removalTime).toLocaleString('zh-CN') + '</span></div>' +
+                (task.removalPhotoCount ? '<div class="readonly-row"><span class="readonly-label">现场照片</span><span class="readonly-value">' + task.removalPhotoCount + ' 张</span></div>' : '');
+            
+            // 更新拆除区badge
+            document.getElementById('removalBadge').textContent = '已完成';
+            document.getElementById('removalBadge').className = 'section-badge done';
+            
+            // 更新安装区badge
+            document.getElementById('installBadge').textContent = '请填写';
+            document.getElementById('installBadge').className = 'section-badge required';
+            document.getElementById('newDeviceLabel').classList.add('required');
+            
+            // 更新页面标题
+            document.getElementById('pageTitle').textContent = '继续安装';
+            
+            // 更新底部按钮：只显示提交更换
+            document.getElementById('submitRemovalBtn').classList.add('hidden');
+            document.getElementById('submitFullBtn').textContent = '提交安装';
+            
+            // 滚动到安装区
+            document.getElementById('installSection').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // ========== 模式切换 ==========
+        function toggleInstallOnly() {
+            isInstallOnly = !isInstallOnly;
+            var toggle = document.getElementById('installOnlyToggle');
+            toggle.classList.toggle('on', isInstallOnly);
+            
+            var removalSection = document.getElementById('removalSection');
+            if (isInstallOnly) {
+                removalSection.classList.add('hidden');
+                document.getElementById('installBadge').textContent = '必填';
+                document.getElementById('installBadge').className = 'section-badge required';
+                document.getElementById('newDeviceLabel').classList.add('required');
+                // 底部按钮：只显示提交安装
+                document.getElementById('submitRemovalBtn').classList.add('hidden');
+                document.getElementById('submitFullBtn').textContent = '提交安装';
+            } else {
+                removalSection.classList.remove('hidden');
+                document.getElementById('installBadge').textContent = '可选 · 可稍后填写';
+                document.getElementById('installBadge').className = 'section-badge optional';
+                document.getElementById('newDeviceLabel').classList.remove('required');
+                document.getElementById('submitRemovalBtn').classList.remove('hidden');
+                document.getElementById('submitFullBtn').textContent = '提交更换';
+            }
+        }
+        
+        // ========== 原因类型选择 ==========
+        function selectReason(el, value) {
+            currentReasonType = value;
+            document.querySelectorAll('#reasonTypeChips .reason-chip').forEach(function(c) {
+                c.classList.remove('active');
+            });
+            el.classList.add('active');
+        }
+        
+        // ========== 模拟扫码 ==========
+        function simulateScan(targetId) {
+            var sample = prompt('模拟扫码输入：', 'DT-2024-009');
+            if (sample) document.getElementById(targetId).value = sample;
+        }
+        
+        // ========== NFC 感应 ==========
+        var nfcTargetId = null;
+        
+        function startNfc(targetId) {
+            nfcTargetId = targetId;
+            document.getElementById('nfcOverlay').classList.add('show');
+            
+            // 模拟3秒后感应成功
+            setTimeout(function() {
+                if (!document.getElementById('nfcOverlay').classList.contains('show')) return;
+                document.getElementById('nfcOverlay').classList.remove('show');
+                // 模拟感应到设备编号
+                var nfcDeviceId = 'DT-2024-002';
+                document.getElementById(nfcTargetId).value = nfcDeviceId;
+                showToast('NFC感应成功：' + nfcDeviceId);
+                nfcTargetId = null;
+            }, 3000);
+        }
+        
+        function cancelNfc() {
+            document.getElementById('nfcOverlay').classList.remove('show');
+            nfcTargetId = null;
+        }
+        
+        // ========== 语音录音 ==========
+        var mediaRecorder = null;
+        var recordTargetId = null;
+        var recordBtnEl = null;
+        var recordChunks = [];
+        var recordTimer = null;
+        var recordSeconds = 0;
+        // 每个targetId的录音列表: { id, url, duration, blob }
+        var audioRecordings = {};
+        var currentPlayingAudio = null;
+        var currentPlayingBtn = null;
+        
+        function toggleRecord(targetId, btnEl) {
+            // 如果正在播放，先停止
+            if (currentPlayingAudio) {
+                currentPlayingAudio.pause();
+                currentPlayingAudio.currentTime = 0;
+                if (currentPlayingBtn) currentPlayingBtn.classList.remove('playing');
+                if (currentPlayingBtn) currentPlayingBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+                currentPlayingAudio = null;
+                currentPlayingBtn = null;
+            }
+            
+            if (mediaRecorder && recordTargetId === targetId) {
+                mediaRecorder.stop();
+                return;
+            }
+            
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showToast('当前浏览器不支持录音');
+                return;
+            }
+            
+            recordTargetId = targetId;
+            recordBtnEl = btnEl;
+            recordChunks = [];
+            recordSeconds = 0;
+            
+            var statusEl = document.getElementById('voiceStatus_' + targetId);
+            
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = function(e) {
+                    if (e.data.size > 0) recordChunks.push(e.data);
+                };
+                
+                mediaRecorder.onstop = function() {
+                    stream.getTracks().forEach(function(t) { t.stop(); });
+                    clearInterval(recordTimer);
+                    
+                    btnEl.classList.remove('recording');
+                    btnEl.innerHTML = '<i class="bi bi-mic-fill"></i>';
+                    statusEl.textContent = '';
+                    
+                    if (recordChunks.length > 0) {
+                        var blob = new Blob(recordChunks, { type: 'audio/webm' });
+                        var url = URL.createObjectURL(blob);
+                        var dur = formatDuration(recordSeconds);
+                        var idx = Date.now();
+                        
+                        if (!audioRecordings[targetId]) audioRecordings[targetId] = [];
+                        audioRecordings[targetId].push({ id: idx, url: url, duration: dur, blob: blob });
+                        
+                        renderAudioList(targetId);
+                    }
+                    
+                    mediaRecorder = null;
+                    recordTargetId = null;
+                    recordBtnEl = null;
+                    recordChunks = [];
+                };
+                
+                mediaRecorder.start();
+                btnEl.classList.add('recording');
+                btnEl.innerHTML = '<i class="bi bi-stop-fill"></i>';
+                statusEl.textContent = '00:00';
+                
+                recordTimer = setInterval(function() {
+                    recordSeconds++;
+                    statusEl.textContent = formatDuration(recordSeconds);
+                }, 1000);
+                
+            }).catch(function(err) {
+                showToast('无法获取麦克风权限');
+                btnEl.classList.remove('recording');
+                btnEl.innerHTML = '<i class="bi bi-mic-fill"></i>';
+            });
+        }
+        
+        function formatDuration(sec) {
+            var m = Math.floor(sec / 60);
+            var s = sec % 60;
+            return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+        }
+        
+        function renderAudioList(targetId) {
+            var container = document.getElementById('audioList_' + targetId);
+            if (!container) return;
+            var list = audioRecordings[targetId] || [];
+            if (list.length === 0) { container.innerHTML = ''; return; }
+            
+            var html = '';
+            list.forEach(function(item, i) {
+                html += '<div class="audio-chip" id="audioChip_' + targetId + '_' + item.id + '">';
+                html += '  <button class="audio-play" onclick="playAudio(\'' + targetId + '\', ' + item.id + ', this)">';
+                html += '    <i class="bi bi-play-fill"></i>';
+                html += '  </button>';
+                html += '  <div class="audio-info">';
+                html += '    <div class="audio-name">录音 ' + (i + 1) + '</div>';
+                html += '    <div class="audio-dur">' + item.duration + '</div>';
+                html += '  </div>';
+                html += '  <button class="audio-del" onclick="deleteAudio(\'' + targetId + '\', ' + item.id + ')">';
+                html += '    <i class="bi bi-x"></i>';
+                html += '  </button>';
+                html += '</div>';
+            });
+            container.innerHTML = html;
+        }
+        
+        function playAudio(targetId, audioId, btnEl) {
+            // 如果正在播放同一个，暂停
+            if (currentPlayingAudio && currentPlayingBtn === btnEl) {
+                currentPlayingAudio.pause();
+                currentPlayingAudio.currentTime = 0;
+                btnEl.classList.remove('playing');
+                btnEl.innerHTML = '<i class="bi bi-play-fill"></i>';
+                currentPlayingAudio = null;
+                currentPlayingBtn = null;
+                return;
+            }
+            
+            // 停止之前的播放
+            if (currentPlayingAudio) {
+                currentPlayingAudio.pause();
+                currentPlayingAudio.currentTime = 0;
+                if (currentPlayingBtn) {
+                    currentPlayingBtn.classList.remove('playing');
+                    currentPlayingBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+                }
+            }
+            
+            var list = audioRecordings[targetId] || [];
+            var item = list.find(function(r) { return r.id === audioId; });
+            if (!item) return;
+            
+            var audio = new Audio(item.url);
+            currentPlayingAudio = audio;
+            currentPlayingBtn = btnEl;
+            
+            btnEl.classList.add('playing');
+            btnEl.innerHTML = '<i class="bi bi-pause-fill"></i>';
+            
+            audio.onended = function() {
+                btnEl.classList.remove('playing');
+                btnEl.innerHTML = '<i class="bi bi-play-fill"></i>';
+                currentPlayingAudio = null;
+                currentPlayingBtn = null;
+            };
+            
+            audio.play();
+        }
+        
+        function deleteAudio(targetId, audioId) {
+            var list = audioRecordings[targetId] || [];
+            audioRecordings[targetId] = list.filter(function(r) { return r.id !== audioId; });
+            
+            // 如果正在播放这个录音，停止
+            if (currentPlayingAudio) {
+                currentPlayingAudio.pause();
+                currentPlayingAudio.currentTime = 0;
+                if (currentPlayingBtn) {
+                    currentPlayingBtn.classList.remove('playing');
+                    currentPlayingBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+                }
+                currentPlayingAudio = null;
+                currentPlayingBtn = null;
+            }
+            
+            renderAudioList(targetId);
+        }
+        
+        // ========== 水印开关 ==========
+        var watermarkEnabled = true;
+        function toggleWatermark(el) {
+            watermarkEnabled = !watermarkEnabled;
+            document.querySelectorAll('.wm-toggle').forEach(function(t) {
+                t.classList.toggle('on', watermarkEnabled);
+            });
+        }
+        
+        // ========== 照片来源选择 ==========
+        function showPhotoSource(target) {
+            photoTarget = target;
+            var gridId = target === 'removal' ? 'removalPhotos' : 'installPhotos';
+            var count = document.getElementById(gridId).querySelectorAll('.photo-item').length;
+            if (count >= 9) { showToast('最多上传9张照片'); return; }
+            
+            var modal = document.createElement('div');
+            modal.className = 'source-modal';
+            modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+            modal.innerHTML = '<div class="source-sheet">' +
+                '<div class="source-sheet-title">选择照片来源</div>' +
+                '<div class="source-option" onclick="document.getElementById(\'photoCameraInput\').click();this.closest(\'.source-modal\').remove();">' +
+                    '<i class="bi bi-camera"></i>拍照</div>' +
+                '<div class="source-option" onclick="document.getElementById(\'photoInput\').click();this.closest(\'.source-modal\').remove();">' +
+                    '<i class="bi bi-images"></i>从相册选择</div>' +
+                '<button class="source-cancel" onclick="this.closest(\'.source-modal\').remove()">取消</button>' +
+                '</div>';
+            document.body.appendChild(modal);
+        }
+        
+        // ========== 照片上传+水印 ==========
+        function handlePhotoUpload(event) {
+            var files = event.target.files;
+            var gridId = photoTarget === 'removal' ? 'removalPhotos' : 'installPhotos';
+            var grid = document.getElementById(gridId);
+            var currentCount = grid.querySelectorAll('.photo-item').length;
+            var remaining = 9 - currentCount;
+            var filesToProcess = Array.from(files).slice(0, remaining);
+            
+            filesToProcess.forEach(function(file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    if (watermarkEnabled) {
+                        applyWatermark(e.target.result, function(dataUrl) {
+                            addPhotoItem(grid, dataUrl);
+                        });
+                    } else {
+                        addPhotoItem(grid, e.target.result);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+            event.target.value = '';
+        }
+        
+        function applyWatermark(imageDataUrl, callback) {
+            var img = new Image();
+            img.onload = function() {
+                var canvas = document.createElement('canvas');
+                canvas.width = img.width; canvas.height = img.height;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                var deviceId = document.getElementById('oldDeviceId').value || '--';
+                var now = new Date();
+                var timeStr = now.getFullYear() + '-' +
+                    String(now.getMonth()+1).padStart(2,'0') + '-' +
+                    String(now.getDate()).padStart(2,'0') + ' ' +
+                    String(now.getHours()).padStart(2,'0') + ':' +
+                    String(now.getMinutes()).padStart(2,'0') + ':' +
+                    String(now.getSeconds()).padStart(2,'0');
+                var gpsStr = 'N30.27° E120.15°（模拟）';
+                
+                var barH = Math.max(60, Math.floor(canvas.height * 0.10));
+                var padL = Math.max(10, Math.floor(canvas.width * 0.02));
+                ctx.fillStyle = 'rgba(0,0,0,0.50)';
+                ctx.fillRect(0, canvas.height - barH, canvas.width, barH);
+                
+                var fontSize = Math.max(14, Math.floor(canvas.height * 0.032));
+                var smallFont = Math.max(12, Math.floor(canvas.height * 0.026));
+                var lineGap = Math.floor(fontSize * 1.5);
+                var baseY = canvas.height - barH + Math.floor((barH - lineGap - smallFont) / 2) + fontSize;
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold ' + fontSize + 'px sans-serif';
+                ctx.fillText(timeStr + '  ' + deviceId, padL, baseY);
+                ctx.font = smallFont + 'px sans-serif';
+                ctx.fillText(gpsStr, padL, baseY + lineGap);
+                
+                callback(canvas.toDataURL('image/jpeg', 0.85));
+            };
+            img.src = imageDataUrl;
+        }
+        
+        function addPhotoItem(grid, dataUrl) {
+            var count = grid.querySelectorAll('.photo-item').length;
+            if (count >= 9) return;
+            var item = document.createElement('div');
+            item.className = 'photo-item';
+            item.innerHTML = '<img src="' + dataUrl + '" alt="photo">' +
+                '<button class="photo-delete-btn" onclick="deletePhoto(this)"><i class="bi bi-x"></i></button>';
+            grid.appendChild(item);
+            updateCounters();
+        }
+        
+        function deletePhoto(btn) {
+            btn.parentElement.remove();
+            updateCounters();
+        }
+        
+        function updateCounters() {
+            var rc = document.getElementById('removalPhotos').querySelectorAll('.photo-item').length;
+            var ic = document.getElementById('installPhotos').querySelectorAll('.photo-item').length;
+            removalPhotoCount = rc;
+            installPhotoCount = ic;
+            document.getElementById('removalPhotoCounter').textContent = rc + '/9';
+            document.getElementById('installPhotoCounter').textContent = ic + '/9';
+            var ra = document.getElementById('removalUploadArea');
+            var ia = document.getElementById('installUploadArea');
+            if (ra) ra.classList.toggle('disabled', rc >= 9);
+            if (ia) ia.classList.toggle('disabled', ic >= 9);
+        }
+        
+        // ========== 视频上传 ==========
+        var MAX_VIDEO_DURATION = 60;
+        var MAX_VIDEO_SIZE_MB = 50;
+        
+        function startVideoRecord() {
+            if (document.getElementById('videoPreview').children.length > 0) {
+                showToast('仅支持上传1个视频'); return;
+            }
+            document.getElementById('videoCameraInput').click();
+        }
+        
+        function handleVideoUpload(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            event.target.value = '';
+            
+            var sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            if (parseFloat(sizeMB) > MAX_VIDEO_SIZE_MB) {
+                showToast('视频文件过大（' + sizeMB + 'MB），限' + MAX_VIDEO_SIZE_MB + 'MB'); return;
+            }
+            
+            var video = document.createElement('video');
+            video.preload = 'metadata';
+            video.onloadedmetadata = function() {
+                URL.revokeObjectURL(video.src);
+                var duration = Math.round(video.duration);
+                if (duration > MAX_VIDEO_DURATION) {
+                    showToast('视频时长 ' + duration + 's 超出限制（限' + MAX_VIDEO_DURATION + '秒）'); return;
+                }
+                showVideoPreview(file, duration, sizeMB);
+            };
+            video.src = URL.createObjectURL(file);
+        }
+        
+        function showVideoPreview(file, duration, sizeMB) {
+            var container = document.getElementById('videoPreview');
+            var url = URL.createObjectURL(file);
+            var min = Math.floor(duration / 60);
+            var sec = String(duration % 60).padStart(2, '0');
+            container.innerHTML = '<div class="video-card">' +
+                '<button class="video-delete-btn" onclick="deleteVideo()"><i class="bi bi-x"></i></button>' +
+                '<video src="' + url + '" controls style="width:100%;max-height:200px;border-radius:8px 8px 0 0;"></video>' +
+                '<div class="video-info"><span>' + min + ':' + sec + '</span><span>' + sizeMB + ' MB</span><span style="color:var(--secondary-color);">✓ 已就绪</span></div>' +
+                '</div>';
+            document.getElementById('videoUploadArea').classList.add('disabled');
+            document.getElementById('videoCounter').textContent = '1/1';
+        }
+        
+        function deleteVideo() {
+            document.getElementById('videoPreview').innerHTML = '';
+            document.getElementById('videoUploadArea').classList.remove('disabled');
+            document.getElementById('videoCounter').textContent = '0/1';
+        }
+        
+        // ========== 提交：仅拆除 ==========
+        function submitRemoval() {
+            var oldId = document.getElementById('oldDeviceId').value.trim();
+            if (!oldId) { alert('请填写旧设备编号'); return; }
+            var reason = document.getElementById('replaceReason').value;
+            if (!reason) { alert('请选择更换原因'); return; }
+            
+            var task = {
+                id: 'RP-' + Date.now(),
+                oldDeviceId: oldId,
+                reasonType: currentReasonType,
+                reasonText: document.getElementById('replaceReason').selectedOptions[0].textContent,
+                reasonDetail: document.getElementById('reasonDetail').value,
+                oldDeviceStatus: document.getElementById('oldDeviceStatus').value,
+                removalPhotoCount: removalPhotoCount,
+                removalTime: new Date().toISOString(),
+                operator: JSON.parse(localStorage.getItem('currentUser') || '{}').name || '未知',
+                // 安装部分为空
+                newDeviceId: '',
+                installLocation: '',
+                installRemark: '',
+                installPhotoCount: 0,
+                installTime: null,
+                status: 'pending_install'
+            };
+            
+            var tasks = getPendingTasks();
+            tasks.unshift(task);
+            savePendingTasks(tasks);
+            
+            showToast('拆除已提交，待安装工单已创建');
+            setTimeout(function() { goBack(); }, 1200);
+        }
+        
+        // ========== 提交：完整更换 / 续做安装 / 仅新增 ==========
+        function submitFull() {
+            if (isInstallOnly) {
+                // 仅新增安装
+                var newId = document.getElementById('newDeviceId').value.trim();
+                if (!newId) { alert('请填写新设备编号'); return; }
+                var record = buildInstallOnlyRecord();
+                showSubmitSuccess(record);
+                return;
+            }
+            
+            if (isResumeMode) {
+                // 续做安装
+                var newId = document.getElementById('newDeviceId').value.trim();
+                if (!newId) { alert('请填写新设备编号'); return; }
+                completePendingTask();
+                return;
+            }
+            
+            // 一次性完整更换
+            var oldId = document.getElementById('oldDeviceId').value.trim();
+            var newId = document.getElementById('newDeviceId').value.trim();
+            if (!oldId) { alert('请填写旧设备编号'); return; }
+            var reason = document.getElementById('replaceReason').value;
+            if (!reason) { alert('请选择更换原因'); return; }
+            if (!newId) {
+                // 提示用户：新设备未填，是否只提交拆除？
+                if (confirm('新设备信息未填写，是否仅提交拆除记录？\n（后续可从待完成列表继续安装）')) {
+                    submitRemoval();
+                    return;
+                }
+                return;
+            }
+            
+            var record = buildFullRecord();
+            showSubmitSuccess(record);
+        }
+        
+        function buildFullRecord() {
+            return {
+                id: 'RR-' + Date.now(),
+                type: 'full_replacement',
+                oldDeviceId: document.getElementById('oldDeviceId').value,
+                reasonType: currentReasonType,
+                reasonText: document.getElementById('replaceReason').selectedOptions[0].textContent,
+                reasonDetail: document.getElementById('reasonDetail').value,
+                oldDeviceStatus: document.getElementById('oldDeviceStatus').value,
+                removalPhotoCount: removalPhotoCount,
+                newDeviceId: document.getElementById('newDeviceId').value,
+                installLocation: document.getElementById('installLocation').value,
+                installRemark: document.getElementById('installRemark').value,
+                installPhotoCount: installPhotoCount,
+                operator: JSON.parse(localStorage.getItem('currentUser') || '{}').name || '未知',
+                timestamp: new Date().toISOString(),
+                status: 'completed'
+            };
+        }
+        
+        function buildInstallOnlyRecord() {
+            return {
+                id: 'RI-' + Date.now(),
+                type: 'install_only',
+                newDeviceId: document.getElementById('newDeviceId').value,
+                installLocation: document.getElementById('installLocation').value,
+                installRemark: document.getElementById('installRemark').value,
+                installPhotoCount: installPhotoCount,
+                operator: JSON.parse(localStorage.getItem('currentUser') || '{}').name || '未知',
+                timestamp: new Date().toISOString(),
+                status: 'completed'
+            };
+        }
+        
+        function completePendingTask() {
+            var tasks = getPendingTasks();
+            var task = tasks.find(function(t) { return t.id === resumeTaskId; });
+            if (!task) { alert('工单不存在'); return; }
+            
+            // 合并安装信息
+            task.newDeviceId = document.getElementById('newDeviceId').value;
+            task.installLocation = document.getElementById('installLocation').value;
+            task.installRemark = document.getElementById('installRemark').value;
+            task.installPhotoCount = installPhotoCount;
+            task.installTime = new Date().toISOString();
+            task.status = 'completed';
+            
+            // 从待完成列表移除
+            var remaining = tasks.filter(function(t) { return t.id !== resumeTaskId; });
+            savePendingTasks(remaining);
+            
+            showSubmitSuccess(task);
+        }
+        
+        // ========== 存草稿 ==========
+        function saveDraft() {
+            var draft = {
+                oldDeviceId: document.getElementById('oldDeviceId').value,
+                reasonType: currentReasonType,
+                reason: document.getElementById('replaceReason').value,
+                reasonDetail: document.getElementById('reasonDetail').value,
+                oldDeviceStatus: document.getElementById('oldDeviceStatus').value,
+                newDeviceId: document.getElementById('newDeviceId').value,
+                installLocation: document.getElementById('installLocation').value,
+                installRemark: document.getElementById('installRemark').value,
+                isInstallOnly: isInstallOnly,
+                savedAt: new Date().toISOString()
+            };
+            localStorage.setItem('replacementDraft', JSON.stringify(draft));
+            showToast('草稿已保存');
+        }
+        
+        // ========== 提交成功展示 ==========
+        function showSubmitSuccess(record) {
+            var overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:300;display:flex;align-items:center;justify-content:center;';
+            
+            var summary = '';
+            if (record.type === 'install_only') {
+                summary = '<div style="margin-bottom:4px;"><b>新设备：</b>' + record.newDeviceId + '</div>' +
+                    (record.installLocation ? '<div style="margin-bottom:4px;"><b>安装位置：</b>' + record.installLocation + '</div>' : '');
+            } else {
+                summary = '<div style="margin-bottom:4px;"><b>旧设备：</b>' + record.oldDeviceId + '</div>' +
+                    '<div style="margin-bottom:4px;"><b>新设备：</b>' + record.newDeviceId + '</div>';
+            }
+            
+            overlay.innerHTML = '<div style="background:white;border-radius:12px;padding:32px 24px;text-align:center;width:300px;">' +
+                '<i class="bi bi-check-circle-fill" style="font-size:48px;color:#34C759;margin-bottom:16px;display:block;"></i>' +
+                '<div style="font-size:18px;font-weight:600;margin-bottom:12px;">提交成功</div>' +
+                '<div style="text-align:left;padding:12px;background:#f5f5f5;border-radius:8px;font-size:12px;color:#666;">' +
+                    summary +
+                    '<div style="margin-bottom:4px;"><b>操作人员：</b>' + record.operator + '</div>' +
+                    '<div><b>状态：</b><span style="color:#34C759;">✓ 已完成</span></div>' +
+                '</div>' +
+                '<div style="display:flex;gap:8px;margin-top:16px;">' +
+                    '<button onclick="this.closest(\'div[style]\').parentElement.remove();goBack();" style="flex:1;padding:10px;border:1px solid #E5E5EA;background:#f5f5f5;border-radius:8px;font-size:14px;cursor:pointer;">返回</button>' +
+                    '<button onclick="this.closest(\'div[style]\').parentElement.remove();location.reload();" style="flex:1;padding:10px;border:none;background:#007AFF;color:white;border-radius:8px;font-size:14px;cursor:pointer;">继续</button>' +
+                '</div></div>';
+            document.body.appendChild(overlay);
+        }
+        
+        // ========== Toast ==========
+        function showToast(msg) {
+            var toast = document.createElement('div');
+            toast.textContent = msg;
+            toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:white;padding:10px 20px;border-radius:8px;font-size:14px;z-index:400;white-space:nowrap;';
+            document.body.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 2000);
+        }
+        
+        // ========== 返回 ==========
+        function goBack() { window.history.back(); }
+        
+        // ========== 启动 ==========
+        initPage();
+    </script>
+</body>
+</html>

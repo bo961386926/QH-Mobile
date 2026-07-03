@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>比对记录详情</title>
+  <link rel="stylesheet" href="../../assets/libs/bootstrap-icons-1.13.1/fonts/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary-color: #007AFF;
+      --secondary-color: #34C759;
+      --warning-color: #FF9500;
+      --danger-color: #FF3B30;
+      --light-bg: #F2F2F7;
+      --dark-text: #1C1C1E;
+      --gray-text: #8E8E93;
+      --border-color: #E5E5EA;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Helvetica Neue', sans-serif; background: var(--light-bg); color: var(--dark-text); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; padding-bottom: 40px; }
+
+    .header { position: sticky; top: 0; z-index: 100; background: #fff; display: flex; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid var(--border-color); }
+    .header .back-btn { color: var(--primary-color); font-size: 22px; text-decoration: none; display: flex; align-items: center; margin-right: 8px; }
+    .header .title { font-size: 17px; font-weight: 600; flex: 1; }
+
+    .content { padding: 16px; }
+
+    .section-card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .section-header { display: flex; align-items: center; margin-bottom: 14px; }
+    .section-header i { color: var(--primary-color); font-size: 18px; margin-right: 8px; }
+    .section-header .section-title { font-size: 16px; font-weight: 600; }
+
+    .info-row { display: flex; padding: 8px 0; border-bottom: 0.5px solid var(--border-color); }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label { color: var(--gray-text); width: 80px; flex-shrink: 0; font-size: 14px; }
+    .info-row .value { flex: 1; font-size: 14px; color: var(--dark-text); }
+
+    .status-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .status-badge.uploaded { background: rgba(52,199,89,0.12); color: var(--secondary-color); }
+    .status-badge.uploading { background: rgba(0,122,255,0.12); color: var(--primary-color); }
+
+    .param-card { background: var(--light-bg); border-radius: 10px; padding: 14px; margin-bottom: 10px; border-left: 3px solid var(--secondary-color); }
+    .param-card:last-child { margin-bottom: 0; }
+    .param-card.over-limit { background: rgba(255,59,48,0.05); border-left-color: var(--danger-color); }
+    .param-name { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+    .param-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; font-size: 13px; }
+    .param-grid .pg-label { color: var(--gray-text); }
+    .param-grid .pg-value { font-family: 'SF Mono', 'Menlo', monospace; text-align: right; }
+    .param-status { display: flex; align-items: center; margin-top: 10px; font-size: 13px; font-weight: 500; }
+    .param-status.ok { color: var(--secondary-color); }
+    .param-status.fail { color: var(--danger-color); }
+    .param-status i { margin-right: 4px; }
+    .param-reason { margin-top: 8px; font-size: 13px; color: var(--danger-color); padding: 8px 10px; background: rgba(255,59,48,0.06); border-radius: 6px; }
+
+    .env-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .env-tag { display: inline-block; padding: 5px 14px; background: var(--light-bg); border-radius: 16px; font-size: 13px; color: var(--dark-text); }
+
+    .evidence-section { margin-bottom: 14px; }
+    .evidence-label { font-size: 14px; font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+    .evidence-label .watermark-tag { font-size: 12px; color: var(--gray-text); font-weight: 400; }
+    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .photo-placeholder { aspect-ratio: 1; background: var(--light-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .photo-placeholder i { font-size: 24px; color: var(--gray-text); }
+
+    .video-placeholder { aspect-ratio: 16/9; background: #2C2C2E; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+    .video-placeholder .play-btn { width: 52px; height: 52px; background: rgba(255,255,255,0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .video-placeholder .play-btn i { font-size: 26px; color: #fff; margin-left: 3px; }
+
+    .remark-text { font-size: 14px; color: var(--dark-text); line-height: 1.6; }
+
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; }
+    .empty-state i { font-size: 56px; color: var(--border-color); margin-bottom: 16px; }
+    .empty-state .empty-text { font-size: 16px; color: var(--gray-text); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <a class="back-btn" href="records.html"><i class="bi bi-arrow-left"></i></a>
+    <div class="title">比对记录详情</div>
+  </div>
+
+  <div class="content" id="app"></div>
+
+  <script>
+    var mockRecords = [
+      { id:'CR-1719800001', deviceId:'DT-2024-009', deviceName:'温度传感器·华东门区·装配线A', comparisonType:'周期性校准', params:[{key:'temperature',label:'温度',standardValue:'25.00',measureValue:'25.12',deviation:'+0.12',unit:'°C',tolerance:0.5,reason:''},{key:'humidity',label:'湿度',standardValue:'60.00',measureValue:'61.50',deviation:'+1.50',unit:'%RH',tolerance:3,reason:''},{key:'pressure',label:'压力',standardValue:'0.35',measureValue:'0.36',deviation:'+0.01',unit:'MPa',tolerance:0.02,reason:''}], environment:['outdoor','temp-normal'], photoCount:5, hasVideo:true, watermarkEnabled:true, operator:'张建国（EMP-2024-003）', timestamp:'2026-07-03T10:15:00', cloudStatus:'uploaded', remark:'' },
+      { id:'CR-1719800002', deviceId:'DT-2024-003', deviceName:'流量计·西部加压站', comparisonType:'故障排查', params:[{key:'flow',label:'流量',standardValue:'120.00',measureValue:'115.30',deviation:'-4.70',unit:'m³/h',tolerance:5,reason:'管道接口处有轻微渗漏'},{key:'pressure',label:'压力',standardValue:'0.40',measureValue:'0.38',deviation:'-0.02',unit:'MPa',tolerance:0.03,reason:''}], environment:['indoor','temp-high'], photoCount:3, hasVideo:false, watermarkEnabled:true, operator:'张建国（EMP-2024-003）', timestamp:'2026-07-01T15:40:00', cloudStatus:'uploaded', remark:'需要关注管道老化问题，建议下次巡检重点检查' },
+      { id:'CR-1719800003', deviceId:'DT-2024-007', deviceName:'水质分析仪·南山水厂', comparisonType:'验收测试', params:[{key:'ph',label:'pH值',standardValue:'7.00',measureValue:'7.05',deviation:'+0.05',unit:'',tolerance:0.1,reason:''},{key:'turbidity',label:'浊度',standardValue:'0.50',measureValue:'0.48',deviation:'-0.02',unit:'NTU',tolerance:0.1,reason:''},{key:'chlorine',label:'余氯',standardValue:'0.40',measureValue:'0.42',deviation:'+0.02',unit:'mg/L',tolerance:0.05,reason:''},{key:'conductivity',label:'电导率',standardValue:'500.00',measureValue:'510.00',deviation:'+10.00',unit:'μS/cm',tolerance:20,reason:''}], environment:['indoor','temp-normal'], photoCount:4, hasVideo:true, watermarkEnabled:false, operator:'李明辉（EMP-2024-005）', timestamp:'2026-06-28T09:20:00', cloudStatus:'uploaded', remark:'' },
+      { id:'CR-1719800004', deviceId:'DT-2024-012', deviceName:'液位传感器·东部调节池', comparisonType:'周期性校准', params:[{key:'level',label:'液位',standardValue:'2.50',measureValue:'2.55',deviation:'+0.05',unit:'m',tolerance:0.1,reason:''},{key:'temperature',label:'水温',standardValue:'18.00',measureValue:'18.20',deviation:'+0.20',unit:'°C',tolerance:0.5,reason:''}], environment:['outdoor','rain'], photoCount:2, hasVideo:false, watermarkEnabled:true, operator:'张建国（EMP-2024-003）', timestamp:'2026-06-20T14:10:00', cloudStatus:'uploaded', remark:'雨天环境，数据可能受影响' },
+      { id:'CR-1719800005', deviceId:'DT-2024-015', deviceName:'电磁流量计·北郊管网', comparisonType:'故障排查', params:[{key:'flow',label:'流量',standardValue:'85.00',measureValue:'78.50',deviation:'-6.50',unit:'m³/h',tolerance:5,reason:'传感器探头附着异物，已清理后重新校准'},{key:'pressure',label:'压力',standardValue:'0.30',measureValue:'0.31',deviation:'+0.01',unit:'MPa',tolerance:0.03,reason:''}], environment:['outdoor','temp-high'], photoCount:6, hasVideo:true, watermarkEnabled:true, operator:'李明辉（EMP-2024-005）', timestamp:'2026-06-15T11:30:00', cloudStatus:'uploading', remark:'' }
+    ];
+
+    var envMap = { outdoor:'室外', indoor:'室内', 'temp-normal':'常温', 'temp-high':'高温', 'temp-low':'低温', rain:'雨天', humid:'高湿', windy:'大风', sunny:'晴天', normal:'正常' };
+
+    function getUrlParam(name) {
+      var params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    function findRecord(id) {
+      // Check localStorage first
+      try {
+        var stored = localStorage.getItem('calibrationRecords');
+        if (stored) {
+          var records = JSON.parse(stored);
+          var found = records.find(function(r) { return r.id === id; });
+          if (found) return found;
+        }
+      } catch(e) {}
+      // Fallback to mock data
+      return mockRecords.find(function(r) { return r.id === id; });
+    }
+
+    function formatTime(ts) {
+      var d = new Date(ts);
+      var pad = function(n) { return n < 10 ? '0' + n : n; };
+      return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+
+    function isOverLimit(param) {
+      var dev = Math.abs(parseFloat(param.deviation));
+      return dev > param.tolerance;
+    }
+
+    function renderEmpty() {
+      document.getElementById('app').innerHTML =
+        '<div class="empty-state">' +
+        '<i class="bi bi-file-earmark-x"></i>' +
+        '<div class="empty-text">记录不存在</div>' +
+        '</div>';
+    }
+
+    function render(r) {
+      var html = '';
+
+      // Card 1: Device Info
+      var statusClass = r.cloudStatus === 'uploaded' ? 'uploaded' : 'uploading';
+      var statusText = r.cloudStatus === 'uploaded' ? '已上报' : '上报中';
+      html += '<div class="section-card">' +
+        '<div class="section-header"><i class="bi bi-cpu"></i><span class="section-title">设备信息</span></div>' +
+        '<div class="info-row"><span class="label">设备编号</span><span class="value">' + r.deviceId + '</span></div>' +
+        '<div class="info-row"><span class="label">设备名称</span><span class="value">' + r.deviceName + '</span></div>' +
+        '<div class="info-row"><span class="label">比对类型</span><span class="value">' + r.comparisonType + '</span></div>' +
+        '<div class="info-row"><span class="label">操作人员</span><span class="value">' + r.operator + '</span></div>' +
+        '<div class="info-row"><span class="label">提交时间</span><span class="value">' + formatTime(r.timestamp) + '</span></div>' +
+        '<div class="info-row"><span class="label">上报状态</span><span class="value"><span class="status-badge ' + statusClass + '">' + statusText + '</span></span></div>' +
+        '</div>';
+
+      // Card 2: Comparison Params
+      var paramsHtml = '';
+      r.params.forEach(function(p) {
+        var over = isOverLimit(p);
+        var cardClass = over ? 'param-card over-limit' : 'param-card';
+        var unit = p.unit ? ' ' + p.unit : '';
+        paramsHtml += '<div class="' + cardClass + '">' +
+          '<div class="param-name">' + p.label + '</div>' +
+          '<div class="param-grid">' +
+          '<span class="pg-label">标准值</span><span class="pg-value">' + p.standardValue + unit + '</span>' +
+          '<span class="pg-label">实测值</span><span class="pg-value">' + p.measureValue + unit + '</span>' +
+          '<span class="pg-label">偏差</span><span class="pg-value">' + p.deviation + unit + '</span>' +
+          '<span class="pg-label">允许</span><span class="pg-value">±' + p.tolerance + unit + '</span>' +
+          '</div>';
+        if (over) {
+          paramsHtml += '<div class="param-status fail"><i class="bi bi-exclamation-triangle-fill"></i>超差</div>';
+          if (p.reason) {
+            paramsHtml += '<div class="param-reason">原因：' + p.reason + '</div>';
+          }
+        } else {
+          paramsHtml += '<div class="param-status ok"><i class="bi bi-check-circle-fill"></i>正常</div>';
+        }
+        paramsHtml += '</div>';
+      });
+      html += '<div class="section-card">' +
+        '<div class="section-header"><i class="bi bi-bar-chart-line"></i><span class="section-title">比对指标</span></div>' +
+        paramsHtml +
+        '</div>';
+
+      // Card 3: Environment
+      var envHtml = '';
+      r.environment.forEach(function(e) {
+        envHtml += '<span class="env-tag">' + (envMap[e] || e) + '</span>';
+      });
+      html += '<div class="section-card">' +
+        '<div class="section-header"><i class="bi bi-cloud-sun"></i><span class="section-title">现场环境</span></div>' +
+        '<div class="env-tags">' + envHtml + '</div>' +
+        '</div>';
+
+      // Card 4: Evidence
+      var photosHtml = '';
+      for (var i = 0; i < r.photoCount; i++) {
+        photosHtml += '<div class="photo-placeholder"><i class="bi bi-camera"></i></div>';
+      }
+      var watermarkText = r.watermarkEnabled ? '已启用' : '未启用';
+      var evidenceHtml = '<div class="evidence-section">' +
+        '<div class="evidence-label"><span>照片（' + r.photoCount + '张）</span><span class="watermark-tag">水印：' + watermarkText + '</span></div>' +
+        '<div class="photo-grid">' + photosHtml + '</div>' +
+        '</div>';
+      if (r.hasVideo) {
+        evidenceHtml += '<div class="evidence-section">' +
+          '<div class="evidence-label">视频</div>' +
+          '<div class="video-placeholder"><div class="play-btn"><i class="bi bi-play-fill"></i></div></div>' +
+          '</div>';
+      }
+      html += '<div class="section-card">' +
+        '<div class="section-header"><i class="bi bi-images"></i><span class="section-title">现场证据</span></div>' +
+        evidenceHtml +
+        '</div>';
+
+      // Card 5: Remark (conditional)
+      if (r.remark) {
+        html += '<div class="section-card">' +
+          '<div class="section-header"><i class="bi bi-chat-square-text"></i><span class="section-title">备注</span></div>' +
+          '<div class="remark-text">' + r.remark + '</div>' +
+          '</div>';
+      }
+
+      document.getElementById('app').innerHTML = html;
+    }
+
+    var recordId = getUrlParam('id');
+    var record = recordId ? findRecord(recordId) : null;
+    if (record) {
+      render(record);
+    } else {
+      renderEmpty();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择设备 - 设备比对</title>
+    <link rel="stylesheet" href="../../assets/libs/bootstrap-icons-1.13.1/fonts/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+            --card-bg: #FFFFFF;
+            --border-color: #E5E5EA;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            padding-top: 48px;
+        }
+        
+        /* 顶部导航栏 */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100; height: 48px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px;
+        }
+        .header-title { font-size: 18px; font-weight: bold; color: #111; flex: 1; text-align: left; }
+        .header-back {
+            background: none; border: none; font-size: 20px; color: #666;
+            cursor: pointer; width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        .main-content { padding: 16px; padding-bottom: 32px; }
+        
+        /* 快速识别入口 */
+        .quick-actions {
+            display: flex; gap: 10px; margin-bottom: 14px;
+        }
+        .action-btn {
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 500;
+            cursor: pointer; transition: all 0.2s; border: none;
+        }
+        .action-btn:active { transform: scale(0.97); }
+        .action-btn i { font-size: 18px; }
+        .action-scan { background: var(--primary-color); color: white; }
+        .action-nfc { background: rgba(0, 122, 255, 0.08); color: var(--primary-color); border: 1px solid rgba(0, 122, 255, 0.2); }
+        
+        /* 定位状态栏 */
+        .location-bar {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 14px; background: white; border-radius: 10px;
+            margin-bottom: 14px; border: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+        .loc-icon { font-size: 16px; color: var(--primary-color); flex-shrink: 0; }
+        .loc-icon.locating { animation: pulse 1.2s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .loc-text { flex: 1; color: var(--dark-text); line-height: 1.4; }
+        .loc-text .loc-sub { font-size: 11px; color: var(--gray-text); }
+        .loc-refresh {
+            background: none; border: none; color: var(--primary-color);
+            font-size: 13px; cursor: pointer; padding: 4px 10px;
+            border-radius: 6px; white-space: nowrap; font-weight: 500;
+        }
+        .loc-refresh:active { background: rgba(0, 122, 255, 0.06); }
+        
+        /* 搜索栏 */
+        .search-wrap {
+            position: relative; margin-bottom: 14px;
+        }
+        .search-input {
+            width: 100%; padding: 10px 36px 10px 14px;
+            border: 1px solid var(--border-color); border-radius: 10px;
+            font-size: 14px; background: white; color: var(--dark-text);
+        }
+        .search-input::placeholder { color: var(--gray-text); }
+        .search-clear {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--gray-text);
+            font-size: 16px; cursor: pointer; display: none; padding: 2px;
+        }
+        
+        /* 范围筛选 */
+        .radius-bar {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 14px;
+        }
+        .radius-label {
+            font-size: 13px; color: var(--gray-text); white-space: nowrap; flex-shrink: 0;
+        }
+        .radius-seg {
+            display: flex; flex: 1; background: white;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            overflow: hidden;
+        }
+        .radius-opt {
+            flex: 1; text-align: center; padding: 7px 0; font-size: 13px;
+            color: var(--gray-text); cursor: pointer; transition: all 0.2s;
+            user-select: none; border-right: 1px solid var(--border-color);
+        }
+        .radius-opt:last-child { border-right: none; }
+        .radius-opt.active {
+            background: var(--primary-color); color: white; font-weight: 500;
+        }
+        
+        /* 站点选择 */
+        .site-chips-wrap {
+            display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px;
+            padding-bottom: 4px; -webkit-overflow-scrolling: touch;
+        }
+        .site-chips-wrap::-webkit-scrollbar { display: none; }
+        .site-chip {
+            padding: 7px 14px; border: 1px solid var(--border-color); border-radius: 18px;
+            font-size: 13px; color: var(--gray-text); background: white;
+            cursor: pointer; white-space: nowrap; transition: all 0.2s;
+            user-select: none; flex-shrink: 0;
+        }
+        .site-chip.active {
+            background: rgba(0, 122, 255, 0.08); border-color: var(--primary-color);
+            color: var(--primary-color); font-weight: 500;
+        }
+        .site-chip .chip-dist {
+            font-size: 11px; color: var(--gray-text); margin-left: 4px;
+            font-weight: 400;
+        }
+        .site-chip.active .chip-dist { color: var(--primary-color); opacity: 0.7; }
+        
+        /* 结果计数 */
+        .result-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; padding: 0 2px;
+        }
+        .result-count { font-size: 12px; color: var(--gray-text); }
+        .result-sort { font-size: 12px; color: var(--gray-text); }
+        
+        /* 分组标题 */
+        .group-title {
+            font-size: 13px; font-weight: 600; color: var(--gray-text);
+            padding: 0 4px; text-transform: uppercase;
+        }
+        
+        /* 设备列表 */
+        .device-list { display: flex; flex-direction: column; gap: 10px; }
+        
+        .device-item {
+            background: white; border: 1px solid var(--border-color); border-radius: 10px;
+            padding: 14px; cursor: pointer; transition: all 0.2s;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .device-item:active {
+            background: #f5f5f5; border-color: var(--primary-color);
+        }
+        .device-wrapper { display: flex; align-items: center; flex: 1; min-width: 0; }
+        .device-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: rgba(0, 122, 255, 0.08); display: flex;
+            align-items: center; justify-content: center;
+            color: var(--primary-color); margin-right: 12px; flex-shrink: 0;
+            font-size: 18px;
+        }
+        .device-icon.icon-water { background: rgba(0, 122, 255, 0.08); color: #007AFF; }
+        .device-icon.icon-level { background: rgba(255, 149, 0, 0.08); color: #FF9500; }
+        .device-icon.icon-flow { background: rgba(52, 199, 89, 0.08); color: #34C759; }
+        .device-icon.icon-temp { background: rgba(255, 59, 48, 0.08); color: #FF3B30; }
+        
+        .device-info { flex: 1; min-width: 0; }
+        .device-name {
+            font-size: 14px; font-weight: 600; color: var(--dark-text); margin-bottom: 3px;
+        }
+        .device-meta {
+            font-size: 12px; color: var(--gray-text); margin-bottom: 4px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .device-tags { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+        .device-status { font-size: 11px; color: var(--secondary-color); font-weight: 500; }
+        .device-status.offline { color: var(--danger-color); }
+        .device-dist {
+            font-size: 11px; color: var(--gray-text); background: var(--light-bg);
+            padding: 1px 6px; border-radius: 4px;
+        }
+        .device-dist.nearby { color: var(--primary-color); background: rgba(0, 122, 255, 0.06); }
+        .device-chevron { color: var(--gray-text); font-size: 14px; margin-left: 10px; flex-shrink: 0; }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center; padding: 48px 16px; color: var(--gray-text);
+        }
+        .empty-state-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+        .empty-state-text { font-size: 14px; line-height: 1.6; }
+        
+        /* 扫描覆盖层 */
+        .scan-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85); z-index: 200;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center; color: white;
+        }
+        .scan-overlay.show { display: flex; }
+        .scan-frame {
+            width: 220px; height: 220px; border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px; position: relative; margin-bottom: 24px;
+        }
+        .scan-frame::before, .scan-frame::after {
+            content: ''; position: absolute; width: 30px; height: 30px;
+            border-color: white; border-style: solid;
+        }
+        .scan-frame::before { top: -1px; left: -1px; border-width: 3px 0 0 3px; border-radius: 16px 0 0 0; }
+        .scan-frame::after { top: -1px; right: -1px; border-width: 3px 3px 0 0; border-radius: 0 16px 0 0; }
+        .scan-line {
+            position: absolute; left: 10px; right: 10px; height: 2px;
+            background: var(--primary-color); animation: scanMove 2s linear infinite;
+            box-shadow: 0 0 8px rgba(0, 122, 255, 0.5);
+        }
+        @keyframes scanMove {
+            0% { top: 10px; } 50% { top: calc(100% - 10px); } 100% { top: 10px; }
+        }
+        .scan-hint { font-size: 15px; opacity: 0.8; }
+        .scan-cancel {
+            margin-top: 32px; padding: 10px 32px; border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 8px; background: none; color: white; font-size: 14px;
+            cursor: pointer;
+        }
+        
+        /* NFC 动画 */
+        .nfc-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85); z-index: 200;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center; color: white;
+        }
+        .nfc-overlay.show { display: flex; }
+        .nfc-anim {
+            width: 120px; height: 120px; border-radius: 50%;
+            border: 3px solid var(--primary-color); position: relative;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 24px;
+        }
+        .nfc-anim i { font-size: 48px; color: var(--primary-color); }
+        .nfc-anim::before, .nfc-anim::after {
+            content: ''; position: absolute; border-radius: 50%;
+            border: 2px solid rgba(0, 122, 255, 0.3);
+            animation: nfcRipple 2s ease-out infinite;
+        }
+        .nfc-anim::before { inset: -15px; animation-delay: 0s; }
+        .nfc-anim::after { inset: -30px; animation-delay: 0.6s; }
+        @keyframes nfcRipple {
+            0% { opacity: 1; transform: scale(0.8); }
+            100% { opacity: 0; transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 扫描覆盖层 -->
+    <div class="scan-overlay" id="scanOverlay">
+        <div class="scan-frame"><div class="scan-line"></div></div>
+        <div class="scan-hint">将二维码放入框内自动识别</div>
+        <button class="scan-cancel" onclick="cancelScan()">取消</button>
+    </div>
+    
+    <!-- NFC 覆盖层 -->
+    <div class="nfc-overlay" id="nfcOverlay">
+        <div class="nfc-anim"><i class="bi bi-wifi"></i></div>
+        <div class="scan-hint">请将手机靠近设备NFC标签</div>
+        <button class="scan-cancel" onclick="cancelNfc()">取消</button>
+    </div>
+    
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <button class="header-back" onclick="goBack()"><i class="bi bi-chevron-left"></i></button>
+        <h1 class="header-title">选择设备</h1>
+        <div style="width: 36px;"></div>
+    </header>
+
+    <main class="main-content">
+        <!-- 快速识别 -->
+        <div class="quick-actions">
+            <button class="action-btn action-scan" onclick="startScan()">
+                <i class="bi bi-qr-code-scan"></i> 扫一扫
+            </button>
+            <button class="action-btn action-nfc" onclick="startNfc()">
+                <i class="bi bi-wifi"></i> NFC感应
+            </button>
+        </div>
+        
+        <!-- 定位状态 -->
+        <div class="location-bar" id="locationBar">
+            <i class="bi bi-geo-alt-fill loc-icon" id="locIcon"></i>
+            <div class="loc-text" id="locText">
+                <div>点击右侧获取位置，按距离排序设备</div>
+            </div>
+            <button class="loc-refresh" onclick="getLocation()">获取位置</button>
+        </div>
+        
+        <!-- 范围筛选 -->
+        <div class="radius-bar" id="radiusBar">
+            <span class="radius-label"><i class="bi bi-broadcast" style="margin-right:4px;"></i>范围</span>
+            <div class="radius-seg">
+                <div class="radius-opt" onclick="setRadius(500)" data-r="500">500m</div>
+                <div class="radius-opt active" onclick="setRadius(1000)" data-r="1000">1km</div>
+                <div class="radius-opt" onclick="setRadius(3000)" data-r="3000">3km</div>
+                <div class="radius-opt" onclick="setRadius(5000)" data-r="5000">5km</div>
+            </div>
+        </div>
+        
+        <!-- 搜索栏 -->
+        <div class="search-wrap">
+            <input type="text" class="search-input" id="deviceSearch" placeholder="搜索设备名称、编号或站点">
+            <button class="search-clear" id="searchClear" onclick="clearSearch()"><i class="bi bi-x-circle-fill"></i></button>
+        </div>
+        
+        <!-- 站点选择 -->
+        <div class="site-chips-wrap" id="siteChips"></div>
+        
+        <!-- 结果栏 -->
+        <div class="result-bar" id="resultBar">
+            <span class="result-count" id="resultCount"></span>
+            <span class="result-sort" id="resultSort"></span>
+        </div>
+        
+        <!-- 设备列表 -->
+        <div class="device-list" id="deviceList"></div>
+    </main>
+    
+    <!-- 隐藏的扫码输入（真实设备摄像头） -->
+    <input type="file" id="qrInput" accept="image/*" capture="environment" style="display:none" onchange="handleQrCapture(event)">
+    
+    <script>
+        // ========== 数据模型 ==========
+        var sites = [
+            { id: 'site-001', name: '城东水质监测站', address: '城东区污水处理厂区', lat: 30.2741, lng: 120.1551 },
+            { id: 'site-002', name: '城西泵站', address: '城西区排水泵站', lat: 30.2600, lng: 120.1300 },
+            { id: 'site-003', name: '北区管网监测点', address: '北区供水管网枢纽', lat: 30.3000, lng: 120.1700 }
+        ];
+        
+        var allDevices = [
+            // 城东水质监测站
+            { id: 'DT-2024-009', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'icon-temp', site: 'site-001', location: '一期生化池', lat: 30.2743, lng: 120.1553, status: 'online' },
+            { id: 'DT-2024-001', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'icon-temp', site: 'site-001', location: '二期沉淀池', lat: 30.2750, lng: 120.1560, status: 'online' },
+            { id: 'DT-2024-002', name: '液位计', type: '超声波液位计', icon: 'bi-water', iconClass: 'icon-level', site: 'site-001', location: '进水口', lat: 30.2760, lng: 120.1545, status: 'online' },
+            { id: 'DT-2024-010', name: '水质分析仪', type: '多参数水质监测仪', icon: 'bi-droplet-half', iconClass: 'icon-water', site: 'site-001', location: '出水口', lat: 30.2780, lng: 120.1580, status: 'offline' },
+            // 城西泵站
+            { id: 'DT-2024-011', name: '流量计', type: '电磁流量计', icon: 'bi-speedometer2', iconClass: 'icon-flow', site: 'site-002', location: '主泵房', lat: 30.2605, lng: 120.1305, status: 'online' },
+            { id: 'DT-2024-012', name: '压力传感器', type: '压阻式压力变送器', icon: 'bi-gauge', iconClass: 'icon-water', site: 'site-002', location: '出水管道', lat: 30.2610, lng: 120.1310, status: 'online' },
+            { id: 'DT-2024-013', name: '液位计', type: '雷达液位计', icon: 'bi-water', iconClass: 'icon-level', site: 'site-002', location: '集水井', lat: 30.2615, lng: 120.1295, status: 'online' },
+            // 北区管网监测点
+            { id: 'DT-2024-014', name: '流量计', type: '超声波流量计', icon: 'bi-speedometer2', iconClass: 'icon-flow', site: 'site-003', location: '主管段', lat: 30.3005, lng: 120.1705, status: 'online' },
+            { id: 'DT-2024-015', name: '压力传感器', type: '压力变送器', icon: 'bi-gauge', iconClass: 'icon-water', site: 'site-003', location: '分支管段', lat: 30.3010, lng: 120.1710, status: 'online' }
+        ];
+        
+        // ========== 状态 ==========
+        var currentSite = 'all';
+        var userLocation = null;
+        var currentRadius = 1000; // 默认1km
+        
+        // ========== 距离计算（Haversine） ==========
+        function calcDistance(lat1, lng1, lat2, lng2) {
+            var R = 6371000;
+            var dLat = (lat2 - lat1) * Math.PI / 180;
+            var dLng = (lng2 - lng1) * Math.PI / 180;
+            var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+        
+        function formatDistance(meters) {
+            if (meters < 1000) return Math.round(meters) + 'm';
+            return (meters / 1000).toFixed(1) + 'km';
+        }
+        
+        // ========== 范围切换 ==========
+        function setRadius(meters) {
+            currentRadius = meters;
+            document.querySelectorAll('.radius-opt').forEach(function(el) {
+                el.classList.toggle('active', parseInt(el.getAttribute('data-r')) === meters);
+            });
+            renderSiteChips();
+            renderDevices();
+        }
+        
+        // ========== 获取位置（模拟GPS） ==========
+        function getLocation() {
+            var locIcon = document.getElementById('locIcon');
+            var locText = document.getElementById('locText');
+            var refreshBtn = locIcon.parentElement.querySelector('.loc-refresh');
+            
+            locIcon.classList.add('locating');
+            locText.innerHTML = '<div>正在定位...</div>';
+            refreshBtn.style.display = 'none';
+            
+            setTimeout(function() {
+                // 模拟GPS定位在城东附近
+                userLocation = { lat: 30.2745, lng: 120.1555 };
+                locIcon.classList.remove('locating');
+                
+                // 找到最近的站点
+                var nearestSite = null, nearestDist = Infinity;
+                sites.forEach(function(s) {
+                    var d = calcDistance(userLocation.lat, userLocation.lng, s.lat, s.lng);
+                    if (d < nearestDist) { nearestDist = d; nearestSite = s; }
+                });
+                
+                locText.innerHTML = '<div>' + nearestSite.name + '附近</div>' +
+                    '<div class="loc-sub">距站点 ' + formatDistance(nearestDist) + ' · GPS已定位</div>';
+                refreshBtn.textContent = '刷新';
+                refreshBtn.style.display = '';
+                
+                renderSiteChips();
+                renderDevices();
+            }, 1500);
+        }
+        
+        // ========== 站点选择 ==========
+        function selectSite(siteId) {
+            currentSite = siteId;
+            document.querySelectorAll('.site-chip').forEach(function(c) { c.classList.remove('active'); });
+            var activeChip = document.querySelector('.site-chip[data-site="' + siteId + '"]');
+            if (activeChip) activeChip.classList.add('active');
+            renderDevices();
+        }
+        
+        function renderSiteChips() {
+            var container = document.getElementById('siteChips');
+            
+            // 计算各站点距离
+            var siteDists = {};
+            sites.forEach(function(s) {
+                if (userLocation) {
+                    siteDists[s.id] = calcDistance(userLocation.lat, userLocation.lng, s.lat, s.lng);
+                }
+            });
+            
+            // 按距离排序（如果有位置）
+            var sortedSites = sites.slice();
+            if (userLocation) {
+                sortedSites.sort(function(a, b) { return (siteDists[a.id] || 0) - (siteDists[b.id] || 0); });
+            }
+            
+            // 只展示范围内的站点
+            var nearbySites = sortedSites;
+            if (userLocation) {
+                nearbySites = sortedSites.filter(function(s) {
+                    // 站点本身在范围内，或者站点下有设备在范围内
+                    return siteDists[s.id] <= currentRadius * 1.5 || // 站点距离在1.5倍范围内
+                        allDevices.some(function(d) { return d.site === s.id && calcDistance(userLocation.lat, userLocation.lng, d.lat, d.lng) <= currentRadius; });
+                });
+            }
+            
+            // 统计范围内设备数
+            var totalNearby = 0;
+            if (userLocation) {
+                totalNearby = allDevices.filter(function(d) {
+                    return calcDistance(userLocation.lat, userLocation.lng, d.lat, d.lng) <= currentRadius;
+                }).length;
+            }
+            
+            var html = '<div class="site-chip' + (currentSite === 'all' ? ' active' : '') + '" onclick="selectSite(\'all\')" data-site="all">附近' +
+                (userLocation ? ' ' + totalNearby + '台' : '') + '</div>';
+            
+            nearbySites.forEach(function(s) {
+                var nearbyCount = 0;
+                if (userLocation) {
+                    nearbyCount = allDevices.filter(function(d) {
+                        return d.site === s.id && calcDistance(userLocation.lat, userLocation.lng, d.lat, d.lng) <= currentRadius;
+                    }).length;
+                } else {
+                    nearbyCount = allDevices.filter(function(d) { return d.site === s.id; }).length;
+                }
+                var distHtml = '';
+                if (userLocation && siteDists[s.id] !== undefined) {
+                    distHtml = '<span class="chip-dist">' + formatDistance(siteDists[s.id]) + '</span>';
+                }
+                html += '<div class="site-chip' + (currentSite === s.id ? ' active' : '') + '" onclick="selectSite(\'' + s.id + '\')" data-site="' + s.id + '">' +
+                    s.name + distHtml + '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // ========== 设备列表 ==========
+        function renderDevices() {
+            var container = document.getElementById('deviceList');
+            var searchText = (document.getElementById('deviceSearch').value || '').toLowerCase();
+            
+            // 过滤
+            var devices = allDevices.slice();
+            if (currentSite !== 'all') {
+                devices = devices.filter(function(d) { return d.site === currentSite; });
+            }
+            if (searchText) {
+                devices = devices.filter(function(d) {
+                    var site = sites.find(function(s) { return s.id === d.site; });
+                    return d.id.toLowerCase().includes(searchText) ||
+                           d.name.toLowerCase().includes(searchText) ||
+                           d.type.toLowerCase().includes(searchText) ||
+                           d.location.toLowerCase().includes(searchText) ||
+                           (site && site.name.toLowerCase().includes(searchText));
+                });
+            }
+            
+            // 计算距离 + 范围过滤
+            if (userLocation) {
+                devices.forEach(function(d) {
+                    d._dist = calcDistance(userLocation.lat, userLocation.lng, d.lat, d.lng);
+                });
+                // 按范围过滤
+                devices = devices.filter(function(d) { return d._dist <= currentRadius; });
+                devices.sort(function(a, b) { return a._dist - b._dist; });
+            }
+            
+            // 更新结果栏
+            var resultCount = document.getElementById('resultCount');
+            var resultSort = document.getElementById('resultSort');
+            if (userLocation) {
+                resultCount.textContent = devices.length + ' 台设备';
+                resultSort.textContent = currentRadius >= 1000 ? (currentRadius / 1000) + 'km内 · 按距离排序' : currentRadius + 'm内 · 按距离排序';
+            } else {
+                resultCount.textContent = devices.length + ' 台设备';
+                resultSort.textContent = '';
+            }
+            
+            // 空状态
+            if (devices.length === 0) {
+                var emptyIcon = searchText ? 'bi-search' : 'bi-broadcast';
+                var emptyText = '';
+                if (searchText) {
+                    emptyText = '未找到匹配的设备';
+                } else if (userLocation) {
+                    var radiusLabel = currentRadius >= 1000 ? (currentRadius / 1000) + 'km' : currentRadius + 'm';
+                    emptyText = '当前 ' + radiusLabel + ' 范围内没有设备<br><span style="font-size:12px;color:var(--gray-text);">试试扩大搜索范围</span>';
+                } else {
+                    emptyText = '请先获取位置信息';
+                }
+                container.innerHTML = '<div class="empty-state">' +
+                    '<div class="empty-state-icon"><i class="bi ' + emptyIcon + '"></i></div>' +
+                    '<div class="empty-state-text">' + emptyText + '</div></div>';
+                return;
+            }
+            
+            // 渲染列表
+            var html = '';
+            var lastSite = null;
+            
+            devices.forEach(function(d) {
+                var site = sites.find(function(s) { return s.id === d.site; });
+                
+                // 全部视图下，按站点分组标题
+                if (currentSite === 'all' && (!lastSite || lastSite !== d.site)) {
+                    lastSite = d.site;
+                    if (html) html += '</div>';
+                    html += '<div class="group-title" style="margin-top:' + (html ? '20' : '0') + 'px">' + (site ? site.name : '') + '</div>';
+                }
+                
+                var distHtml = '';
+                if (d._dist !== undefined) {
+                    var distClass = d._dist < 200 ? 'device-dist nearby' : 'device-dist';
+                    distHtml = '<span class="' + distClass + '">' + formatDistance(d._dist) + '</span>';
+                }
+                
+                var statusClass = d.status === 'offline' ? 'device-status offline' : 'device-status';
+                var statusText = d.status === 'offline' ? '故障中' : '在线';
+                
+                html += '<div class="device-item" onclick="selectDevice(\'' + d.id + '\', \'' + d.name + '·' + (site ? site.name : '') + '·' + d.location + '\')">' +
+                    '<div class="device-wrapper">' +
+                        '<div class="device-icon ' + d.iconClass + '"><i class="bi ' + d.icon + '"></i></div>' +
+                        '<div class="device-info">' +
+                            '<div class="device-name">' + d.id + '</div>' +
+                            '<div class="device-meta">' + d.type + ' · ' + (site ? site.name : '') + ' · ' + d.location + '</div>' +
+                            '<div class="device-tags">' +
+                                '<span class="' + statusClass + '">' + statusText + '</span>' +
+                                distHtml +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="device-chevron"><i class="bi bi-chevron-right"></i></div>' +
+                '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // ========== 搜索 ==========
+        document.getElementById('deviceSearch').addEventListener('input', function() {
+            var clearBtn = document.getElementById('searchClear');
+            clearBtn.style.display = this.value ? '' : 'none';
+            renderDevices();
+        });
+        
+        function clearSearch() {
+            document.getElementById('deviceSearch').value = '';
+            document.getElementById('searchClear').style.display = 'none';
+            renderDevices();
+        }
+        
+        // ========== 扫一扫 ==========
+        function startScan() {
+            // 先展示模拟扫描界面
+            document.getElementById('scanOverlay').classList.add('show');
+            // 同时尝试调用真实摄像头（原型可忽略）
+            // document.getElementById('qrInput').click();
+            
+            // 模拟2秒后识别成功
+            setTimeout(function() {
+                document.getElementById('scanOverlay').classList.remove('show');
+                // 模拟扫到了 DT-2024-009
+                var device = allDevices.find(function(d) { return d.id === 'DT-2024-009'; });
+                if (device) {
+                    var site = sites.find(function(s) { return s.id === device.site; });
+                    showToast('识别成功：' + device.id);
+                    setTimeout(function() {
+                        selectDevice(device.id, device.name + '·' + (site ? site.name : '') + '·' + device.location);
+                    }, 800);
+                }
+            }, 2500);
+        }
+        
+        function handleQrCapture(event) {
+            // 真实扫码回调（原型暂用模拟）
+            document.getElementById('scanOverlay').classList.remove('show');
+        }
+        
+        function cancelScan() {
+            document.getElementById('scanOverlay').classList.remove('show');
+        }
+        
+        // ========== NFC 感应 ==========
+        function startNfc() {
+            document.getElementById('nfcOverlay').classList.add('show');
+            
+            // 模拟3秒后感应成功
+            setTimeout(function() {
+                document.getElementById('nfcOverlay').classList.remove('show');
+                // 模拟感应到 DT-2024-002
+                var device = allDevices.find(function(d) { return d.id === 'DT-2024-002'; });
+                if (device) {
+                    var site = sites.find(function(s) { return s.id === device.site; });
+                    showToast('NFC感应成功：' + device.id);
+                    setTimeout(function() {
+                        selectDevice(device.id, device.name + '·' + (site ? site.name : '') + '·' + device.location);
+                    }, 800);
+                }
+            }, 3000);
+        }
+        
+        function cancelNfc() {
+            document.getElementById('nfcOverlay').classList.remove('show');
+        }
+        
+        // ========== 选择设备 ==========
+        function selectDevice(deviceId, deviceName) {
+            localStorage.setItem('selectedDevice', JSON.stringify({
+                id: deviceId,
+                name: deviceName
+            }));
+            window.location.href = 'device-comparison.html';
+        }
+        
+        // ========== Toast ==========
+        function showToast(msg) {
+            var toast = document.createElement('div');
+            toast.textContent = msg;
+            toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:white;padding:10px 20px;border-radius:8px;font-size:14px;z-index:300;white-space:nowrap;';
+            document.body.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 2000);
+        }
+        
+        // ========== 返回 ==========
+        function goBack() { window.history.back(); }
+        
+        // ========== 初始化 ==========
+        renderSiteChips();
+        renderDevices();
+        // 页面加载自动获取位置
+        getLocation();
+    </script>
+</body>
+</html>

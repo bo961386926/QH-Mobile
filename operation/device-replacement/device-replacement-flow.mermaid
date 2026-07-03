@@ -1,0 +1,57 @@
+flowchart TD
+    Start([打开「设备更换」]) --> CheckPending{有待完成<br>安装工单?}
+
+    CheckPending -->|有| Banner[顶部橙色提示条<br>你有 X 条待完成安装]
+    CheckPending -->|无| Page[进入更换表单]
+
+    Banner --> Choice{工人选择操作}
+    Choice -->|点击提示条<br>继续安装| ResumeMode
+    Choice -->|新建更换| Page
+
+    Page --> ModeToggle{是否<br>仅新增安装?}
+
+    %% ===== 场景一：一次到场 =====
+    ModeToggle -->|否 · 默认| Scene1
+    subgraph Scene1 [场景一：带了新设备 · 一次搞定]
+        direction TB
+        A1[填写旧设备拆除区<br>设备编号 · 更换类型 · 原因<br>设备状态 · 现场照片] --> A2[填写新设备安装区<br>新设备编号 · 安装位置<br>安装备注 · 安装照片]
+        A2 --> A3([提交更换<br>一条完整记录 ✓])
+    end
+
+    Scene1 -.->|新设备未填时<br>弹窗提醒| Scene2Entry
+
+    %% ===== 场景二：分两次 =====
+    ModeToggle -->|否 · 默认| Scene2Entry[也可只填拆除区]
+    subgraph Scene2 [场景二：没带新设备 · 分两次到场]
+        direction TB
+        B1[填写旧设备拆除区] --> B2([提交拆除<br>生成「待安装」工单])
+        B2 --> B3[工单存入待完成列表<br>页面顶部显示提示条]
+        B3 --> B4["下次带新设备到现场<br>点击提示条 → 选择工单"]
+        B4 --> B5[自动加载拆除记录<br>只读展示 · 不可修改]
+        B5 --> B6[填写新设备安装区<br>新设备编号 · 安装位置<br>安装备注 · 安装照片]
+        B6 --> B7([提交安装<br>两次数据合并为完整记录 ✓])
+    end
+    Scene2Entry --> B1
+
+    %% ===== 场景三：仅新增 =====
+    ModeToggle -->|是 · 打开开关| Scene3
+    subgraph Scene3 [场景三：全新位置加装 · 无旧设备]
+        direction TB
+        C0[旧设备拆除区隐藏] --> C1[只填新设备安装区<br>新设备编号 · 安装位置<br>安装备注 · 安装照片]
+        C1 --> C2([提交安装 ✓])
+    end
+
+    %% ===== 样式 =====
+    style Start fill:#007AFF,color:#fff,stroke:none
+    style A3 fill:#34C759,color:#fff,stroke:none
+    style B2 fill:#FF9500,color:#fff,stroke:none
+    style B7 fill:#34C759,color:#fff,stroke:none
+    style C2 fill:#34C759,color:#fff,stroke:none
+    style Banner fill:#FFF3E0,color:#E65100,stroke:#FFB74D
+    style ResumeMode fill:#FFF3E0,color:#E65100,stroke:#FFB74D
+    style Scene1 fill:#F0FFF0,stroke:#34C759
+    style Scene2 fill:#FFF8F0,stroke:#FF9500
+    style Scene3 fill:#F0F0FF,stroke:#007AFF
+
+    ResumeMode[选择待完成工单<br>进入续做模式]
+    ResumeMode --> B5

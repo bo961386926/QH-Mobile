@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>设备比对记录</title>
+    <!-- 引入Bootstrap Icons -->
+    <link rel="stylesheet" href="../../assets/libs/bootstrap-icons-1.13.1/fonts/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+            --border-color: #E5E5EA;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            padding-top: 48px;
+            padding-bottom: 40px;
+        }
+
+        /* 顶部导航栏 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+
+        .header-back {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--primary-color);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin: 0;
+            flex: 1;
+            text-align: center;
+        }
+
+        .header-placeholder {
+            width: 36px;
+            flex-shrink: 0;
+        }
+
+        /* 筛选栏 */
+        .filter-bar {
+            padding: 12px 16px 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            white-space: nowrap;
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            display: inline-block;
+            padding: 6px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--gray-text);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .filter-chip.active {
+            background: rgba(0, 122, 255, 0.08);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* 搜索框 */
+        .search-bar {
+            padding: 12px 16px 0;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--primary-color);
+        }
+
+        .search-box i {
+            font-size: 16px;
+            color: var(--gray-text);
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: var(--dark-text);
+            background: transparent;
+        }
+
+        .search-box input::placeholder {
+            color: #C7C7CC;
+        }
+
+        /* 统计栏 */
+        .stats-bar {
+            padding: 12px 16px 4px;
+            font-size: 13px;
+            color: var(--gray-text);
+        }
+
+        /* 记录列表 */
+        .record-list {
+            padding: 0 16px;
+        }
+
+        /* 记录卡片 */
+        .record-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .record-card:active {
+            transform: scale(0.98);
+            opacity: 0.85;
+        }
+
+        /* 卡片头部 */
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 14px 14px 10px;
+        }
+
+        .card-device-id {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .card-device-name {
+            font-size: 12px;
+            color: var(--gray-text);
+            margin-top: 2px;
+        }
+
+        .card-status {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+
+        .card-status.uploaded {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .card-status.uploading {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* 卡片分隔线 */
+        .card-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 0 14px;
+        }
+
+        /* 卡片信息区 */
+        .card-info {
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .card-info-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #636366;
+        }
+
+        .card-info-row i {
+            font-size: 14px;
+            color: var(--gray-text);
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        /* 卡片底部 */
+        .card-footer {
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-media-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--gray-text);
+        }
+
+        .card-media-info i {
+            font-size: 14px;
+        }
+
+        .card-arrow {
+            font-size: 16px;
+            color: #C7C7CC;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: #D1D1D6;
+            margin-bottom: 12px;
+        }
+
+        .empty-state .empty-title {
+            font-size: 15px;
+            color: var(--gray-text);
+            margin-bottom: 4px;
+        }
+
+        .empty-state .empty-desc {
+            font-size: 13px;
+            color: #C7C7CC;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <button class="header-back" onclick="goBack()">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h1 class="header-title">设备比对记录</h1>
+        <div class="header-placeholder"></div>
+    </header>
+
+    <!-- 筛选栏 -->
+    <div class="filter-bar" id="filterBar">
+        <div class="filter-chip active" data-filter="all" onclick="selectFilter(this)">全部</div>
+        <div class="filter-chip" data-filter="周期性校准" onclick="selectFilter(this)">周期性校准</div>
+        <div class="filter-chip" data-filter="故障排查" onclick="selectFilter(this)">故障排查</div>
+        <div class="filter-chip" data-filter="验收测试" onclick="selectFilter(this)">验收测试</div>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="search-bar">
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" id="searchInput" placeholder="搜索设备编号或名称" oninput="handleSearch()">
+        </div>
+    </div>
+
+    <!-- 统计栏 -->
+    <div class="stats-bar" id="statsBar">共 0 条记录</div>
+
+    <!-- 记录列表 -->
+    <div class="record-list" id="recordList"></div>
+
+    <script>
+        // ========== 环境标签中文映射 ==========
+        var envLabelMap = {
+            'outdoor': '室外',
+            'indoor': '室内',
+            'temp-normal': '常温',
+            'temp-high': '高温',
+            'temp-low': '低温',
+            'rain': '雨天',
+            'humid': '高湿',
+            'windy': '大风',
+            'sunny': '晴天',
+            'normal': '正常'
+        };
+
+        // ========== 模拟数据 ==========
+        var mockRecords = [
+            { id:'CR-1719800001', deviceId:'DT-2024-009', deviceName:'温度传感器·华东门区·装配线A', comparisonType:'周期性校准', params:[{key:'temperature',label:'温度',standardValue:'25.00',measureValue:'25.12',deviation:'+0.12',unit:'°C',tolerance:0.5,reason:''},{key:'humidity',label:'湿度',standardValue:'60.00',measureValue:'61.50',deviation:'+1.50',unit:'%RH',tolerance:3,reason:''},{key:'pressure',label:'压力',standardValue:'0.35',measureValue:'0.36',deviation:'+0.01',unit:'MPa',tolerance:0.02,reason:''}], environment:['outdoor','temp-normal'], photoCount:5, hasVideo:true, watermarkEnabled:true, operator:'张建国（EMP-2024-003）', timestamp:'2026-07-03T10:15:00', cloudStatus:'uploaded', remark:'' },
+            { id:'CR-1719800002', deviceId:'DT-2024-003', deviceName:'流量计·西部加压站', comparisonType:'故障排查', params:[{key:'flow',label:'流量',standardValue:'120.00',measureValue:'115.30',deviation:'-4.70',unit:'m³/h',tolerance:5,reason:'管道接口处有轻微渗漏'},{key:'pressure',label:'压力',standardValue:'0.40',measureValue:'0.38',deviation:'-0.02',unit:'MPa',tolerance:0.03,reason:''}], environment:['indoor','temp-high'], photoCount:3, hasVideo:false, watermarkEnabled:true, operator:'张建国（EMP-2024-003）', timestamp:'2026-07-01T15:40:00', cloudStatus:'uploaded', remark:'需要关注管道老化问题' },
+            { id:'CR-1719800003', deviceId:'DT-2024-007', deviceName:'水质分析仪·南山水厂', comparisonType:'验收测试', params:[{key:'ph',label:'pH值',standardValue:'7.00',measureValue:'7.05',deviation:'+0.05',unit:'',tolerance:0.1,reason:''},{key:'turbidity',label:'浊度',standardValue:'0.50',measureValue:'0.48',deviation:'-0.02',unit:'NTU',tolerance:0.1,reason:''},{key:'chlorine',label:'余氯',standardValue:'0.40',measureValue:'0.42',deviation:'+0.02',unit:'mg/L',tolerance:0.05,reason:''},{key:'conductivity',label:'电导率',standardValue:'500.00',measureValue:'510.00',deviation:'+10.00',unit:'μS/cm',tolerance:20,reason:''}], environment:['indoor','temp-normal'], photoCount:4, hasVideo:true, watermarkEnabled:false, operator:'李明辉（EMP-2024-005）', timestamp:'2026-06-28T09:20:00', cloudStatus:'uploaded', remark:'' },
+            { id:'CR-1719800004', deviceId:'DT-2024-012', deviceName:'液位传感器·东部调节池', comparisonType:'周期性校准', params:[{key:'level',label:'液位',standardValue:'2.50',measureValue:'2.55',deviation:'+0.05',unit:'m',tolerance:0.1,reason:''},{key:'temperature',label:'水温',standardValue:'18.00',measureValue:'18.20',deviation:'+0.20',unit:'°C',tolerance:0.5,reason:''}], environment:['outdoor','rain'], photoCount:2, hasVideo:false, watermarkEnabled:true, operator:'张建国（EMP-2024-003）', timestamp:'2026-06-20T14:10:00', cloudStatus:'uploaded', remark:'雨天环境，数据可能受影响' },
+            { id:'CR-1719800005', deviceId:'DT-2024-015', deviceName:'电磁流量计·北郊管网', comparisonType:'故障排查', params:[{key:'flow',label:'流量',standardValue:'85.00',measureValue:'78.50',deviation:'-6.50',unit:'m³/h',tolerance:5,reason:'传感器探头附着异物，已清理后重新校准'},{key:'pressure',label:'压力',standardValue:'0.30',measureValue:'0.31',deviation:'+0.01',unit:'MPa',tolerance:0.03,reason:''}], environment:['outdoor','temp-high'], photoCount:6, hasVideo:true, watermarkEnabled:true, operator:'李明辉（EMP-2024-005）', timestamp:'2026-06-15T11:30:00', cloudStatus:'uploading', remark:'' }
+        ];
+
+        // ========== 状态变量 ==========
+        var currentFilter = 'all';
+        var currentSearch = '';
+        var allRecords = [];
+
+        // ========== 初始化 ==========
+        function initPage() {
+            // 检查 localStorage 中是否有真实记录，优先使用
+            var storedRecords = null;
+            try {
+                storedRecords = JSON.parse(localStorage.getItem('calibrationRecords'));
+            } catch (e) {}
+
+            if (storedRecords && storedRecords.length > 0) {
+                allRecords = storedRecords;
+            } else {
+                allRecords = mockRecords;
+            }
+
+            renderList();
+        }
+
+        // ========== 筛选 ==========
+        function selectFilter(el) {
+            document.querySelectorAll('.filter-chip').forEach(function(c) {
+                c.classList.remove('active');
+            });
+            el.classList.add('active');
+            currentFilter = el.getAttribute('data-filter');
+            renderList();
+        }
+
+        // ========== 搜索 ==========
+        function handleSearch() {
+            currentSearch = document.getElementById('searchInput').value.trim().toLowerCase();
+            renderList();
+        }
+
+        // ========== 过滤记录 ==========
+        function getFilteredRecords() {
+            return allRecords.filter(function(r) {
+                // 类型筛选
+                if (currentFilter !== 'all' && r.comparisonType !== currentFilter) {
+                    return false;
+                }
+                // 搜索过滤
+                if (currentSearch) {
+                    var haystack = (r.deviceId + ' ' + r.deviceName + ' ' + r.operator).toLowerCase();
+                    if (haystack.indexOf(currentSearch) === -1) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+
+        // ========== 格式化时间 ==========
+        function formatTime(isoStr) {
+            if (!isoStr) return '';
+            var d = new Date(isoStr);
+            var Y = d.getFullYear();
+            var M = String(d.getMonth() + 1).padStart(2, '0');
+            var D = String(d.getDate()).padStart(2, '0');
+            var h = String(d.getHours()).padStart(2, '0');
+            var m = String(d.getMinutes()).padStart(2, '0');
+            return Y + '-' + M + '-' + D + ' ' + h + ':' + m;
+        }
+
+        // ========== 状态文本 ==========
+        function getStatusText(status) {
+            if (status === 'uploaded') return '已上报';
+            if (status === 'uploading') return '上报中';
+            return status || '未知';
+        }
+
+        // ========== 渲染列表 ==========
+        function renderList() {
+            var filtered = getFilteredRecords();
+            var container = document.getElementById('recordList');
+            var statsBar = document.getElementById('statsBar');
+
+            statsBar.textContent = '共 ' + filtered.length + ' 条记录';
+
+            if (filtered.length === 0) {
+                container.innerHTML =
+                    '<div class="empty-state">' +
+                    '  <i class="bi bi-clipboard-data"></i>' +
+                    '  <div class="empty-title">暂无比对记录</div>' +
+                    '  <div class="empty-desc">完成设备比对后，记录将在此显示</div>' +
+                    '</div>';
+                return;
+            }
+
+            var html = '';
+            filtered.forEach(function(r) {
+                var paramCount = r.params ? r.params.length : 0;
+
+                // 媒体信息
+                var mediaParts = [];
+                if (r.photoCount) mediaParts.push(r.photoCount + '张照片');
+                if (r.hasVideo) mediaParts.push('1段视频');
+                var mediaText = mediaParts.length > 0 ? mediaParts.join(' · ') : '无附件';
+
+                html += '<div class="record-card" onclick="goDetail(\'' + r.id + '\')">';
+
+                // 顶部：设备编号 + 状态
+                html += '  <div class="card-top">';
+                html += '    <div>';
+                html += '      <div class="card-device-id">' + escapeHtml(r.deviceId) + '</div>';
+                html += '      <div class="card-device-name">' + escapeHtml(r.deviceName) + '</div>';
+                html += '    </div>';
+                html += '    <span class="card-status ' + (r.cloudStatus || 'uploaded') + '">' + getStatusText(r.cloudStatus) + '</span>';
+                html += '  </div>';
+
+                // 分隔线
+                html += '  <div class="card-divider"></div>';
+
+                // 信息区
+                html += '  <div class="card-info">';
+                html += '    <div class="card-info-row">';
+                html += '      <i class="bi bi-list-check"></i>';
+                html += '      <span>' + escapeHtml(r.comparisonType) + ' · ' + paramCount + '项指标</span>';
+                html += '    </div>';
+                html += '    <div class="card-info-row">';
+                html += '      <i class="bi bi-clock"></i>';
+                html += '      <span>' + formatTime(r.timestamp) + '</span>';
+                html += '    </div>';
+                html += '    <div class="card-info-row">';
+                html += '      <i class="bi bi-person"></i>';
+                html += '      <span>' + escapeHtml(r.operator) + '</span>';
+                html += '    </div>';
+                html += '  </div>';
+
+                // 分隔线
+                html += '  <div class="card-divider"></div>';
+
+                // 底部：媒体 + 箭头
+                html += '  <div class="card-footer">';
+                html += '    <div class="card-media-info">';
+                html += '      <i class="bi bi-camera"></i>';
+                html += '      <span>' + mediaText + '</span>';
+                html += '    </div>';
+                html += '    <i class="bi bi-chevron-right card-arrow"></i>';
+                html += '  </div>';
+
+                html += '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ========== HTML转义 ==========
+        function escapeHtml(str) {
+            if (!str) return '';
+            var div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ========== 跳转详情 ==========
+        function goDetail(recordId) {
+            window.location.href = 'record-detail.html?id=' + encodeURIComponent(recordId);
+        }
+
+        // ========== 返回 ==========
+        function goBack() {
+            window.location.href = 'device-comparison.html';
+        }
+
+        // ========== 启动 ==========
+        window.addEventListener('load', initPage);
+    </script>
+</body>
+</html>

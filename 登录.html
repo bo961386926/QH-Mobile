@@ -251,7 +251,14 @@
             this.disabled = true;
             
             setTimeout(() => {
-                // 模拟登录成功
+                // 模拟登录成功，存储当前用户信息
+                localStorage.setItem('currentUser', JSON.stringify({
+                    id: 'EMP-2024-003',
+                    name: '张建国',
+                    role: '运维工程师',
+                    dept: '城东区运维组',
+                    phone: '138****6789'
+                }));
                 window.location.href = 'home/home.html';
             }, 1500);
         });

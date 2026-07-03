@@ -1,0 +1,96 @@
+flowchart TD
+    Start([运维中心 · 点击「比对」]) --> SelectPage[设备选择页]
+
+    %% ===== 设备选择 =====
+    subgraph DeviceSelect [第一步：选择设备]
+        direction TB
+        AutoGPS[自动GPS定位<br>检测当前位置] --> RadiusFilter[范围过滤<br>500m / 1km / 3km / 5km]
+        RadiusFilter --> NearbyList[只显示范围内的<br>站点和设备]
+
+        QuickAction{快速识别?}
+        QuickAction -->|扫一扫| QRScan[扫描设备二维码<br>自动识别设备]
+        QuickAction -->|NFC感应| NFCTap[贴近设备NFC标签<br>自动识别设备]
+        QuickAction -->|手动选择| BrowseList[浏览站点芯片<br>按距离排序的设备列表]
+
+        QRScan --> SelectDevice
+        NFCTap --> SelectDevice
+        BrowseList --> SelectDevice
+        NearbyList --> SelectDevice
+        SelectDevice[选中设备<br>存入 localStorage] --> NextPage([跳转比对表单页])
+    end
+
+    SelectPage --> DeviceSelect
+
+    %% ===== 比对表单 =====
+    NextPage --> FormPage[比对数据采集表单]
+
+    subgraph AutoFill [自动填充]
+        direction TB
+        AutoDevice[设备信息<br>从选择页带入] --- AutoOperator[操作人员<br>从登录用户读取]
+    end
+
+    FormPage --> AutoFill
+
+    %% ===== 表单填写流程 =====
+    AutoFill --> CompType[选择比对类型<br>周期性校准 / 故障排查 / 验收测试]
+
+    CompType --> FetchType[从平台获取比对指标]
+    FetchType --> ParamCards[动态生成参数卡片<br>每个指标一张独立卡片]
+
+    subgraph ParamCard [每张参数卡片]
+        direction TB
+        StdValue[标准值<br>平台自动下发] --> InputMode{录入模式}
+        InputMode -->|手动| ManualInput[键盘输入实测值]
+        InputMode -->|蓝牙| BTScan[蓝牙采集设备<br>自动读取数据]
+        InputMode -->|OCR| OCRScan[拍照识别<br>OCR自动提取数值]
+        ManualInput --> CalcDeviation
+        BTScan --> CalcDeviation
+        OCRScan --> CalcDeviation
+        CalcDeviation[自动计算偏差<br>实测值 − 标准值] --> CheckTol{偏差 ≤ 容差?}
+        CheckTol -->|是| Normal[✓ 正常 · 绿色]
+        CheckTol -->|否| Abnormal[! 异常 · 橙色<br>展开偏差原因输入框]
+    end
+
+    ParamCards --> ParamCard
+
+    %% ===== 环境参数 =====
+    ParamCard --> EnvChips[现场环境多选标签<br>高温/低温/高湿/雨天/通风不良等<br>互斥：「环境正常」取消其他]
+
+    %% ===== 现场证据 =====
+    EnvChips --> Evidence
+    subgraph Evidence [现场证据]
+        direction TB
+        Watermark[水印开关<br>时间+设备ID+GPS坐标]
+        Photos[照片 · 最多9张<br>拍照或相册选择<br>Canvas自动添加水印]
+        Video[视频 · 最多1个<br>仅允许手机录制<br>限60秒 / 50MB]
+    end
+
+    %% ===== 提交 =====
+    Evidence --> SubmitChoice{提交操作}
+    SubmitChoice -->|保存草稿| SaveDraft[存入 localStorage<br>下次自动恢复]
+    SubmitChoice -->|提交比对| Validate{数据校验}
+
+    Validate -->|缺少实测值| AlertFill[提醒填写实测值]
+    Validate -->|偏差未填原因| AlertReason[提醒填写偏差原因]
+    AlertFill --> ParamCard
+    AlertReason --> ParamCard
+
+    Validate -->|通过| CloudUpload
+    subgraph CloudUpload [云上报]
+        direction TB
+        UploadAnim[上传动画<br>数据打包中...] --> UploadDone[上报成功]
+        UploadDone --> Summary["摘要展示<br>记录编号 · 设备 · 操作人员<br>各指标偏差汇总（✓/!）<br>照片/视频数量 · 水印状态"]
+    end
+
+    SubmitChoice -->|重置表单| ResetForm[清空所有填写内容]
+
+    %% ===== 样式 =====
+    style Start fill:#007AFF,color:#fff,stroke:none
+    style NextPage fill:#007AFF,color:#fff,stroke:none
+    style DeviceSelect fill:#F0F8FF,stroke:#007AFF
+    style AutoFill fill:#F5F5F5,stroke:#E5E5EA
+    style ParamCard fill:#FFF8F0,stroke:#FF9500
+    style Evidence fill:#F0FFF0,stroke:#34C759
+    style CloudUpload fill:#F0F0FF,stroke:#007AFF
+    style SaveDraft fill:#FF9500,color:#fff,stroke:none
+    style ResetForm fill:#E5E5EA,color:#666,stroke:none

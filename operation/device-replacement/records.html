@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>设备更换记录</title>
+    <link rel="stylesheet" href="../../assets/libs/bootstrap-icons-1.13.1/fonts/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+            --border-color: #E5E5EA;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding-top: 48px;
+            padding-bottom: 40px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: 48px; background: #fff;
+            display: flex; align-items: center;
+            padding: 0 16px; z-index: 100;
+            box-shadow: 0 0.5px 2px rgba(0,0,0,0.08);
+        }
+        .header-back {
+            background: none; border: none; font-size: 22px;
+            color: var(--primary-color); cursor: pointer;
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .header-title {
+            font-size: 17px; font-weight: 600; color: var(--dark-text);
+            flex: 1; text-align: center; margin-right: 36px;
+        }
+
+        /* 筛选栏 */
+        .filter-bar {
+            padding: 12px 16px 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            white-space: nowrap;
+        }
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-pill {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-text);
+            background: #fff;
+            border: 1px solid var(--border-color);
+            margin-right: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .filter-pill.active {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+        .filter-pill:active { opacity: 0.7; }
+
+        /* 搜索框 */
+        .search-bar {
+            padding: 4px 16px 8px;
+        }
+        .search-input-wrap {
+            display: flex; align-items: center;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0 12px;
+            height: 38px;
+            transition: border-color 0.2s;
+        }
+        .search-input-wrap:focus-within {
+            border-color: var(--primary-color);
+        }
+        .search-input-wrap i {
+            font-size: 16px; color: var(--gray-text);
+            margin-right: 8px; flex-shrink: 0;
+        }
+        .search-input-wrap input {
+            flex: 1; border: none; outline: none;
+            font-size: 14px; color: var(--dark-text);
+            background: transparent;
+        }
+        .search-input-wrap input::placeholder { color: #C7C7CC; }
+
+        /* 统计栏 */
+        .stats-bar {
+            padding: 4px 16px 8px;
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+
+        /* 卡片列表 */
+        .record-list {
+            padding: 0 16px;
+        }
+        .record-card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .record-card:active {
+            background: #f9f9f9;
+            transform: scale(0.99);
+        }
+
+        /* 卡片头部 */
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px 6px;
+        }
+        .card-device-id {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+        .card-status-badge {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+        .card-status-badge.completed {
+            background: rgba(52,199,89,0.12);
+            color: #34C759;
+        }
+        .card-status-badge.pending_install {
+            background: rgba(255,149,0,0.12);
+            color: #FF9500;
+        }
+        .card-status-badge.install_only {
+            background: rgba(0,122,255,0.12);
+            color: #007AFF;
+        }
+
+        /* 卡片类型行 */
+        .card-type-row {
+            padding: 0 14px 8px;
+            font-size: 13px;
+            color: var(--gray-text);
+        }
+
+        /* 卡片信息区 */
+        .card-info-section {
+            padding: 8px 14px;
+            border-top: 1px solid #F2F2F7;
+        }
+        .card-info-line {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--dark-text);
+            line-height: 1.8;
+        }
+        .card-info-line i {
+            font-size: 14px;
+            color: var(--gray-text);
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        /* 卡片底部 - 设备对照 */
+        .card-device-flow {
+            padding: 10px 14px;
+            border-top: 1px solid #F2F2F7;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: var(--gray-text);
+            gap: 6px;
+        }
+        .card-device-flow .flow-label {
+            color: #AEAEB2;
+            flex-shrink: 0;
+        }
+        .card-device-flow .flow-device {
+            color: var(--dark-text);
+            font-weight: 500;
+        }
+        .card-device-flow .flow-arrow {
+            color: var(--primary-color);
+            font-size: 14px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .card-device-flow .flow-separator {
+            color: #C7C7CC;
+            margin: 0 2px;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-text);
+        }
+        .empty-state i {
+            font-size: 48px;
+            color: #D1D1D6;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* 底部留白 */
+        .bottom-spacer {
+            height: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <button class="header-back" onclick="goBack()">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h1 class="header-title">设备更换记录</h1>
+    </header>
+
+    <!-- 筛选栏 -->
+    <div class="filter-bar" id="filterBar">
+        <span class="filter-pill active" data-filter="all" onclick="setFilter('all', this)">全部</span>
+        <span class="filter-pill" data-filter="completed" onclick="setFilter('completed', this)">已完成</span>
+        <span class="filter-pill" data-filter="pending_install" onclick="setFilter('pending_install', this)">待安装</span>
+        <span class="filter-pill" data-filter="install_only" onclick="setFilter('install_only', this)">仅安装</span>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="search-bar">
+        <div class="search-input-wrap">
+            <i class="bi bi-search"></i>
+            <input type="text" id="searchInput" placeholder="搜索设备编号或操作人员" oninput="handleSearch()">
+        </div>
+    </div>
+
+    <!-- 统计栏 -->
+    <div class="stats-bar" id="statsBar">共 0 条记录</div>
+
+    <!-- 记录列表 -->
+    <div class="record-list" id="recordList"></div>
+
+    <!-- 底部留白 -->
+    <div class="bottom-spacer"></div>
+
+    <script>
+        // ========== 映射表 ==========
+        var reasonTypeMap = {
+            fault: '故障更换',
+            prevent: '预防更换',
+            upgrade: '升级更换'
+        };
+
+        var reasonTextMap = {
+            lifecycle: '寿命到期',
+            damage: '故障损坏',
+            drift: '数据漂移',
+            corrosion: '腐蚀老化',
+            other: '其他'
+        };
+
+        var statusMap = {
+            completed: '已完成',
+            pending_install: '待安装',
+            install_only: '仅安装'
+        };
+
+        var oldDeviceStatusMap = {
+            repair: '返厂维修',
+            scrap: '报废处理',
+            stock: '回库待检'
+        };
+
+        // ========== 模拟数据 ==========
+        var mockRecords = [
+            {
+                id: 'RR-1719800001',
+                type: 'full_replacement',
+                oldDeviceId: 'DT-2024-009',
+                newDeviceId: 'DT-2024-015',
+                reasonType: 'fault',
+                reasonText: '寿命到期',
+                reasonDetail: '设备运行超过5年，传感器精度下降明显',
+                oldDeviceStatus: 'scrap',
+                removalPhotoCount: 3,
+                installPhotoCount: 2,
+                operator: '张建国',
+                timestamp: '2026-07-03T14:30:00',
+                status: 'completed'
+            },
+            {
+                id: 'RR-1719800002',
+                type: 'full_replacement',
+                oldDeviceId: 'DT-2024-003',
+                newDeviceId: 'DT-2024-018',
+                reasonType: 'prevent',
+                reasonText: '腐蚀老化',
+                reasonDetail: '预防性更换，管道接口处有腐蚀迹象',
+                oldDeviceStatus: 'stock',
+                removalPhotoCount: 2,
+                installPhotoCount: 1,
+                operator: '张建国',
+                timestamp: '2026-07-02T09:15:00',
+                status: 'completed'
+            },
+            {
+                id: 'RP-1719800003',
+                type: 'full_replacement',
+                oldDeviceId: 'DT-2024-007',
+                newDeviceId: '',
+                reasonType: 'fault',
+                reasonText: '故障损坏',
+                reasonDetail: '雷击导致设备完全损坏',
+                oldDeviceStatus: 'scrap',
+                removalPhotoCount: 4,
+                installPhotoCount: 0,
+                operator: '李明辉',
+                timestamp: '2026-07-01T16:45:00',
+                status: 'pending_install'
+            },
+            {
+                id: 'RR-1719800004',
+                type: 'full_replacement',
+                oldDeviceId: 'DT-2024-012',
+                newDeviceId: 'DT-2024-021',
+                reasonType: 'upgrade',
+                reasonText: '数据漂移',
+                reasonDetail: '升级为新型号，精度更高',
+                oldDeviceStatus: 'stock',
+                removalPhotoCount: 2,
+                installPhotoCount: 3,
+                operator: '张建国',
+                timestamp: '2026-06-28T11:20:00',
+                status: 'completed'
+            },
+            {
+                id: 'RI-1719800005',
+                type: 'install_only',
+                oldDeviceId: '',
+                newDeviceId: 'DT-2024-025',
+                reasonType: '',
+                reasonText: '',
+                reasonDetail: '',
+                oldDeviceStatus: '',
+                removalPhotoCount: 0,
+                installPhotoCount: 2,
+                operator: '李明辉',
+                timestamp: '2026-06-25T08:50:00',
+                status: 'completed',
+                installLocation: '新建站点-西部加压站'
+            }
+        ];
+
+        // ========== 状态 ==========
+        var allRecords = [];
+        var currentFilter = 'all';
+        var currentSearch = '';
+
+        // ========== 初始化 ==========
+        function init() {
+            mergeLocalStorage();
+            renderList();
+        }
+
+        // ========== 合并 localStorage ==========
+        function mergeLocalStorage() {
+            allRecords = mockRecords.slice();
+
+            // 合并待安装记录
+            try {
+                var pending = JSON.parse(localStorage.getItem('replacementPending') || '[]');
+                if (Array.isArray(pending) && pending.length > 0) {
+                    pending.forEach(function(item) {
+                        // 避免重复
+                        var exists = allRecords.some(function(r) { return r.id === item.id; });
+                        if (!exists) {
+                            allRecords.unshift({
+                                id: item.id,
+                                type: 'full_replacement',
+                                oldDeviceId: item.oldDeviceId || '',
+                                newDeviceId: item.newDeviceId || '',
+                                reasonType: item.reasonType || '',
+                                reasonText: item.reasonText || '',
+                                reasonDetail: item.reasonDetail || '',
+                                oldDeviceStatus: item.oldDeviceStatus || '',
+                                removalPhotoCount: item.removalPhotoCount || 0,
+                                installPhotoCount: item.installPhotoCount || 0,
+                                operator: item.operator || '未知',
+                                timestamp: item.removalTime || item.timestamp || new Date().toISOString(),
+                                status: item.status || 'pending_install'
+                            });
+                        }
+                    });
+                }
+            } catch (e) {}
+
+            // 合并已完成记录
+            try {
+                var history = JSON.parse(localStorage.getItem('replacementHistory') || '[]');
+                if (Array.isArray(history) && history.length > 0) {
+                    history.forEach(function(item) {
+                        var exists = allRecords.some(function(r) { return r.id === item.id; });
+                        if (!exists) {
+                            allRecords.push(item);
+                        }
+                    });
+                }
+            } catch (e) {}
+
+            // 按时间倒序排列
+            allRecords.sort(function(a, b) {
+                return new Date(b.timestamp) - new Date(a.timestamp);
+            });
+        }
+
+        // ========== 筛选逻辑 ==========
+        function filterRecords(records) {
+            return records.filter(function(r) {
+                switch (currentFilter) {
+                    case 'completed':
+                        return r.status === 'completed' && r.type !== 'install_only';
+                    case 'pending_install':
+                        return r.status === 'pending_install';
+                    case 'install_only':
+                        return r.type === 'install_only';
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        // ========== 搜索逻辑 ==========
+        function searchRecords(records) {
+            if (!currentSearch) return records;
+            var kw = currentSearch.toLowerCase();
+            return records.filter(function(r) {
+                return (r.oldDeviceId && r.oldDeviceId.toLowerCase().indexOf(kw) !== -1) ||
+                       (r.newDeviceId && r.newDeviceId.toLowerCase().indexOf(kw) !== -1) ||
+                       (r.operator && r.operator.toLowerCase().indexOf(kw) !== -1);
+            });
+        }
+
+        // ========== 设置筛选 ==========
+        function setFilter(filter, el) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-pill').forEach(function(p) {
+                p.classList.remove('active');
+            });
+            el.classList.add('active');
+            renderList();
+        }
+
+        // ========== 搜索输入 ==========
+        function handleSearch() {
+            currentSearch = document.getElementById('searchInput').value.trim();
+            renderList();
+        }
+
+        // ========== 渲染列表 ==========
+        function renderList() {
+            var filtered = filterRecords(allRecords);
+            var results = searchRecords(filtered);
+            var container = document.getElementById('recordList');
+            var statsBar = document.getElementById('statsBar');
+
+            statsBar.textContent = '共 ' + results.length + ' 条记录';
+
+            if (results.length === 0) {
+                container.innerHTML =
+                    '<div class="empty-state">' +
+                        '<i class="bi bi-inbox"></i>' +
+                        '<p>暂无匹配的记录</p>' +
+                    '</div>';
+                return;
+            }
+
+            var html = '';
+            results.forEach(function(r) {
+                html += buildCard(r);
+            });
+            container.innerHTML = html;
+        }
+
+        // ========== 构建卡片 ==========
+        function buildCard(record) {
+            // 卡片头部：设备编号 + 状态标签
+            var displayId = record.type === 'install_only'
+                ? record.newDeviceId
+                : record.oldDeviceId;
+
+            var statusLabel = '';
+            var statusClass = '';
+            if (record.type === 'install_only') {
+                statusLabel = '仅安装';
+                statusClass = 'install_only';
+            } else if (record.status === 'completed') {
+                statusLabel = '已完成';
+                statusClass = 'completed';
+            } else if (record.status === 'pending_install') {
+                statusLabel = '待安装';
+                statusClass = 'pending_install';
+            }
+
+            // 类型行：更换类型 + 原因
+            var typeLine = '';
+            if (record.type === 'install_only') {
+                typeLine = '新增安装';
+                if (record.installLocation) {
+                    typeLine += ' · ' + record.installLocation;
+                }
+            } else {
+                var typeName = reasonTypeMap[record.reasonType] || '';
+                var reasonName = record.reasonText || '';
+                // 尝试将reasonText映射回去（如果是option的value）
+                if (reasonTextMap[reasonName]) {
+                    reasonName = reasonTextMap[reasonName];
+                }
+                typeLine = typeName;
+                if (reasonName) {
+                    typeLine += ' · ' + reasonName;
+                }
+            }
+
+            // 信息区
+            var timeStr = formatTime(record.timestamp);
+            var photoLine = '';
+            if (record.removalPhotoCount > 0 || record.installPhotoCount > 0) {
+                var parts = [];
+                if (record.removalPhotoCount > 0) parts.push('拆除' + record.removalPhotoCount + '张');
+                if (record.installPhotoCount > 0) parts.push('安装' + record.installPhotoCount + '张');
+                photoLine = parts.join(' · ');
+            }
+
+            var infoHtml = '<div class="card-info-section">';
+            infoHtml += '<div class="card-info-line"><i class="bi bi-clock"></i>' + timeStr + '</div>';
+            infoHtml += '<div class="card-info-line"><i class="bi bi-person"></i>' + (record.operator || '未知') + '</div>';
+            if (photoLine) {
+                infoHtml += '<div class="card-info-line"><i class="bi bi-camera"></i>' + photoLine + '</div>';
+            }
+            infoHtml += '</div>';
+
+            // 底部设备对照
+            var flowHtml = '';
+            if (record.type !== 'install_only' && record.oldDeviceId) {
+                flowHtml = '<div class="card-device-flow">';
+                flowHtml += '<span class="flow-label">旧:</span>';
+                flowHtml += '<span class="flow-device">' + record.oldDeviceId + '</span>';
+                if (record.newDeviceId) {
+                    flowHtml += '<span class="flow-separator">&rarr;</span>';
+                    flowHtml += '<span class="flow-label">新:</span>';
+                    flowHtml += '<span class="flow-device">' + record.newDeviceId + '</span>';
+                } else {
+                    flowHtml += '<span class="flow-separator">&rarr;</span>';
+                    flowHtml += '<span style="color:var(--warning-color);font-size:12px;">待安装新设备</span>';
+                }
+                flowHtml += '<i class="bi bi-chevron-right flow-arrow"></i>';
+                flowHtml += '</div>';
+            } else if (record.type === 'install_only') {
+                flowHtml = '<div class="card-device-flow">';
+                flowHtml += '<span class="flow-label">新设备:</span>';
+                flowHtml += '<span class="flow-device">' + record.newDeviceId + '</span>';
+                flowHtml += '<i class="bi bi-chevron-right flow-arrow"></i>';
+                flowHtml += '</div>';
+            }
+
+            // 组装卡片
+            var card = '<div class="record-card" onclick="goDetail(\'' + record.id + '\')">';
+            card += '<div class="card-header-row">';
+            card += '<span class="card-device-id">' + displayId + '</span>';
+            card += '<span class="card-status-badge ' + statusClass + '">' + statusLabel + '</span>';
+            card += '</div>';
+            card += '<div class="card-type-row">' + typeLine + '</div>';
+            card += infoHtml;
+            card += flowHtml;
+            card += '</div>';
+
+            return card;
+        }
+
+        // ========== 格式化时间 ==========
+        function formatTime(isoStr) {
+            if (!isoStr) return '--';
+            var d = new Date(isoStr);
+            if (isNaN(d.getTime())) return isoStr;
+            var Y = d.getFullYear();
+            var M = String(d.getMonth() + 1).padStart(2, '0');
+            var D = String(d.getDate()).padStart(2, '0');
+            var h = String(d.getHours()).padStart(2, '0');
+            var m = String(d.getMinutes()).padStart(2, '0');
+            return Y + '-' + M + '-' + D + ' ' + h + ':' + m;
+        }
+
+        // ========== 跳转详情 ==========
+        function goDetail(id) {
+            window.location.href = 'record-detail.html?id=' + encodeURIComponent(id);
+        }
+
+        // ========== 返回 ==========
+        function goBack() {
+            window.location.href = 'device-replacement.html';
+        }
+
+        // ========== 启动 ==========
+        init();
+    </script>
+</body>
+</html>

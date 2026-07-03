@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>更换记录详情</title>
+    <link rel="stylesheet" href="../../assets/libs/bootstrap-icons-1.13.1/fonts/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+            --border-color: #E5E5EA;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding-top: 48px;
+            padding-bottom: 40px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: 48px; background: #fff;
+            display: flex; align-items: center;
+            padding: 0 16px; z-index: 100;
+            box-shadow: 0 0.5px 2px rgba(0,0,0,0.08);
+        }
+        .header-back {
+            background: none; border: none; font-size: 22px;
+            color: var(--primary-color); cursor: pointer;
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .header-title {
+            font-size: 17px; font-weight: 600; color: var(--dark-text);
+            flex: 1; text-align: center; margin-right: 36px;
+        }
+
+        /* Section Card */
+        .section-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .page-content {
+            padding: 16px;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .section-header i {
+            font-size: 16px;
+            color: var(--primary-color);
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .section-header .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark-text);
+            flex: 1;
+        }
+        .section-header .section-tag {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+        .section-tag.completed {
+            background: rgba(52,199,89,0.12);
+            color: #34C759;
+        }
+        .section-tag.pending_install {
+            background: rgba(255,149,0,0.12);
+            color: #FF9500;
+        }
+
+        /* Info Row */
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            padding: 8px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .info-row .info-label {
+            color: var(--gray-text);
+            width: 80px;
+            flex-shrink: 0;
+        }
+        .info-row .info-value {
+            color: var(--dark-text);
+            flex: 1;
+            word-break: break-all;
+        }
+
+        /* Divider */
+        .section-divider {
+            height: 1px;
+            background: var(--light-bg);
+            margin: 12px 0;
+        }
+
+        /* Detail Text */
+        .detail-text-label {
+            font-size: 13px;
+            color: var(--gray-text);
+            margin-bottom: 8px;
+        }
+        .detail-text {
+            background: var(--light-bg);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--dark-text);
+        }
+
+        /* Photo Grid */
+        .photo-section-label {
+            font-size: 13px;
+            color: var(--gray-text);
+            margin-bottom: 8px;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .photo-placeholder {
+            aspect-ratio: 1;
+            background: var(--light-bg);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .photo-placeholder i {
+            font-size: 24px;
+            color: #C7C7CC;
+        }
+
+        /* Summary Card */
+        .summary-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 0;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .summary-device {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-text);
+            background: var(--light-bg);
+            padding: 8px 14px;
+            border-radius: 8px;
+        }
+        .summary-arrow {
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+        .summary-label {
+            font-size: 12px;
+            color: var(--gray-text);
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--gray-text);
+        }
+        .empty-state i {
+            font-size: 48px;
+            color: #D1D1D6;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .empty-state p {
+            font-size: 15px;
+        }
+
+        /* Bottom Spacer */
+        .bottom-spacer {
+            height: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <button class="header-back" onclick="goBack()">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h1 class="header-title">更换记录详情</h1>
+    </header>
+
+    <!-- Page Content -->
+    <div class="page-content" id="pageContent"></div>
+
+    <!-- Bottom Spacer -->
+    <div class="bottom-spacer"></div>
+
+    <script>
+        // ========== 映射表 ==========
+        var typeMap = {
+            full_replacement: '完整更换',
+            install_only: '仅新增安装'
+        };
+
+        var statusMap = {
+            completed: '已完成',
+            pending_install: '待安装'
+        };
+
+        var reasonTypeMap = {
+            fault: '故障更换',
+            prevent: '预防更换',
+            upgrade: '升级更换'
+        };
+
+        var oldDeviceStatusMap = {
+            repair: '返厂维修',
+            scrap: '报废处理',
+            stock: '回库待检'
+        };
+
+        // ========== 模拟数据 ==========
+        var mockRecords = [
+            {
+                id: 'RR-1719800001',
+                type: 'full_replacement',
+                oldDeviceId: 'DT-2024-009',
+                newDeviceId: 'DT-2024-015',
+                reasonType: 'fault',
+                reasonText: '寿命到期',
+                reasonDetail: '设备运行超过5年，传感器精度下降明显，偏差率达8.5%，超出允许范围。已确认需要更换。',
+                oldDeviceStatus: 'scrap',
+                removalPhotoCount: 3,
+                installPhotoCount: 2,
+                installLocation: '原位置-华东门区装配线A',
+                installRemark: '新设备校准参数：零点偏移+0.02，量程系数1.005。调试正常，数据已同步平台。',
+                operator: '张建国',
+                timestamp: '2026-07-03T14:30:00',
+                status: 'completed'
+            },
+            {
+                id: 'RR-1719800002',
+                type: 'full_replacement',
+                oldDeviceId: 'DT-2024-003',
+                newDeviceId: 'DT-2024-018',
+                reasonType: 'prevent',
+                reasonText: '腐蚀老化',
+                reasonDetail: '预防性更换，管道接口处有明显腐蚀迹象，预计半年内可能故障。',
+                oldDeviceStatus: 'stock',
+                removalPhotoCount: 2,
+                installPhotoCount: 1,
+                installLocation: '西部加压站2号管位',
+                installRemark: '更换顺利完成。',
+                operator: '张建国',
+                timestamp: '2026-07-02T09:15:00',
+                status: 'completed'
+            },
+            {
+                id: 'RP-1719800003',
+                type: 'full_replacement',
+                oldDeviceId: 'DT-2024-007',
+                newDeviceId: '',
+                reasonType: 'fault',
+                reasonText: '故障损坏',
+                reasonDetail: '雷击导致设备完全损坏，无信号输出。现场发现避雷设施老化。',
+                oldDeviceStatus: 'scrap',
+                removalPhotoCount: 4,
+                installPhotoCount: 0,
+                installLocation: '',
+                installRemark: '',
+                operator: '李明辉',
+                timestamp: '2026-07-01T16:45:00',
+                status: 'pending_install'
+            },
+            {
+                id: 'RR-1719800004',
+                type: 'full_replacement',
+                oldDeviceId: 'DT-2024-012',
+                newDeviceId: 'DT-2024-021',
+                reasonType: 'upgrade',
+                reasonText: '数据漂移',
+                reasonDetail: '升级为新型号，精度更高，响应速度更快。',
+                oldDeviceStatus: 'stock',
+                removalPhotoCount: 2,
+                installPhotoCount: 3,
+                installLocation: '东部调节池（新位置）',
+                installRemark: '新设备安装位置有所调整，距原位置向东约2米。',
+                operator: '张建国',
+                timestamp: '2026-06-28T11:20:00',
+                status: 'completed'
+            },
+            {
+                id: 'RI-1719800005',
+                type: 'install_only',
+                oldDeviceId: '',
+                newDeviceId: 'DT-2024-025',
+                reasonType: '',
+                reasonText: '',
+                reasonDetail: '',
+                oldDeviceStatus: '',
+                removalPhotoCount: 0,
+                installPhotoCount: 2,
+                installLocation: '新建站点-西部加压站',
+                installRemark: '新增设备安装，配合管网扩建工程。',
+                operator: '李明辉',
+                timestamp: '2026-06-25T08:50:00',
+                status: 'completed'
+            }
+        ];
+
+        // ========== 工具函数 ==========
+        function getUrlParam(name) {
+            var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURIComponent(r[2]);
+            return null;
+        }
+
+        function formatTime(isoStr) {
+            if (!isoStr) return '--';
+            var d = new Date(isoStr);
+            if (isNaN(d.getTime())) return isoStr;
+            var Y = d.getFullYear();
+            var M = String(d.getMonth() + 1).padStart(2, '0');
+            var D = String(d.getDate()).padStart(2, '0');
+            var h = String(d.getHours()).padStart(2, '0');
+            var m = String(d.getMinutes()).padStart(2, '0');
+            return Y + '-' + M + '-' + D + ' ' + h + ':' + m;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+        // ========== 查找记录 ==========
+        function findRecord(id) {
+            // 优先检查 localStorage
+            var allRecords = mockRecords.slice();
+
+            // 合并 replacementPending
+            try {
+                var pending = JSON.parse(localStorage.getItem('replacementPending') || '[]');
+                if (Array.isArray(pending)) {
+                    for (var i = 0; i < pending.length; i++) {
+                        if (pending[i].id === id) return pending[i];
+                        var exists = allRecords.some(function(r) { return r.id === pending[i].id; });
+                        if (!exists) {
+                            allRecords.unshift(pending[i]);
+                        }
+                    }
+                }
+            } catch (e) {}
+
+            // 合并 replacementHistory
+            try {
+                var history = JSON.parse(localStorage.getItem('replacementHistory') || '[]');
+                if (Array.isArray(history)) {
+                    for (var j = 0; j < history.length; j++) {
+                        if (history[j].id === id) return history[j];
+                        var exists2 = allRecords.some(function(r) { return r.id === history[j].id; });
+                        if (!exists2) {
+                            allRecords.push(history[j]);
+                        }
+                    }
+                }
+            } catch (e) {}
+
+            // 从合并后的列表中查找
+            for (var k = 0; k < allRecords.length; k++) {
+                if (allRecords[k].id === id) return allRecords[k];
+            }
+            return null;
+        }
+
+        // ========== 渲染照片网格 ==========
+        function renderPhotoGrid(count) {
+            if (!count || count <= 0) return '';
+            var html = '<div class="photo-grid">';
+            for (var i = 0; i < count; i++) {
+                html += '<div class="photo-placeholder"><i class="bi bi-camera"></i></div>';
+            }
+            html += '</div>';
+            return html;
+        }
+
+        // ========== 渲染页面 ==========
+        function renderPage() {
+            var id = getUrlParam('id');
+            var container = document.getElementById('pageContent');
+
+            if (!id) {
+                container.innerHTML =
+                    '<div class="empty-state">' +
+                        '<i class="bi bi-exclamation-circle"></i>' +
+                        '<p>记录不存在</p>' +
+                    '</div>';
+                return;
+            }
+
+            var record = findRecord(id);
+
+            if (!record) {
+                container.innerHTML =
+                    '<div class="empty-state">' +
+                        '<i class="bi bi-exclamation-circle"></i>' +
+                        '<p>记录不存在</p>' +
+                    '</div>';
+                return;
+            }
+
+            var html = '';
+
+            // ===== 卡片1: 基本信息 =====
+            html += '<div class="section-card">';
+            html += '<div class="section-header">';
+            html += '<i class="bi bi-info-circle"></i>';
+            html += '<span class="section-title">基本信息</span>';
+            // 状态标签
+            var statusLabel = statusMap[record.status] || record.status;
+            var statusClass = record.status === 'completed' ? 'completed' : 'pending_install';
+            if (statusLabel) {
+                html += '<span class="section-tag ' + statusClass + '">' + escapeHtml(statusLabel) + '</span>';
+            }
+            html += '</div>';
+
+            html += '<div class="info-row">';
+            html += '<span class="info-label">记录编号</span>';
+            html += '<span class="info-value">' + escapeHtml(record.id) + '</span>';
+            html += '</div>';
+
+            html += '<div class="info-row">';
+            html += '<span class="info-label">记录类型</span>';
+            html += '<span class="info-value">' + escapeHtml(typeMap[record.type] || record.type) + '</span>';
+            html += '</div>';
+
+            html += '<div class="info-row">';
+            html += '<span class="info-label">操作人员</span>';
+            html += '<span class="info-value">' + escapeHtml(record.operator || '未知') + '</span>';
+            html += '</div>';
+
+            html += '<div class="info-row">';
+            html += '<span class="info-label">提交时间</span>';
+            html += '<span class="info-value">' + formatTime(record.timestamp) + '</span>';
+            html += '</div>';
+
+            html += '<div class="info-row">';
+            html += '<span class="info-label">工单状态</span>';
+            html += '<span class="info-value">' + escapeHtml(statusLabel) + '</span>';
+            html += '</div>';
+
+            html += '</div>';
+
+            // ===== 卡片2: 旧设备拆除 (仅在非 install_only 时显示) =====
+            if (record.type !== 'install_only') {
+                html += '<div class="section-card">';
+                html += '<div class="section-header">';
+                html += '<i class="bi bi-box-seam"></i>';
+                html += '<span class="section-title">旧设备拆除</span>';
+                html += '</div>';
+
+                html += '<div class="info-row">';
+                html += '<span class="info-label">设备编号</span>';
+                html += '<span class="info-value">' + escapeHtml(record.oldDeviceId || '--') + '</span>';
+                html += '</div>';
+
+                if (record.reasonType) {
+                    html += '<div class="info-row">';
+                    html += '<span class="info-label">更换类型</span>';
+                    html += '<span class="info-value">' + escapeHtml(reasonTypeMap[record.reasonType] || record.reasonType) + '</span>';
+                    html += '</div>';
+                }
+
+                if (record.reasonText) {
+                    html += '<div class="info-row">';
+                    html += '<span class="info-label">更换原因</span>';
+                    html += '<span class="info-value">' + escapeHtml(record.reasonText) + '</span>';
+                    html += '</div>';
+                }
+
+                if (record.oldDeviceStatus) {
+                    html += '<div class="info-row">';
+                    html += '<span class="info-label">旧设备状态</span>';
+                    html += '<span class="info-value">' + escapeHtml(oldDeviceStatusMap[record.oldDeviceStatus] || record.oldDeviceStatus) + '</span>';
+                    html += '</div>';
+                }
+
+                // 原因详情
+                if (record.reasonDetail) {
+                    html += '<div class="section-divider"></div>';
+                    html += '<div class="detail-text-label">原因详情</div>';
+                    html += '<div class="detail-text">' + escapeHtml(record.reasonDetail) + '</div>';
+                }
+
+                // 现场照片
+                if (record.removalPhotoCount > 0) {
+                    html += '<div class="section-divider"></div>';
+                    html += '<div class="photo-section-label">现场照片 (' + record.removalPhotoCount + '张)</div>';
+                    html += renderPhotoGrid(record.removalPhotoCount);
+                }
+
+                html += '</div>';
+            }
+
+            // ===== 卡片3: 新设备安装 (仅在 newDeviceId 非空时显示) =====
+            if (record.newDeviceId) {
+                html += '<div class="section-card">';
+                html += '<div class="section-header">';
+                html += '<i class="bi bi-plus-circle"></i>';
+                html += '<span class="section-title">新设备安装</span>';
+                html += '</div>';
+
+                html += '<div class="info-row">';
+                html += '<span class="info-label">新设备编号</span>';
+                html += '<span class="info-value">' + escapeHtml(record.newDeviceId) + '</span>';
+                html += '</div>';
+
+                if (record.installLocation) {
+                    html += '<div class="info-row">';
+                    html += '<span class="info-label">安装位置</span>';
+                    html += '<span class="info-value">' + escapeHtml(record.installLocation) + '</span>';
+                    html += '</div>';
+                }
+
+                // 安装备注
+                if (record.installRemark) {
+                    html += '<div class="section-divider"></div>';
+                    html += '<div class="detail-text-label">安装备注</div>';
+                    html += '<div class="detail-text">' + escapeHtml(record.installRemark) + '</div>';
+                }
+
+                // 安装照片
+                if (record.installPhotoCount > 0) {
+                    html += '<div class="section-divider"></div>';
+                    html += '<div class="photo-section-label">安装照片 (' + record.installPhotoCount + '张)</div>';
+                    html += renderPhotoGrid(record.installPhotoCount);
+                }
+
+                html += '</div>';
+            }
+
+            // ===== 卡片4: 操作摘要 =====
+            if (record.oldDeviceId || record.newDeviceId) {
+                html += '<div class="section-card">';
+                html += '<div class="section-header">';
+                html += '<i class="bi bi-arrow-left-right"></i>';
+                html += '<span class="section-title">操作摘要</span>';
+                html += '</div>';
+
+                html += '<div class="summary-flow">';
+                if (record.oldDeviceId) {
+                    html += '<div>';
+                    html += '<div class="summary-device">' + escapeHtml(record.oldDeviceId) + '</div>';
+                    html += '<div class="summary-label">旧设备</div>';
+                    html += '</div>';
+                }
+                if (record.oldDeviceId && record.newDeviceId) {
+                    html += '<i class="bi bi-arrow-right summary-arrow"></i>';
+                }
+                if (record.newDeviceId) {
+                    html += '<div>';
+                    html += '<div class="summary-device">' + escapeHtml(record.newDeviceId) + '</div>';
+                    html += '<div class="summary-label">新设备</div>';
+                    html += '</div>';
+                }
+                html += '</div>';
+
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ========== 返回 ==========
+        function goBack() {
+            window.location.href = 'records.html';
+        }
+
+        // ========== 启动 ==========
+        renderPage();
+    </script>
+</body>
+</html>

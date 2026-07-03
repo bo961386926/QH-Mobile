@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备比对数据采集</title>
+    <!-- 引入Bootstrap Icons -->
+    <link rel="stylesheet" href="../../assets/libs/bootstrap-icons-1.13.1/fonts/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --light-bg: #F2F2F7;
+            --dark-text: #1C1C1E;
+            --gray-text: #8E8E93;
+            --card-bg: #FFFFFF;
+            --border-color: #E5E5EA;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            padding-top: 48px;
+            padding-bottom: 100px;
+        }
+        
+        /* 顶部导航栏 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #111111;
+            margin: 0;
+            flex: 1;
+            text-align: left;
+        }
+        
+        .header-back {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #666666;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-action {
+            background: none;
+            border: none;
+            font-size: 14px;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+        
+        .main-content {
+            padding: 16px;
+        }
+        
+        /* 设备信息卡片 */
+        .device-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .device-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 4px;
+        }
+        
+        .device-desc {
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+        
+        /* 表单分组 */
+        .form-group {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .form-label.required::after {
+            content: "*";
+            color: var(--danger-color);
+        }
+        
+        
+        /* 输入框 */
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .input-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .input-label {
+            font-size: 13px;
+            color: var(--gray-text);
+            min-width: 70px;
+        }
+        
+        .input-field {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .input-field input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--dark-text);
+            background-color: #fafafa;
+        }
+        
+        .input-field input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: white;
+        }
+        
+        .input-unit {
+            font-size: 13px;
+            color: var(--gray-text);
+            min-width: 30px;
+            text-align: right;
+        }
+        
+        .unit-dropdown {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--dark-text);
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        /* 偏差显示 */
+        .deviation-display {
+            background-color: #f5f5f5;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 12px;
+            border: 1px dashed var(--border-color);
+        }
+        
+        .deviation-label {
+            font-size: 12px;
+            color: var(--gray-text);
+            margin-bottom: 4px;
+        }
+        
+        .deviation-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--warning-color);
+        }
+        
+        .deviation-value.normal {
+            color: var(--secondary-color);
+        }
+        
+        .deviation-range {
+            font-size: 11px;
+            color: var(--gray-text);
+            margin-top: 4px;
+        }
+        
+        /* 文本区域 */
+        .textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--dark-text);
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            margin-top: 8px;
+        }
+        
+        .textarea::placeholder {
+            color: var(--gray-text);
+        }
+        
+        .textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        /* 下拉菜单 */
+        .select-field {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--dark-text);
+            background-color: white;
+            cursor: pointer;
+            margin-top: 8px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23666' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+        
+        .select-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        /* 照片网格 */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .photo-item {
+            position: relative;
+            padding-top: 100%;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .photo-item img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* 底部按钮 */
+        .footer-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 16px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            z-index: 90;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:active {
+            opacity: 0.8;
+        }
+        
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: var(--gray-text);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: flex-end;
+        }
+        
+        .modal-content {
+            background-color: white;
+            width: 100%;
+            border-radius: 12px 12px 0 0;
+            padding: 20px;
+            animation: slideUp 0.3s;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .modal-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--gray-text);
+            cursor: pointer;
+        }
+        
+        .modal-option {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--dark-text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .modal-option:last-child {
+            border-bottom: none;
+        }
+        
+        .modal-option:active {
+            background-color: #f5f5f5;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .header-action-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .header-action-group a {
+            font-size: 13px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        /* 参数选择标签 */
+        .param-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .param-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--dark-text);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .param-chip.checked {
+            background: rgba(0, 122, 255, 0.08);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .param-chip input[type="checkbox"] {
+            display: none;
+        }
+        
+        .param-chip .chip-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-color);
+            transition: background 0.2s;
+        }
+        
+        .param-chip.checked .chip-dot {
+            background: var(--primary-color);
+        }
+        
+        /* 比对参数卡片 */
+        .param-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+            animation: fadeIn 0.25s;
+        }
+        
+        .param-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .param-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+        
+        .param-card-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        
+        .param-card-badge.normal { background: rgba(52,199,89,0.1); color: var(--secondary-color); }
+        .param-card-badge.warn { background: rgba(255,149,0,0.1); color: var(--warning-color); }
+        .param-card-badge.error { background: rgba(255,59,48,0.1); color: var(--danger-color); }
+        .param-card-badge.pending { background: #f5f5f5; color: var(--gray-text); }
+        
+        .param-card .input-row { margin-bottom: 8px; }
+        .param-card .input-row:last-child { margin-bottom: 0; }
+        
+        /* 卡片内模式切换 */
+        .card-mode-tabs {
+            display: flex;
+            background: #f0f0f5;
+            border-radius: 6px;
+            padding: 2px;
+            margin: 8px 0;
+        }
+        
+        .card-mode-tab {
+            flex: 1;
+            padding: 6px 2px;
+            border: none;
+            background: none;
+            border-radius: 5px;
+            font-size: 11px;
+            color: var(--gray-text);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+        
+        .card-mode-tab.active {
+            background: white;
+            color: var(--primary-color);
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        }
+        
+        .card-mode-panel { display: none; }
+        .card-mode-panel.active { display: block; }
+        
+        .card-bt-area, .card-ocr-area {
+            padding: 12px;
+            border: 1px dashed var(--border-color);
+            border-radius: 6px;
+            text-align: center;
+            background: #fafafa;
+        }
+        
+        .card-bt-area .area-icon, .card-ocr-area .area-icon {
+            font-size: 24px;
+            color: var(--gray-text);
+            margin-bottom: 4px;
+        }
+        
+        .card-bt-area .area-text, .card-ocr-area .area-text {
+            font-size: 12px;
+            color: var(--dark-text);
+            margin-bottom: 8px;
+        }
+        
+        .card-scan-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--primary-color);
+            background: rgba(0,122,255,0.06);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .card-scan-btn:active { opacity: 0.7; }
+        
+        .card-result {
+            margin-top: 8px;
+            padding: 10px;
+            background: rgba(52,199,89,0.06);
+            border: 1px solid rgba(52,199,89,0.2);
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .card-result.show { display: block; }
+        
+        .param-reason {
+            margin-top: 8px;
+            display: none;
+        }
+        
+        .param-reason .reason-box {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            position: relative;
+        }
+        .param-reason .reason-box:focus-within {
+            border-color: var(--primary-color);
+        }
+        .param-reason .reason-box textarea {
+            width: 100%;
+            padding: 8px 38px 8px 10px;
+            border: none;
+            font-size: 12px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 42px;
+            background: transparent;
+            display: block;
+        }
+        .param-reason .reason-box textarea:focus {
+            outline: none;
+        }
+        .param-reason .reason-box .voice-fab {
+            position: absolute; right: 6px; bottom: 6px;
+            width: 26px; height: 26px; border-radius: 50%; border: none;
+            background: #F0F0F0; color: var(--gray-text); font-size: 12px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .param-reason .reason-box .voice-fab.recording {
+            background: #FF3B30; color: white;
+            animation: voicePulse 1s ease-in-out infinite;
+        }
+        .param-reason .reason-box .voice-fab-status {
+            position: absolute; right: 36px; bottom: 10px;
+            font-size: 10px; color: #FF3B30; white-space: nowrap;
+        }
+        
+        /* 备注输入框 */
+        .textarea-box {
+            border: 1px solid var(--border-color); border-radius: 8px; background: white;
+            position: relative;
+        }
+        .textarea-box:focus-within { border-color: var(--primary-color); }
+        .textarea-box .textarea-inner {
+            width: 100%; padding: 10px 44px 10px 12px; border: none; font-size: 14px;
+            color: var(--dark-text); font-family: inherit; resize: vertical;
+            min-height: 70px; background: transparent; display: block;
+        }
+        .textarea-box .textarea-inner:focus { outline: none; }
+        .textarea-box .voice-fab {
+            position: absolute; right: 8px; bottom: 8px;
+            width: 30px; height: 30px; border-radius: 50%; border: none;
+            background: #F0F0F0; color: var(--gray-text); font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .textarea-box .voice-fab.recording {
+            background: #FF3B30; color: white;
+            animation: voicePulse 1s ease-in-out infinite;
+        }
+        .textarea-box .voice-fab-status {
+            position: absolute; right: 44px; bottom: 14px;
+            font-size: 11px; color: #FF3B30; white-space: nowrap;
+        }
+        
+        /* 语音输入 */
+        .voice-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+        .voice-btn {
+            display: flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 14px; border: 1px solid var(--border-color);
+            background: white; font-size: 12px; color: var(--gray-text);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .voice-btn i { font-size: 14px; }
+        .voice-btn.recording {
+            border-color: #FF3B30; color: #FF3B30; background: #FFF5F5;
+            animation: voicePulse 1s ease-in-out infinite;
+        }
+        .voice-btn.recording i { color: #FF3B30; }
+        .voice-status { font-size: 11px; color: var(--gray-text); }
+        .voice-status.active { color: #FF3B30; }
+        @keyframes voicePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.3); }
+            50% { box-shadow: 0 0 0 6px rgba(255,59,48,0); }
+        }
+        .audio-list { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+        .audio-chip {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 10px; border-radius: 8px; background: #F5F5F7;
+            font-size: 12px; color: var(--dark-text);
+        }
+        .audio-chip .audio-play {
+            width: 28px; height: 28px; border-radius: 50%; border: none;
+            background: var(--secondary-color); color: white; font-size: 12px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0;
+        }
+        .audio-chip .audio-play.playing { background: #FF9500; }
+        .audio-chip .audio-info { flex: 1; min-width: 0; }
+        .audio-chip .audio-name { font-size: 12px; color: var(--dark-text); }
+        .audio-chip .audio-dur { font-size: 10px; color: var(--gray-text); }
+        .audio-chip .audio-del {
+            width: 22px; height: 22px; border-radius: 50%; border: none;
+            background: transparent; color: var(--gray-text); font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0;
+        }
+        
+        /* 比对类型水平标签 */
+        .type-chips {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .type-chip {
+            flex: 1;
+            padding: 8px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--gray-text);
+            background: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .type-chip.active {
+            background: rgba(0, 122, 255, 0.08);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        /* 环境参数多选标签 */
+        .env-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .env-chip {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            font-size: 12px;
+            color: var(--gray-text);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .env-chip.checked {
+            background: rgba(0, 122, 255, 0.08);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .env-custom-row {
+            display: flex; gap: 8px; margin-top: 10px; align-items: center;
+        }
+        .env-custom-input {
+            flex: 1; padding: 7px 12px; border: 1px solid var(--border-color);
+            border-radius: 18px; font-size: 12px; color: var(--dark-text);
+            background: white;
+        }
+        .env-custom-input:focus { outline: none; border-color: var(--primary-color); }
+        .env-custom-input::placeholder { color: #C7C7CC; }
+        .env-custom-add {
+            width: 30px; height: 30px; border-radius: 50%;
+            border: 1px solid var(--primary-color); background: rgba(0,122,255,0.06);
+            color: var(--primary-color); font-size: 16px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+        .env-custom-add:active { background: var(--primary-color); color: white; }
+        .env-custom-chips {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+        }
+        .env-custom-chips:empty { display: none; }
+        .env-custom-tag {
+            padding: 5px 10px; border: 1px solid var(--primary-color);
+            border-radius: 16px; font-size: 12px; color: var(--primary-color);
+            background: rgba(0,122,255,0.06); display: flex; align-items: center; gap: 4px;
+        }
+        .env-custom-tag .tag-remove {
+            background: none; border: none; color: var(--primary-color);
+            font-size: 14px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.6;
+        }
+        .env-custom-tag .tag-remove:active { opacity: 1; }
+        
+        /* 现场证据区 */
+        .media-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .media-counter {
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+        
+        .watermark-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+        
+        .toggle-switch {
+            width: 36px;
+            height: 20px;
+            background: #E5E5EA;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .toggle-switch.on {
+            background: var(--secondary-color);
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+        }
+        
+        .toggle-switch.on::after {
+            transform: translateX(16px);
+        }
+        
+        .video-card {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f5f5f5;
+            border: 1px solid var(--border-color);
+        }
+        
+        .video-card video {
+            width: 100%;
+            display: block;
+            max-height: 200px;
+        }
+        
+        .video-info {
+            padding: 8px 10px;
+            font-size: 11px;
+            color: var(--gray-text);
+            display: flex;
+            justify-content: space-between;
+            background: white;
+        }
+        
+        .media-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px 16px;
+            text-align: center;
+            background-color: #fafafa;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .media-upload-area:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .media-upload-area.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .media-upload-icon {
+            font-size: 28px;
+            color: var(--gray-text);
+            margin-bottom: 4px;
+        }
+        
+        .media-upload-text {
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+        
+        /* 照片水印覆盖层 */
+        .photo-item .watermark-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 4px 6px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.5));
+            color: white;
+            font-size: 8px;
+            line-height: 1.3;
+        }
+        
+        .photo-delete-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 22px;
+            height: 22px;
+            background-color: rgba(255, 59, 48, 0.85);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        
+        .video-delete-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(255, 59, 48, 0.85);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <button class="header-back" onclick="goBack()">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <h1 class="header-title">设备比对数据采集</h1>
+        <div class="header-action-group">
+            <button class="header-action" onclick="resetForm()">重置</button>
+        </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="main-content">
+        <!-- 设备信息 -->
+        <div class="device-card">
+            <div class="device-title" id="selectedDeviceId">DT-2024-009</div>
+            <div class="device-desc" id="selectedDeviceDesc">温度传感器·华东门区·装配线A</div>
+        </div>
+        
+        <!-- 比对类型 -->
+        <div class="form-group">
+            <div class="form-label required">比对类型</div>
+            <div class="type-chips">
+                <div class="type-chip active" onclick="selectType(this)" data-value="periodic">周期性校准</div>
+                <div class="type-chip" onclick="selectType(this)" data-value="fault">故障排查</div>
+                <div class="type-chip" onclick="selectType(this)" data-value="acceptance">验收测试</div>
+            </div>
+        </div>
+        
+        <!-- 比对指标 -->
+        <div class="form-group">
+            <div class="form-label required">比对指标</div>
+            <div class="input-row">
+                <div class="input-label">最近更新：</div>
+                <div class="input-field" style="flex: 1;">
+                    <span style="color: var(--gray-text); font-size: 13px;" id="standardUpdateTime">尚未获取</span>
+                </div>
+            </div>
+            <div class="input-row" style="margin-top: 4px;">
+                <div class="input-label"></div>
+                <div class="input-field">
+                    <button id="fetchStandardBtn" onclick="fetchStandardFromPlatform()" style="flex:1; padding:8px 12px; border:1px solid var(--primary-color); background:rgba(0,122,255,0.06); border-radius:6px; font-size:13px; color:var(--primary-color); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+                        <i class="bi bi-cloud-arrow-down" id="fetchIcon"></i> <span id="fetchText">从平台获取</span>
+                    </button>
+                </div>
+            </div>
+            <div id="paramSelection" style="display:none; margin-top: 12px;">
+                <div style="font-size:12px; color:var(--gray-text); margin-bottom:8px;">勾选需要比对的测量指标：</div>
+                <div class="param-chips" id="paramChips"></div>
+            </div>
+        </div>
+        
+        <!-- 比对参数组（动态生成） -->
+        <div id="paramCards"></div>
+        
+        <!-- 环境参数 -->
+        <div class="form-group">
+            <div class="form-label">现场环境</div>
+            <div class="env-chips" id="envChips">
+                <div class="env-chip" onclick="toggleEnv(this)" data-value="temp-high">高温（&gt;30°C）</div>
+                <div class="env-chip" onclick="toggleEnv(this)" data-value="temp-low">低温（&lt;10°C）</div>
+                <div class="env-chip" onclick="toggleEnv(this)" data-value="humid-high">高湿（&gt;80%）</div>
+                <div class="env-chip" onclick="toggleEnv(this)" data-value="humid-low">低湿（&lt;30%）</div>
+                <div class="env-chip" onclick="toggleEnv(this)" data-value="rain">雨天</div>
+                <div class="env-chip" onclick="toggleEnv(this)" data-value="outdoor">户外暴晒</div>
+                <div class="env-chip" onclick="toggleEnv(this)" data-value="vent-poor">通风不良</div>
+                <div class="env-chip" onclick="toggleEnv(this)" data-value="vibration">振动干扰</div>
+                <div class="env-chip" onclick="toggleEnv(this)" data-value="pipe-unstable">管道不稳定</div>
+                <div class="env-chip" onclick="toggleEnv(this)" data-value="normal">环境正常</div>
+            </div>
+            <!-- 自定义环境标签输入 -->
+            <div class="env-custom-row">
+                <input type="text" class="env-custom-input" id="envCustomInput" placeholder="其他环境情况，手动输入" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomEnv();}">
+                <button class="env-custom-add" onclick="addCustomEnv()"><i class="bi bi-plus"></i></button>
+            </div>
+            <div class="env-custom-chips" id="envCustomChips"></div>
+        </div>
+        
+        <!-- 现场证据 -->
+        <div class="form-group">
+            <div class="form-label">现场证据</div>
+            
+            <!-- 水印开关 -->
+            <div class="watermark-row">
+                <div class="toggle-switch on" id="watermarkToggle" onclick="toggleWatermark()"></div>
+                <span>照片自动添加水印（时间+设备+定位）</span>
+            </div>
+            
+            <!-- 照片区域 -->
+            <div class="media-section-header">
+                <span style="font-size:13px; color:var(--dark-text); font-weight:500;">照片</span>
+                <span class="media-counter" id="photoCounter">0/9</span>
+            </div>
+            <div class="photo-grid" id="photoGrid"></div>
+            <div class="media-upload-area" id="photoUploadArea" onclick="showPhotoSource()">
+                <div class="media-upload-icon"><i class="bi bi-camera"></i></div>
+                <div class="media-upload-text">拍照或从相册选择</div>
+            </div>
+            
+            <!-- 视频区域 -->
+            <div class="media-section-header" style="margin-top:14px;">
+                <span style="font-size:13px; color:var(--dark-text); font-weight:500;">视频</span>
+                <span class="media-counter" id="videoCounter">0/1</span>
+            </div>
+            <div id="videoPreview"></div>
+            <div class="media-upload-area" id="videoUploadArea" onclick="startVideoRecord()">
+                <div class="media-upload-icon"><i class="bi bi-camera-video"></i></div>
+                <div class="media-upload-text">点击录制视频（请控制在60秒以内）</div>
+            </div>
+        </div>
+        
+        <!-- 备注 -->
+        <div class="form-group">
+            <div class="form-label">备注</div>
+            <div class="textarea-box">
+                <textarea class="textarea-inner" id="remarkText" placeholder="填写其他需要说明的情况..."></textarea>
+                <button class="voice-fab" id="voiceBtn_remarkText" onclick="toggleRecord('remarkText', this)">
+                    <i class="bi bi-mic-fill"></i>
+                </button>
+                <span class="voice-fab-status" id="voiceStatus_remarkText"></span>
+            </div>
+            <div class="audio-list" id="audioList_remarkText"></div>
+        </div>
+        
+        <!-- 底部间距 -->
+        <div style="height: 100px;"></div>
+    </main>
+    
+    <!-- 底部按钮 -->
+    <div class="footer-buttons">
+        <button class="btn btn-secondary" onclick="saveDraft()">保存草稿</button>
+        <button class="btn btn-primary" onclick="submitForm()">提交比对</button>
+    </div>
+    
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="photoInput" accept="image/*" multiple style="display: none;" onchange="handlePhotoUpload(event)">
+    <input type="file" id="photoCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handlePhotoUpload(event)">
+    <input type="file" id="videoCameraInput" accept="video/*" capture="environment" style="display: none;" onchange="handleVideoUpload(event)">
+    
+    <script>
+        // ========== 设备数据模型（多指标） ==========
+        var deviceStandards = {
+            'DT-2024-009': { params: [
+                { key: 'temperature', label: '温度', value: 25.3, tolerance: 0.5, unit: '°C' },
+                { key: 'humidity', label: '湿度', value: 65.0, tolerance: 3.0, unit: '%RH' }
+            ]},
+            'DT-2024-001': { params: [
+                { key: 'temperature', label: '温度', value: 25.0, tolerance: 0.5, unit: '°C' }
+            ]},
+            'DT-2024-002': { params: [
+                { key: 'level', label: '液位', value: 3.85, tolerance: 0.1, unit: 'm' },
+                { key: 'flow', label: '流量', value: 12.5, tolerance: 0.5, unit: 'L/s' }
+            ]},
+            'DT-2024-010': { params: [
+                { key: 'ph', label: 'pH值', value: 7.0, tolerance: 0.3, unit: 'pH' },
+                { key: 'turbidity', label: '浊度', value: 1.5, tolerance: 0.5, unit: 'NTU' },
+                { key: 'temperature', label: '水温', value: 18.5, tolerance: 1.0, unit: '°C' }
+            ]},
+            'DT-2024-011': { params: [
+                { key: 'flow', label: '流量', value: 12.5, tolerance: 0.5, unit: 'L/s' },
+                { key: 'pressure', label: '压力', value: 0.35, tolerance: 0.05, unit: 'MPa' }
+            ]}
+        };
+        
+        // 蓝牙设备映射
+        var btDevices = {
+            'temperature': 'Fluke 52 II 温度计',
+            'humidity': 'Testo 605i 湿度计',
+            'level': 'Endress+Hauser 液位计',
+            'flow': 'Siemens MAG 6000 流量计',
+            'ph': 'HACH HQ40d 水质仪',
+            'turbidity': 'HACH 2100Q 浊度计',
+            'pressure': 'WIKA 数字压力计'
+        };
+        
+        // 模拟蓝牙读数
+        var btReadings = {
+            'DT-2024-009': { temperature: 26.1, humidity: 63.5 },
+            'DT-2024-001': { temperature: 25.2 },
+            'DT-2024-002': { level: 3.92, flow: 12.8 },
+            'DT-2024-010': { ph: 6.8, turbidity: 1.8, temperature: 18.2 },
+            'DT-2024-011': { flow: 12.8, pressure: 0.37 }
+        };
+        
+        // 模拟OCR读数
+        var ocrReadings = {
+            'DT-2024-009': { temperature: 26.0, humidity: 64.0 },
+            'DT-2024-001': { temperature: 25.1 },
+            'DT-2024-002': { level: 3.88, flow: 12.3 },
+            'DT-2024-010': { ph: 7.1, turbidity: 1.6, temperature: 18.8 },
+            'DT-2024-011': { flow: 12.3, pressure: 0.34 }
+        };
+        
+        // 当前已选参数列表
+        var selectedParams = [];
+        // 平台下发的所有参数
+        var allParams = [];
+        
+        // ========== 页面初始化 ==========
+        function initPage() {
+            const selectedDevice = JSON.parse(localStorage.getItem('selectedDevice') || '{}');
+            if (selectedDevice.id) {
+                document.getElementById('selectedDeviceId').textContent = selectedDevice.id;
+                document.getElementById('selectedDeviceDesc').textContent = selectedDevice.name;
+            }
+        }
+        
+        // ========== 从平台获取标准值 ==========
+        function fetchStandardFromPlatform() {
+            var btn = document.getElementById('fetchStandardBtn');
+            var icon = document.getElementById('fetchIcon');
+            var text = document.getElementById('fetchText');
+            var timeEl = document.getElementById('standardUpdateTime');
+            
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            icon.className = 'bi bi-arrow-repeat';
+            icon.style.animation = 'spin 0.8s linear infinite';
+            text.textContent = '正在获取...';
+            timeEl.textContent = '请求中...';
+            timeEl.style.color = 'var(--primary-color)';
+            
+            var deviceId = document.getElementById('selectedDeviceId').textContent;
+            
+            setTimeout(function() {
+                var device = deviceStandards[deviceId] || { params: [
+                    { key: 'unknown', label: '测量值', value: (20 + Math.random() * 10).toFixed(1), tolerance: 0.5, unit: '—' }
+                ]};
+                
+                allParams = device.params;
+                var now = new Date();
+                var timeStr = now.getFullYear() + '-' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(now.getDate()).padStart(2, '0') + ' ' +
+                    String(now.getHours()).padStart(2, '0') + ':' +
+                    String(now.getMinutes()).padStart(2, '0');
+                
+                timeEl.textContent = timeStr + '（平台下发 ' + allParams.length + ' 项指标）';
+                timeEl.style.color = 'var(--secondary-color)';
+                
+                // 渲染参数选择标签
+                renderParamChips(allParams);
+                document.getElementById('paramSelection').style.display = '';
+                
+                // 默认全选
+                selectedParams = allParams.map(function(p) { return p.key; });
+                allParams.forEach(function(p) {
+                    var chip = document.querySelector('.param-chip[data-key="' + p.key + '"]');
+                    if (chip) chip.classList.add('checked');
+                });
+                renderParamCards();
+                
+                // 恢复按钮
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                icon.className = 'bi bi-check-circle';
+                icon.style.animation = 'none';
+                text.textContent = '已获取';
+                btn.style.borderColor = 'var(--secondary-color)';
+                btn.style.color = 'var(--secondary-color)';
+                btn.style.background = 'rgba(52,199,89,0.06)';
+                
+                setTimeout(function() {
+                    icon.className = 'bi bi-cloud-arrow-down';
+                    text.textContent = '从平台获取';
+                    btn.style.borderColor = 'var(--primary-color)';
+                    btn.style.color = 'var(--primary-color)';
+                    btn.style.background = 'rgba(0,122,255,0.06)';
+                }, 3000);
+            }, 1200);
+        }
+        
+        // ========== 渲染参数选择标签 ==========
+        function renderParamChips(params) {
+            var html = '';
+            params.forEach(function(p) {
+                html += '<div class="param-chip" data-key="' + p.key + '" onclick="toggleParam(\'' + p.key + '\', this)">';
+                html += '<span class="chip-dot"></span>' + p.label + '（' + p.unit + '）</div>';
+            });
+            document.getElementById('paramChips').innerHTML = html;
+        }
+        
+        // ========== 切换参数选中 ==========
+        function toggleParam(key, el) {
+            var idx = selectedParams.indexOf(key);
+            if (idx > -1) {
+                selectedParams.splice(idx, 1);
+                el.classList.remove('checked');
+            } else {
+                selectedParams.push(key);
+                el.classList.add('checked');
+            }
+            renderParamCards();
+        }
+        
+        // ========== 渲染比对参数卡片 ==========
+        function renderParamCards() {
+            var container = document.getElementById('paramCards');
+            var html = '';
+            
+            selectedParams.forEach(function(key) {
+                var param = allParams.find(function(p) { return p.key === key; });
+                if (!param) return;
+                
+                html += '<div class="param-card" id="card-' + key + '">';
+                html += '  <div class="param-card-header">';
+                html += '    <div class="param-card-title">' + param.label + '</div>';
+                html += '    <span class="param-card-badge pending" id="badge-' + key + '">待测量</span>';
+                html += '  </div>';
+                
+                // 标准值行
+                html += '  <div class="input-row">';
+                html += '    <div class="input-label">标准值</div>';
+                html += '    <div class="input-field">';
+                html += '      <input type="number" value="' + param.value + '" step="0.01" id="std-' + key + '" oninput="calcParamDeviation(\'' + key + '\')">';
+                html += '      <div class="input-unit">' + param.unit + '</div>';
+                html += '    </div>';
+                html += '  </div>';
+                
+                // 模式切换
+                html += '  <div class="card-mode-tabs" id="tabs-' + key + '">';
+                html += '    <button class="card-mode-tab active" onclick="switchCardMode(\'' + key + '\',\'manual\')"><i class="bi bi-keyboard"></i> 手动</button>';
+                html += '    <button class="card-mode-tab" onclick="switchCardMode(\'' + key + '\',\'bluetooth\')"><i class="bi bi-bluetooth"></i> 蓝牙</button>';
+                html += '    <button class="card-mode-tab" onclick="switchCardMode(\'' + key + '\',\'ocr\')"><i class="bi bi-camera"></i> OCR</button>';
+                html += '  </div>';
+                
+                // 手动输入面板
+                html += '  <div class="card-mode-panel active" id="panel-manual-' + key + '">';
+                html += '    <div class="input-row">';
+                html += '      <div class="input-label">实测值</div>';
+                html += '      <div class="input-field">';
+                html += '        <input type="number" placeholder="输入实测值" step="0.01" id="mea-' + key + '" oninput="calcParamDeviation(\'' + key + '\')">';
+                html += '        <div class="input-unit">' + param.unit + '</div>';
+                html += '      </div>';
+                html += '    </div>';
+                html += '  </div>';
+                
+                // 蓝牙采集面板
+                html += '  <div class="card-mode-panel" id="panel-bluetooth-' + key + '">';
+                html += '    <div class="card-bt-area">';
+                html += '      <div class="area-icon"><i class="bi bi-bluetooth"></i></div>';
+                html += '      <div class="area-text">连接第三方检测设备采集' + param.label + '</div>';
+                html += '      <button class="card-scan-btn" onclick="btFillParam(\'' + key + '\')"><i class="bi bi-search"></i> 搜索并连接</button>';
+                html += '    </div>';
+                html += '    <div class="card-result" id="btResult-' + key + '">';
+                html += '      <div style="display:flex;justify-content:space-between;align-items:center;">';
+                html += '        <div><div style="font-size:11px;color:var(--gray-text);">已连接</div>';
+                html += '          <div style="font-size:13px;font-weight:600;" id="btDev-' + key + '">—</div></div>';
+                html += '        <i class="bi bi-check-circle-fill" style="font-size:18px;color:var(--secondary-color);"></i>';
+                html += '      </div>';
+                html += '      <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(52,199,89,0.15);">';
+                html += '        <div style="font-size:11px;color:var(--gray-text);">采集读数</div>';
+                html += '        <div style="font-size:18px;font-weight:700;" id="btVal-' + key + '">—</div>';
+                html += '      </div>';
+                html += '    </div>';
+                html += '  </div>';
+                
+                // OCR识别面板
+                html += '  <div class="card-mode-panel" id="panel-ocr-' + key + '">';
+                html += '    <div class="card-ocr-area">';
+                html += '      <div class="area-icon"><i class="bi bi-camera"></i></div>';
+                html += '      <div class="area-text">拍摄设备显示屏，自动识别' + param.label + '读数</div>';
+                html += '      <button class="card-scan-btn" onclick="ocrFillParam(\'' + key + '\')"><i class="bi bi-camera-fill"></i> 拍照识别</button>';
+                html += '    </div>';
+                html += '    <div class="card-result" id="ocrResult-' + key + '">';
+                html += '      <div style="display:flex;justify-content:space-between;align-items:center;">';
+                html += '        <div><div style="font-size:11px;color:var(--gray-text);">OCR结果</div>';
+                html += '          <div style="font-size:11px;color:var(--secondary-color);">置信度 <span id="ocrConf-' + key + '">—</span></div></div>';
+                html += '        <i class="bi bi-check-circle-fill" style="font-size:18px;color:var(--secondary-color);"></i>';
+                html += '      </div>';
+                html += '      <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(52,199,89,0.15);">';
+                html += '        <div style="font-size:11px;color:var(--gray-text);">识别读数</div>';
+                html += '        <div style="font-size:18px;font-weight:700;" id="ocrVal-' + key + '">—</div>';
+                html += '      </div>';
+                html += '    </div>';
+                html += '  </div>';
+                
+                // 偏差显示
+                html += '  <div class="deviation-display" id="dev-' + key + '" style="margin-top:8px;">';
+                html += '    <div class="deviation-label">等待输入实测值</div>';
+                html += '    <div class="deviation-range">允许偏差：±' + param.tolerance + ' ' + param.unit + '</div>';
+                html += '  </div>';
+                
+                // 偏差原因
+                html += '  <div class="param-reason" id="reason-' + key + '">';
+                html += '    <div class="reason-box">';
+                html += '      <textarea placeholder="偏差超出范围，请填写原因..." id="reasonText-' + key + '"></textarea>';
+                html += '      <button class="voice-fab" id="voiceBtn_reasonText-' + key + '" onclick="toggleRecord(\'reasonText-' + key + '\', this)">';
+                html += '        <i class="bi bi-mic-fill"></i>';
+                html += '      </button>';
+                html += '      <span class="voice-fab-status" id="voiceStatus_reasonText-' + key + '"></span>';
+                html += '    </div>';
+                html += '    <div class="audio-list" id="audioList_reasonText-' + key + '"></div>';
+                html += '  </div>';
+                html += '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // ========== 切换卡片内录入模式 ==========
+        function switchCardMode(key, mode) {
+            var tabs = document.querySelectorAll('#tabs-' + key + ' .card-mode-tab');
+            var modes = ['manual', 'bluetooth', 'ocr'];
+            tabs.forEach(function(tab, i) {
+                tab.classList.toggle('active', modes[i] === mode);
+            });
+            ['manual', 'bluetooth', 'ocr'].forEach(function(m) {
+                var panel = document.getElementById('panel-' + m + '-' + key);
+                if (panel) panel.classList.toggle('active', m === mode);
+            });
+        }
+        
+        // ========== 单参数偏差计算 ==========
+        function calcParamDeviation(key) {
+            var param = allParams.find(function(p) { return p.key === key; });
+            if (!param) return;
+            
+            var stdEl = document.getElementById('std-' + key);
+            var meaEl = document.getElementById('mea-' + key);
+            var devEl = document.getElementById('dev-' + key);
+            var badgeEl = document.getElementById('badge-' + key);
+            var reasonEl = document.getElementById('reason-' + key);
+            
+            var stdVal = parseFloat(stdEl.value) || 0;
+            var meaVal = parseFloat(meaEl.value);
+            
+            if (!meaEl.value || isNaN(meaVal)) {
+                devEl.innerHTML = '<div class="deviation-label">等待输入实测值</div><div class="deviation-range">允许偏差：±' + param.tolerance + ' ' + param.unit + '</div>';
+                badgeEl.className = 'param-card-badge pending';
+                badgeEl.textContent = '待测量';
+                reasonEl.style.display = 'none';
+                return;
+            }
+            
+            var deviation = meaVal - stdVal;
+            var absDev = Math.abs(deviation);
+            var statusText, statusClass, badgeClass;
+            
+            if (absDev <= param.tolerance) {
+                statusText = '正常';
+                statusClass = 'normal';
+                badgeClass = 'normal';
+                badgeEl.textContent = '正常';
+                reasonEl.style.display = 'none';
+            } else if (absDev <= param.tolerance * 2) {
+                statusText = '偏差（待复核）';
+                statusClass = '';
+                badgeClass = 'warn';
+                badgeEl.textContent = '待复核';
+                reasonEl.style.display = '';
+            } else {
+                statusText = '偏差（异常）';
+                statusClass = '';
+                badgeClass = 'error';
+                badgeEl.textContent = '异常';
+                reasonEl.style.display = '';
+            }
+            
+            var html = '<div class="deviation-label">' + statusText + '</div>';
+            html += '<div class="deviation-value ' + statusClass + '">' + (deviation > 0 ? '+' : '') + deviation.toFixed(2) + ' ' + param.unit + '</div>';
+            html += '<div class="deviation-range">允许：±' + param.tolerance + ' ' + param.unit + '（当前：' + (deviation > 0 ? '+' : '') + deviation.toFixed(2) + ' ' + param.unit + '）</div>';
+            devEl.innerHTML = html;
+            badgeEl.className = 'param-card-badge ' + badgeClass;
+        }
+        
+        // ========== 蓝牙采集（单参数，卡片内面板） ==========
+        function btFillParam(key) {
+            var deviceId = document.getElementById('selectedDeviceId').textContent;
+            var param = allParams.find(function(p) { return p.key === key; });
+            if (!param) return;
+            
+            var readings = btReadings[deviceId] || {};
+            var reading = readings[key];
+            if (reading === undefined) {
+                reading = parseFloat((param.value * (0.95 + Math.random() * 0.1)).toFixed(2));
+            }
+            
+            var btn = event.target.closest('.card-scan-btn');
+            var origHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-arrow-repeat" style="animation:spin 0.8s linear infinite;display:inline-block;"></i> 连接中...';
+            
+            setTimeout(function() {
+                btn.innerHTML = origHTML;
+                btn.disabled = false;
+                
+                // 显示结果卡片
+                var resultEl = document.getElementById('btResult-' + key);
+                resultEl.classList.add('show');
+                document.getElementById('btDev-' + key).textContent = btDevices[key] || '检测设备';
+                document.getElementById('btVal-' + key).textContent = reading + ' ' + param.unit;
+                
+                // 自动填入实测值（写入手动面板的输入框）
+                document.getElementById('mea-' + key).value = reading;
+                calcParamDeviation(key);
+                
+                showToast('蓝牙 ' + (btDevices[key] || '设备') + ' 已连接');
+            }, 1500);
+        }
+        
+        // ========== OCR识别（单参数，卡片内面板） ==========
+        function ocrFillParam(key) {
+            var deviceId = document.getElementById('selectedDeviceId').textContent;
+            var param = allParams.find(function(p) { return p.key === key; });
+            if (!param) return;
+            
+            var readings = ocrReadings[deviceId] || {};
+            var reading = readings[key];
+            var confidence = (85 + Math.floor(Math.random() * 13)) + '%';
+            if (reading === undefined) {
+                reading = parseFloat((param.value * (0.96 + Math.random() * 0.08)).toFixed(2));
+            }
+            
+            var btn = event.target.closest('.card-scan-btn');
+            var origHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-arrow-repeat" style="animation:spin 0.8s linear infinite;display:inline-block;"></i> 识别中...';
+            
+            setTimeout(function() {
+                btn.innerHTML = origHTML;
+                btn.disabled = false;
+                
+                // 显示结果卡片
+                var resultEl = document.getElementById('ocrResult-' + key);
+                resultEl.classList.add('show');
+                document.getElementById('ocrConf-' + key).textContent = confidence;
+                document.getElementById('ocrVal-' + key).textContent = reading + ' ' + param.unit;
+                
+                // 自动填入实测值
+                document.getElementById('mea-' + key).value = reading;
+                calcParamDeviation(key);
+                
+                showToast('OCR识别完成（' + confidence + '）');
+            }, 1200);
+        }
+        
+        // ========== 比对类型切换 ==========
+        function selectType(el) {
+            document.querySelectorAll('.type-chip').forEach(function(c) { c.classList.remove('active'); });
+            el.classList.add('active');
+        }
+        
+        // ========== 环境参数多选 ==========
+        function toggleEnv(el) {
+            // 点击"环境正常"时，取消其他选中
+            if (el.dataset.value === 'normal') {
+                document.querySelectorAll('.env-chip').forEach(function(c) { c.classList.remove('checked'); });
+                el.classList.add('checked');
+                return;
+            }
+            // 点击其他时，取消"环境正常"
+            document.querySelector('.env-chip[data-value="normal"]').classList.remove('checked');
+            el.classList.toggle('checked');
+        }
+        
+        function getSelectedEnv() {
+            var selected = [];
+            document.querySelectorAll('.env-chip.checked').forEach(function(c) {
+                selected.push(c.dataset.value);
+            });
+            // 加入自定义标签
+            document.querySelectorAll('.env-custom-tag').forEach(function(tag) {
+                selected.push('custom:' + tag.dataset.text);
+            });
+            return selected;
+        }
+        
+        // ========== 自定义环境标签 ==========
+        function addCustomEnv() {
+            var input = document.getElementById('envCustomInput');
+            var text = input.value.trim();
+            if (!text) return;
+            
+            var container = document.getElementById('envCustomChips');
+            // 防止重复
+            var exists = false;
+            container.querySelectorAll('.env-custom-tag').forEach(function(tag) {
+                if (tag.dataset.text === text) exists = true;
+            });
+            if (exists) { input.value = ''; return; }
+            
+            var tag = document.createElement('div');
+            tag.className = 'env-custom-tag';
+            tag.dataset.text = text;
+            tag.innerHTML = '<span>' + text + '</span><button class="tag-remove" onclick="removeCustomEnv(this)"><i class="bi bi-x"></i></button>';
+            container.appendChild(tag);
+            input.value = '';
+            
+            // 取消"环境正常"
+            document.querySelector('.env-chip[data-value="normal"]').classList.remove('checked');
+        }
+        
+        function removeCustomEnv(btn) {
+            btn.parentElement.remove();
+        }
+        
+        // ========== 轻量toast ==========
+        function showToast(msg) {
+            var toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:white;padding:10px 20px;border-radius:20px;font-size:13px;z-index:400;max-width:80%;text-align:center;';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 2500);
+        }
+        
+        // ========== 语音录音 ==========
+        var mediaRecorder = null;
+        var recordTargetId = null;
+        var recordBtnEl = null;
+        var recordChunks = [];
+        var recordTimer = null;
+        var recordSeconds = 0;
+        var audioRecordings = {};
+        var currentPlayingAudio = null;
+        var currentPlayingBtn = null;
+        
+        function toggleRecord(targetId, btnEl) {
+            if (currentPlayingAudio) {
+                currentPlayingAudio.pause();
+                currentPlayingAudio.currentTime = 0;
+                if (currentPlayingBtn) currentPlayingBtn.classList.remove('playing');
+                if (currentPlayingBtn) currentPlayingBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+                currentPlayingAudio = null;
+                currentPlayingBtn = null;
+            }
+            
+            if (mediaRecorder && recordTargetId === targetId) {
+                mediaRecorder.stop();
+                return;
+            }
+            
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showToast('当前浏览器不支持录音');
+                return;
+            }
+            
+            recordTargetId = targetId;
+            recordBtnEl = btnEl;
+            recordChunks = [];
+            recordSeconds = 0;
+            
+            var statusEl = document.getElementById('voiceStatus_' + targetId);
+            
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = function(e) {
+                    if (e.data.size > 0) recordChunks.push(e.data);
+                };
+                
+                mediaRecorder.onstop = function() {
+                    stream.getTracks().forEach(function(t) { t.stop(); });
+                    clearInterval(recordTimer);
+                    
+                    btnEl.classList.remove('recording');
+                    btnEl.innerHTML = '<i class="bi bi-mic-fill"></i>';
+                    statusEl.textContent = '';
+                    
+                    if (recordChunks.length > 0) {
+                        var blob = new Blob(recordChunks, { type: 'audio/webm' });
+                        var url = URL.createObjectURL(blob);
+                        var dur = formatDuration(recordSeconds);
+                        var idx = Date.now();
+                        
+                        if (!audioRecordings[targetId]) audioRecordings[targetId] = [];
+                        audioRecordings[targetId].push({ id: idx, url: url, duration: dur, blob: blob });
+                        
+                        renderAudioList(targetId);
+                    }
+                    
+                    mediaRecorder = null;
+                    recordTargetId = null;
+                    recordBtnEl = null;
+                    recordChunks = [];
+                };
+                
+                mediaRecorder.start();
+                btnEl.classList.add('recording');
+                btnEl.innerHTML = '<i class="bi bi-stop-fill"></i>';
+                statusEl.textContent = '00:00';
+                
+                recordTimer = setInterval(function() {
+                    recordSeconds++;
+                    statusEl.textContent = formatDuration(recordSeconds);
+                }, 1000);
+                
+            }).catch(function(err) {
+                showToast('无法获取麦克风权限');
+                btnEl.classList.remove('recording');
+                btnEl.innerHTML = '<i class="bi bi-mic-fill"></i>';
+            });
+        }
+        
+        function formatDuration(sec) {
+            var m = Math.floor(sec / 60);
+            var s = sec % 60;
+            return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+        }
+        
+        function renderAudioList(targetId) {
+            var container = document.getElementById('audioList_' + targetId);
+            if (!container) return;
+            var list = audioRecordings[targetId] || [];
+            if (list.length === 0) { container.innerHTML = ''; return; }
+            
+            var html = '';
+            list.forEach(function(item, i) {
+                html += '<div class="audio-chip" id="audioChip_' + targetId + '_' + item.id + '">';
+                html += '  <button class="audio-play" onclick="playAudio(\'' + targetId + '\', ' + item.id + ', this)">';
+                html += '    <i class="bi bi-play-fill"></i>';
+                html += '  </button>';
+                html += '  <div class="audio-info">';
+                html += '    <div class="audio-name">录音 ' + (i + 1) + '</div>';
+                html += '    <div class="audio-dur">' + item.duration + '</div>';
+                html += '  </div>';
+                html += '  <button class="audio-del" onclick="deleteAudio(\'' + targetId + '\', ' + item.id + ')">';
+                html += '    <i class="bi bi-x"></i>';
+                html += '  </button>';
+                html += '</div>';
+            });
+            container.innerHTML = html;
+        }
+        
+        function playAudio(targetId, audioId, btnEl) {
+            if (currentPlayingAudio && currentPlayingBtn === btnEl) {
+                currentPlayingAudio.pause();
+                currentPlayingAudio.currentTime = 0;
+                btnEl.classList.remove('playing');
+                btnEl.innerHTML = '<i class="bi bi-play-fill"></i>';
+                currentPlayingAudio = null;
+                currentPlayingBtn = null;
+                return;
+            }
+            
+            if (currentPlayingAudio) {
+                currentPlayingAudio.pause();
+                currentPlayingAudio.currentTime = 0;
+                if (currentPlayingBtn) {
+                    currentPlayingBtn.classList.remove('playing');
+                    currentPlayingBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+                }
+            }
+            
+            var list = audioRecordings[targetId] || [];
+            var item = list.find(function(r) { return r.id === audioId; });
+            if (!item) return;
+            
+            var audio = new Audio(item.url);
+            currentPlayingAudio = audio;
+            currentPlayingBtn = btnEl;
+            
+            btnEl.classList.add('playing');
+            btnEl.innerHTML = '<i class="bi bi-pause-fill"></i>';
+            
+            audio.onended = function() {
+                btnEl.classList.remove('playing');
+                btnEl.innerHTML = '<i class="bi bi-play-fill"></i>';
+                currentPlayingAudio = null;
+                currentPlayingBtn = null;
+            };
+            
+            audio.play();
+        }
+        
+        function deleteAudio(targetId, audioId) {
+            var list = audioRecordings[targetId] || [];
+            audioRecordings[targetId] = list.filter(function(r) { return r.id !== audioId; });
+            
+            if (currentPlayingAudio) {
+                currentPlayingAudio.pause();
+                currentPlayingAudio.currentTime = 0;
+                if (currentPlayingBtn) {
+                    currentPlayingBtn.classList.remove('playing');
+                    currentPlayingBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+                }
+                currentPlayingAudio = null;
+                currentPlayingBtn = null;
+            }
+            
+            renderAudioList(targetId);
+        }
+        
+        // ========== 水印开关 ==========
+        var watermarkEnabled = true;
+        function toggleWatermark() {
+            watermarkEnabled = !watermarkEnabled;
+            document.getElementById('watermarkToggle').classList.toggle('on', watermarkEnabled);
+        }
+        
+        // ========== 来源选择弹窗 ==========
+        function showPhotoSource() {
+            var count = document.querySelectorAll('#photoGrid .photo-item').length;
+            if (count >= 9) { showToast('最多上传9张照片'); return; }
+            
+            var modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+            modal.innerHTML = '<div class="modal-content">' +
+                '<div class="modal-header"><span>选择照片来源</span><button class="modal-close" onclick="this.closest(\'.modal\').remove()"><i class="bi bi-x"></i></button></div>' +
+                '<div class="modal-option" onclick="document.getElementById(\'photoCameraInput\').click();this.closest(\'.modal\').remove();"><i class="bi bi-camera" style="margin-right:8px;"></i>拍照</div>' +
+                '<div class="modal-option" onclick="document.getElementById(\'photoInput\').click();this.closest(\'.modal\').remove();"><i class="bi bi-images" style="margin-right:8px;"></i>从相册选择</div>' +
+                '</div>';
+            document.body.appendChild(modal);
+        }
+        
+        function startVideoRecord() {
+            if (document.getElementById('videoPreview').children.length > 0) {
+                showToast('仅支持上传1个视频'); return;
+            }
+            document.getElementById('videoCameraInput').click();
+        }
+        
+        // ========== 照片上传+水印 ==========
+        function handlePhotoUpload(event) {
+            var files = event.target.files;
+            var photoGrid = document.getElementById('photoGrid');
+            var currentCount = photoGrid.querySelectorAll('.photo-item').length;
+            var remaining = 9 - currentCount;
+            
+            var filesToProcess = Array.from(files).slice(0, remaining);
+            
+            filesToProcess.forEach(function(file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    if (watermarkEnabled) {
+                        applyWatermark(e.target.result, function(watermarkedDataUrl) {
+                            addPhotoItem(photoGrid, watermarkedDataUrl, file.name);
+                        });
+                    } else {
+                        addPhotoItem(photoGrid, e.target.result, file.name);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            // 重置input以允许重复选择同一文件
+            event.target.value = '';
+        }
+        
+        function applyWatermark(imageDataUrl, callback) {
+            var img = new Image();
+            img.onload = function() {
+                var canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                // 水印信息
+                var deviceId = document.getElementById('selectedDeviceId').textContent;
+                var now = new Date();
+                var timeStr = now.getFullYear() + '-' +
+                    String(now.getMonth()+1).padStart(2,'0') + '-' +
+                    String(now.getDate()).padStart(2,'0') + ' ' +
+                    String(now.getHours()).padStart(2,'0') + ':' +
+                    String(now.getMinutes()).padStart(2,'0') + ':' +
+                    String(now.getSeconds()).padStart(2,'0');
+                var gpsStr = 'N30.27° E120.15°（模拟）';
+                
+                // 底部半透明水印条
+                var barH = Math.max(60, Math.floor(canvas.height * 0.10));
+                var padL = Math.max(10, Math.floor(canvas.width * 0.02));
+                ctx.fillStyle = 'rgba(0,0,0,0.50)';
+                ctx.fillRect(0, canvas.height - barH, canvas.width, barH);
+                
+                // 水印文字
+                var fontSize = Math.max(14, Math.floor(canvas.height * 0.032));
+                var smallFont = Math.max(12, Math.floor(canvas.height * 0.026));
+                var lineGap = Math.floor(fontSize * 1.5);
+                var baseY = canvas.height - barH + Math.floor((barH - lineGap - smallFont) / 2) + fontSize;
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold ' + fontSize + 'px sans-serif';
+                ctx.fillText(timeStr + '  ' + deviceId, padL, baseY);
+                ctx.font = smallFont + 'px sans-serif';
+                ctx.fillText(gpsStr, padL, baseY + lineGap);
+                
+                callback(canvas.toDataURL('image/jpeg', 0.85));
+            };
+            img.src = imageDataUrl;
+        }
+        
+        function addPhotoItem(grid, dataUrl, fileName) {
+            var count = grid.querySelectorAll('.photo-item').length;
+            if (count >= 9) return;
+            
+            var item = document.createElement('div');
+            item.className = 'photo-item';
+            item.innerHTML = '<img src="' + dataUrl + '" alt="photo">' +
+                '<button class="photo-delete-btn" onclick="deletePhoto(this)"><i class="bi bi-x"></i></button>';
+            grid.appendChild(item);
+            updatePhotoCounter();
+        }
+        
+        function deletePhoto(btn) {
+            btn.parentElement.remove();
+            updatePhotoCounter();
+        }
+        
+        function updatePhotoCounter() {
+            var count = document.querySelectorAll('#photoGrid .photo-item').length;
+            document.getElementById('photoCounter').textContent = count + '/9';
+            var area = document.getElementById('photoUploadArea');
+            if (count >= 9) {
+                area.classList.add('disabled');
+            } else {
+                area.classList.remove('disabled');
+            }
+        }
+        
+        // ========== 视频上传 ==========
+        var MAX_VIDEO_DURATION = 60; // 秒
+        var MAX_VIDEO_SIZE_MB = 50;
+        
+        function handleVideoUpload(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            event.target.value = '';
+            
+            // 检查文件大小
+            var sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            if (parseFloat(sizeMB) > MAX_VIDEO_SIZE_MB) {
+                showToast('视频文件过大（' + sizeMB + 'MB），请压缩后重试（限' + MAX_VIDEO_SIZE_MB + 'MB）');
+                return;
+            }
+            
+            // 检查时长
+            var video = document.createElement('video');
+            video.preload = 'metadata';
+            video.onloadedmetadata = function() {
+                URL.revokeObjectURL(video.src);
+                var duration = Math.round(video.duration);
+                
+                if (duration > MAX_VIDEO_DURATION) {
+                    showToast('视频时长 ' + duration + 's 超出限制（限' + MAX_VIDEO_DURATION + '秒），请裁剪后重试');
+                    return;
+                }
+                
+                showVideoPreview(file, duration, sizeMB);
+            };
+            video.src = URL.createObjectURL(file);
+        }
+        
+        function showVideoPreview(file, duration, sizeMB) {
+            var container = document.getElementById('videoPreview');
+            var url = URL.createObjectURL(file);
+            
+            var min = Math.floor(duration / 60);
+            var sec = String(duration % 60).padStart(2, '0');
+            
+            container.innerHTML = '<div class="video-card">' +
+                '<button class="video-delete-btn" onclick="deleteVideo()"><i class="bi bi-x"></i></button>' +
+                '<video src="' + url + '" controls style="width:100%;max-height:200px;border-radius:8px 8px 0 0;"></video>' +
+                '<div class="video-info"><span>' + min + ':' + sec + '</span><span>' + sizeMB + ' MB</span><span style="color:var(--secondary-color);">✓ 已就绪</span></div>' +
+                '</div>';
+            
+            document.getElementById('videoUploadArea').classList.add('disabled');
+            updateVideoCounter(1);
+        }
+        
+        function deleteVideo() {
+            document.getElementById('videoPreview').innerHTML = '';
+            document.getElementById('videoUploadArea').classList.remove('disabled');
+            updateVideoCounter(0);
+        }
+        
+        function updateVideoCounter(count) {
+            document.getElementById('videoCounter').textContent = count + '/1';
+        }
+        
+        // ========== 重置表单 ==========
+        function resetForm() {
+            document.getElementById('paramCards').innerHTML = '';
+            document.getElementById('paramChips').innerHTML = '';
+            document.getElementById('paramSelection').style.display = 'none';
+            document.getElementById('standardUpdateTime').textContent = '尚未获取';
+            document.getElementById('standardUpdateTime').style.color = 'var(--gray-text)';
+            
+            // 清除照片和视频
+            document.getElementById('photoGrid').innerHTML = '';
+            document.getElementById('videoPreview').innerHTML = '';
+            document.getElementById('photoUploadArea').classList.remove('disabled');
+            document.getElementById('videoUploadArea').classList.remove('disabled');
+            updatePhotoCounter();
+            updateVideoCounter(0);
+            
+            // 清除环境标签
+            document.querySelectorAll('.env-chip').forEach(function(c) { c.classList.remove('checked'); });
+            
+            // 重置获取按钮
+            var btn = document.getElementById('fetchStandardBtn');
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            document.getElementById('fetchIcon').className = 'bi bi-cloud-arrow-down';
+            document.getElementById('fetchIcon').style.animation = 'none';
+            document.getElementById('fetchText').textContent = '从平台获取';
+            btn.style.borderColor = 'var(--primary-color)';
+            btn.style.color = 'var(--primary-color)';
+            btn.style.background = 'rgba(0,122,255,0.06)';
+            
+            selectedParams = [];
+            allParams = [];
+            
+            // 清除备注
+            document.getElementById('remarkText').value = '';
+            if (audioRecordings['remarkText']) {
+                audioRecordings['remarkText'] = [];
+                renderAudioList('remarkText');
+            }
+        }
+        
+        // ========== 保存草稿 ==========
+        function saveDraft() {
+            var deviceInfo = JSON.parse(localStorage.getItem('selectedDevice') || '{}');
+            var paramsData = [];
+            selectedParams.forEach(function(key) {
+                var param = allParams.find(function(p) { return p.key === key; });
+                paramsData.push({
+                    key: key,
+                    label: param ? param.label : key,
+                    standardValue: document.getElementById('std-' + key).value,
+                    measureValue: document.getElementById('mea-' + key).value,
+                    reason: (document.getElementById('reasonText-' + key) || {}).value || ''
+                });
+            });
+            var draft = {
+                deviceId: deviceInfo.id || document.getElementById('selectedDeviceId').textContent,
+                comparisonType: document.querySelector('.type-chip.active').getAttribute('data-value'),
+                selectedParamKeys: selectedParams,
+                params: paramsData,
+                env: getSelectedEnv(),
+                remark: document.getElementById('remarkText').value || '',
+                savedAt: new Date().toISOString()
+            };
+            localStorage.setItem('comparisonDraft', JSON.stringify(draft));
+            showToast('草稿已保存');
+        }
+        
+        // ========== 加载草稿 ==========
+        function loadDraft() {
+            var draft = JSON.parse(localStorage.getItem('comparisonDraft') || 'null');
+            if (!draft) return;
+            var deviceInfo = JSON.parse(localStorage.getItem('selectedDevice') || '{}');
+            if (draft.deviceId !== (deviceInfo.id || document.getElementById('selectedDeviceId').textContent)) return;
+            
+            // 恢复比对类型
+            document.querySelectorAll('.type-chip').forEach(function(c) { c.classList.remove('active'); });
+            var typeChip = document.querySelector('.type-chip[data-value="' + draft.comparisonType + '"]');
+            if (typeChip) typeChip.classList.add('active');
+            
+            // 恢复环境标签
+            if (draft.env) {
+                draft.env.forEach(function(v) {
+                    if (v.indexOf('custom:') === 0) {
+                        // 自定义标签：重新创建
+                        var text = v.substring(7);
+                        var container = document.getElementById('envCustomChips');
+                        var tag = document.createElement('div');
+                        tag.className = 'env-custom-tag';
+                        tag.dataset.text = text;
+                        tag.innerHTML = '<span>' + text + '</span><button class="tag-remove" onclick="removeCustomEnv(this)"><i class="bi bi-x"></i></button>';
+                        container.appendChild(tag);
+                    } else {
+                        var chip = document.querySelector('.env-chip[data-value="' + v + '"]');
+                        if (chip) chip.classList.add('checked');
+                    }
+                });
+            }
+            
+            // 恢复备注
+            if (draft.remark) {
+                document.getElementById('remarkText').value = draft.remark;
+            }
+            
+            // 注意：参数值需要先 fetchStandard 才能恢复，这里仅标记
+            showToast('已恢复草稿（请点击"从平台获取"后自动填充）');
+            window._pendingDraft = draft;
+            localStorage.removeItem('comparisonDraft');
+        }
+        
+        // ========== 提交表单 ==========
+        function submitForm() {
+            if (selectedParams.length === 0) {
+                alert('请先从平台获取比对指标');
+                return;
+            }
+            
+            var comparisonType = document.querySelector('.type-chip.active').getAttribute('data-value');
+            var typeLabel = {periodic:'周期性校准',fault:'故障排查',acceptance:'验收测试'}[comparisonType];
+            var deviceInfo = JSON.parse(localStorage.getItem('selectedDevice') || '{}');
+            var envSelected = getSelectedEnv();
+            var photoCount = document.querySelectorAll('#photoGrid .photo-item').length;
+            var hasVideo = document.getElementById('videoPreview').children.length > 0;
+            
+            // 收集所有参数数据并验证
+            var paramsResults = [];
+            var hasEmpty = false;
+            var hasDeviationWithoutReason = false;
+            
+            selectedParams.forEach(function(key) {
+                var param = allParams.find(function(p) { return p.key === key; });
+                var stdVal = document.getElementById('std-' + key).value;
+                var meaVal = document.getElementById('mea-' + key).value;
+                var reasonEl = document.getElementById('reasonText-' + key);
+                var reason = reasonEl ? reasonEl.value : '';
+                
+                if (!meaVal) { hasEmpty = true; }
+                
+                var std = parseFloat(stdVal) || 0;
+                var mea = parseFloat(meaVal) || 0;
+                var dev = (mea - std).toFixed(2);
+                var absDev = Math.abs(parseFloat(dev));
+                
+                if (absDev > param.tolerance && !reason) {
+                    hasDeviationWithoutReason = true;
+                }
+                
+                paramsResults.push({
+                    key: key,
+                    label: param.label,
+                    standardValue: stdVal,
+                    measureValue: meaVal,
+                    deviation: dev,
+                    unit: param.unit,
+                    tolerance: param.tolerance,
+                    reason: reason
+                });
+            });
+            
+            if (hasEmpty) {
+                alert('请填写所有已选指标的实测值');
+                return;
+            }
+            if (hasDeviationWithoutReason) {
+                alert('存在偏差超出允许范围的指标，请填写偏差原因');
+                return;
+            }
+            
+            var record = {
+                id: 'CR-' + Date.now(),
+                deviceId: deviceInfo.id || document.getElementById('selectedDeviceId').textContent,
+                deviceName: deviceInfo.name || document.getElementById('selectedDeviceDesc').textContent,
+                comparisonType: typeLabel,
+                params: paramsResults,
+                environment: envSelected,
+                remark: document.getElementById('remarkText').value || '',
+                hasRemarkAudio: (audioRecordings['remarkText'] && audioRecordings['remarkText'].length > 0),
+                photoCount: photoCount,
+                hasVideo: hasVideo,
+                watermarkEnabled: watermarkEnabled,
+                operator: (JSON.parse(localStorage.getItem('currentUser') || '{}').name || '未知') + '（' + (JSON.parse(localStorage.getItem('currentUser') || '{}').id || '--') + '）',
+                timestamp: new Date().toISOString(),
+                cloudStatus: 'uploading'
+            };
+            
+            showUploadOverlay(record);
+        }
+        
+        // ========== 上报动画 ==========
+        function showUploadOverlay(record) {
+            var overlay = document.createElement('div');
+            overlay.id = 'uploadOverlay';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:300;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = '<div style="background:white;border-radius:12px;padding:32px 24px;text-align:center;width:300px;">' +
+                '<div id="uploadSpinner" style="width:48px;height:48px;border:4px solid #E5E5EA;border-top-color:#007AFF;border-radius:50%;margin:0 auto 16px;animation:spin 0.8s linear infinite;"></div>' +
+                '<div id="uploadTitle" style="font-size:16px;font-weight:600;color:#1C1C1E;margin-bottom:8px;">正在上报云平台...</div>' +
+                '<div id="uploadDesc" style="font-size:13px;color:#8E8E93;">比对数据上传中，请稍候</div></div>';
+            document.body.appendChild(overlay);
+            
+            setTimeout(function() {
+                var records = JSON.parse(localStorage.getItem('calibrationRecords') || '[]');
+                record.cloudStatus = 'uploaded';
+                records.unshift(record);
+                localStorage.setItem('calibrationRecords', JSON.stringify(records));
+                
+                // 构建偏差摘要
+                var devSummary = '';
+                record.params.forEach(function(p) {
+                    var devNum = parseFloat(p.deviation);
+                    var icon = Math.abs(devNum) <= p.tolerance ? '<span style="color:#34C759;">✓</span>' : '<span style="color:#FF9500;">!</span>';
+                    devSummary += '<div style="margin-bottom:2px;">' + icon + ' ' + p.label + '：' + (devNum > 0 ? '+' : '') + p.deviation + ' ' + p.unit + '</div>';
+                });
+                
+                document.getElementById('uploadSpinner').style.display = 'none';
+                document.getElementById('uploadTitle').innerHTML = '<i class="bi bi-check-circle-fill" style="color:#34C759;font-size:32px;"></i><br>上报成功';
+                document.getElementById('uploadDesc').innerHTML =
+                    '<div style="text-align:left;margin-top:12px;padding:12px;background:#f5f5f5;border-radius:8px;font-size:12px;color:#666;">' +
+                    '<div style="margin-bottom:4px;"><b>记录编号：</b>' + record.id + '</div>' +
+                    '<div style="margin-bottom:4px;"><b>设备：</b>' + record.deviceId + '</div>' +
+                    '<div style="margin-bottom:4px;"><b>操作人员：</b>' + record.operator + '</div>' +
+                    '<div style="margin-bottom:6px;">' + devSummary + '</div>' +
+                    '<div style="margin-bottom:4px;"><b>现场证据：</b>' + record.photoCount + ' 张照片' + (record.hasVideo ? ' + 1 个视频' : '') + (record.watermarkEnabled ? '（已加水印）' : '') + '</div>' +
+                    '<div><b>云端状态：</b><span style="color:#34C759;">✓ 已上报</span></div></div>';
+                
+                var actionDiv = document.createElement('div');
+                actionDiv.style.cssText = 'display:flex;gap:8px;margin-top:16px;';
+                actionDiv.innerHTML =
+                    '<button onclick="document.getElementById(\'uploadOverlay\').remove();window.history.back();" style="flex:1;padding:10px;border:1px solid #E5E5EA;background:#f5f5f5;border-radius:8px;font-size:14px;cursor:pointer;">返回</button>' +
+                    '<button onclick="document.getElementById(\'uploadOverlay\').remove();resetForm();" style="flex:1;padding:10px;border:none;background:#007AFF;color:white;border-radius:8px;font-size:14px;cursor:pointer;">继续比对</button>';
+                overlay.querySelector('div').appendChild(actionDiv);
+            }, 1500);
+        }
+        
+        // ========== 平台同步检测 ==========
+        function checkSyncFromPlatform() {
+            var syncData = localStorage.getItem('syncToDevice_' + (JSON.parse(localStorage.getItem('selectedDevice') || '{}').id || ''));
+            if (syncData) {
+                var info = JSON.parse(syncData);
+                var banner = document.createElement('div');
+                banner.style.cssText = 'margin:0 16px 12px;padding:12px;background:rgba(52,199,89,0.08);border:1px solid rgba(52,199,89,0.3);border-radius:8px;font-size:13px;color:#34C759;display:flex;gap:8px;align-items:center;';
+                banner.innerHTML = '<i class="bi bi-cloud-arrow-down" style="font-size:18px;"></i><div>已收到平台同步的校准记录 <b>' + info.recordId + '</b>，请核实数据标记。</div>';
+                document.querySelector('.main-content').insertBefore(banner, document.querySelector('.device-card'));
+                localStorage.removeItem('syncToDevice_' + info.deviceId);
+            }
+        }
+        
+        function goBack() { window.history.back(); }
+        
+        // ========== 初始化 ==========
+        window.addEventListener('load', function() {
+            initPage();
+            checkSyncFromPlatform();
+            resetForm();
+            loadDraft();
+        });
+    </script>
+</body>
+</html>
