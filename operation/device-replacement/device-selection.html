@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>选择设备 - 设备比对</title>
+    <title>选择设备 - 设备更换</title>
     <link rel="stylesheet" href="../../assets/libs/bootstrap-icons-1.13.1/fonts/bootstrap-icons.css">
     <style>
         :root {
@@ -50,11 +50,12 @@
         }
         .header-back:active { background: rgba(0,0,0,0.06); }
         .header-title { font-size: 17px; font-weight: 600; }
-        .header-action {
-            background: none; border: none; font-size: 14px; color: var(--primary);
-            padding: 6px 12px; cursor: pointer; border-radius: var(--radius-sm); font-weight: 500;
+        .header-target-tag {
+            font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 600;
+            white-space: nowrap; flex-shrink: 0;
         }
-        .header-action:active { background: var(--primary-bg); }
+        .header-target-tag.old { background: rgba(255,149,0,0.1); color: #FF9500; }
+        .header-target-tag.new { background: rgba(52,199,89,0.1); color: #34C759; }
 
         /* ======== MAIN ======= */
         .main-content {
@@ -64,7 +65,7 @@
         @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
 
         /* =============================================
-           SEARCH BAR — PROTAGONIST (美团式大搜索)
+           SEARCH BAR — 美团式大搜索
            ============================================= */
         .search-hero {
             background: var(--surface);
@@ -267,7 +268,7 @@
         }
         .device-dist-badge.near { background: rgba(52,199,89,0.1); color: var(--success); }
         .device-dist-badge.mid  { background: #F2F2F7; color: var(--text-secondary); }
-        .device-dist-badge.far   { background: #F2F2F7; color: var(--text-tertiary); }
+        .device-dist-badge.far  { background: #F2F2F7; color: var(--text-tertiary); }
         .device-chevron { color: var(--text-tertiary); font-size: 13px; flex-shrink: 0; margin-left: 2px; transition: transform var(--transition); }
         .device-card:active .device-chevron { transform: translateX(2px); }
 
@@ -315,6 +316,7 @@
         .ptr-indicator { text-align:center;padding:6px;color:var(--text-tertiary);font-size:13px;display:none; }
         .ptr-indicator.show { display:block; }
         .ptr-spinner { display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px; }
+        @keyframes spin { to{transform:rotate(360deg)} }
     </style>
 </head>
 <body>
@@ -344,15 +346,15 @@
     <!-- Header -->
     <header class="header">
         <button class="header-back" onclick="goBack()"><i class="bi bi-chevron-left"></i></button>
-        <span class="header-title">选择设备</span>
-        <button class="header-action" </button> 
+        <span class="header-title" id="pageTitle">选择设备</span>
+        <span class="header-target-tag old" id="targetTag">待拆除</span>
     </header>
 
     <!-- Main Content -->
     <main class="main-content" id="mainContent">
         <div class="ptr-indicator" id="ptrIndicator"><span class="ptr-spinner"></span>刷新中...</div>
 
-        <!-- ★ 搜索栏 — 页面主角 -->
+        <!-- 搜索栏 -->
         <div class="search-hero">
             <div class="search-icon-wrap"><i class="bi bi-search"></i></div>
             <input type="search" class="search-input" id="deviceSearch"
@@ -363,7 +365,7 @@
             <button class="search-more-btn" onclick="openActionSheet()"><i class="bi bi-three-dots-vertical"></i></button>
         </div>
 
-        <!-- ★ 筛选紧凑行 — 定位 + 范围（美团式辅助信息） -->
+        <!-- 筛选紧凑行 -->
         <div class="filter-compact">
             <div class="loc-pill" id="locPill">
                 <span class="loc-icon pulsing" id="locIcon"><i class="bi bi-geo-alt-fill"></i></span>
@@ -396,6 +398,19 @@
     <input type="file" id="qrInput" accept="image/*" capture="environment" style="display:none" onchange="handleQrCapture(event)">
 
     <script>
+        // ========== CONFIG — 从 URL 参数读取目标 ==========
+        var params = new URLSearchParams(window.location.search);
+        var pickTarget = params.get('target') || 'old'; // 'old' | 'new'
+        var excludeId = params.get('exclude') || '';    // 要排除的设备ID
+
+        // 根据 target 设置 UI
+        if (pickTarget === 'new') {
+            document.getElementById('pageTitle').textContent = '选择新设备';
+            var tag = document.getElementById('targetTag');
+            tag.textContent = '新安装';
+            tag.className = 'header-target-tag new';
+        }
+
         // ========== DATA ==========
         var sites = [
             { id: 'site-001', name: '城东水质监测站', address: '城东区污水处理厂区', lat: 30.2741, lng: 120.1551, color: '#007AFF' },
@@ -403,16 +418,25 @@
             { id: 'site-003', name: '北区管网监测点', address: '北区供水管网枢纽', lat: 30.3000, lng: 120.1700, color: '#34C759' }
         ];
         var allDevices = [
-            { id: 'DT-2024-009', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'type-temp', site: 'site-001', location: '一期生化池', lat: 30.2743, lng: 120.1553, status: 'online' },
-            { id: 'DT-2024-001', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'type-temp', site: 'site-001', location: '二期沉淀池', lat: 30.2750, lng: 120.1560, status: 'online' },
-            { id: 'DT-2024-002', name: '液位计', type: '超声波液位计', icon: 'bi-water', iconClass: 'type-level', site: 'site-001', location: '进水口', lat: 30.2760, lng: 120.1545, status: 'online' },
-            { id: 'DT-2024-010', name: '水质分析仪', type: '多参数水质监测仪', icon: 'bi-droplet-half', iconClass: 'type-water', site: 'site-001', location: '出水口', lat: 30.2780, lng: 120.1580, status: 'offline' },
-            { id: 'DT-2024-011', name: '流量计', type: '电磁流量计', icon: 'bi-speedometer2', iconClass: 'type-flow', site: 'site-002', location: '主泵房', lat: 30.2605, lng: 120.1305, status: 'online' },
-            { id: 'DT-2024-012', name: '压力传感器', type: '压阻式压力变送器', icon: 'bi-gauge', iconClass: 'type-water', site: 'site-002', location: '出水管道', lat: 30.2610, lng: 120.1310, status: 'online' },
-            { id: 'DT-2024-013', name: '液位计', type: '雷达液位计', icon: 'bi-water', iconClass: 'type-level', site: 'site-002', location: '集水井', lat: 30.2615, lng: 120.1295, status: 'online' },
-            { id: 'DT-2024-014', name: '流量计', type: '超声波流量计', icon: 'bi-speedometer2', iconClass: 'type-flow', site: 'site-003', location: '主管段', lat: 30.3005, lng: 120.1705, status: 'online' },
-            { id: 'DT-2024-015', name: '压力传感器', type: '压力变送器', icon: 'bi-gauge', iconClass: 'type-water', site: 'site-003', location: '分支管段', lat: 30.3010, lng: 120.1710, status: 'online' }
+            { id: 'DT-2024-001', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'type-temp', site: 'site-001', location: '一期生化池', lat: 30.2743, lng: 120.1553, status: 'online', paramKeys:['temperature','humidity'] },
+            { id: 'DT-2024-002', name: '液位计', type: '超声波液位计', icon: 'bi-water', iconClass: 'type-level', site: 'site-001', location: '进水口', lat: 30.2760, lng: 120.1545, status: 'online', paramKeys:['level'] },
+            { id: 'DT-2024-003', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'type-temp', site: 'site-001', location: '二期沉淀池', lat: 30.2750, lng: 120.1560, status: 'online', paramKeys:['temperature','humidity'] },
+            { id: 'DT-2024-004', name: '流量计', type: '电磁流量计', icon: 'bi-speedometer2', iconClass: 'type-flow', site: 'site-001', location: '总出水口', lat: 30.2770, lng: 120.1558, status: 'online', paramKeys:['flow'] },
+            { id: 'DT-2024-005', name: '压力传感器', type: '压阻式压力变送器', icon: 'bi-gauge', iconClass: 'type-water', site: 'site-001', location: '泵房主管道', lat: 30.2735, lng: 120.1540, status: 'online', paramKeys:['pressure'] },
+            { id: 'DT-2024-006', name: '水质分析仪', type: '多参数水质监测仪', icon: 'bi-droplet-half', iconClass: 'type-water', site: 'site-001', location: '出水口', lat: 30.2780, lng: 120.1580, status: 'offline', paramKeys:['ph','turbidity'] },
+            { id: 'DT-2024-007', name: '液位计', type: '雷达液位计', icon: 'bi-water', iconClass: 'type-level', site: 'site-002', location: '集水井A', lat: 30.2605, lng: 120.1305, status: 'online', paramKeys:['level'] },
+            { id: 'DT-2024-008', name: '流量计', type: '超声波流量计', icon: 'bi-speedometer2', iconClass: 'type-flow', site: 'site-002', location: '出水管道', lat: 30.2610, lng: 120.1310, status: 'online', paramKeys:['flow'] },
+            { id: 'DT-2024-009', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'type-temp', site: 'site-002', location: '泵房内部', lat: 30.2615, lng: 120.1295, status: 'online', paramKeys:['temperature','humidity'] },
+            { id: 'DT-2024-010', name: '压力传感器', type: '压力变送器', icon: 'bi-gauge', iconClass: 'type-water', site: 'site-003', location: '主管段A', lat: 30.3005, lng: 120.1705, status: 'online', paramKeys:['pressure'] },
+            { id: 'DT-2024-011', name: '流量计', type: '电磁流量计', icon: 'bi-speedometer2', iconClass: 'type-flow', site: 'site-003', location: '分支管段B', lat: 30.3010, lng: 120.1710, status: 'online', paramKeys:['flow'] },
+            { id: 'DT-2024-012', name: '液位计', type: '静压液位计', icon: 'bi-water', iconClass: 'type-level', site: 'site-003', location: '蓄水池', lat: 30.3020, lng: 120.1690, status: 'offline', paramKeys:['level'] },
+            { id: 'DT-2024-013', name: '水质分析仪', type: '在线水质监测仪', icon: 'bi-droplet-half', iconClass: 'type-water', site: 'site-003', location: '监测点B', lat: 30.3015, lng: 120.1720, status: 'online', paramKeys:['ph','turbidity'] }
         ];
+
+        // 排除已选设备
+        if (excludeId) {
+            allDevices = allDevices.filter(function(d) { return d.id !== excludeId; });
+        }
 
         // ========== STATE ==========
         var currentSite = 'all';
@@ -429,8 +453,8 @@
         function getDistClass(m) { return m < 200 ? 'near' : m < 1000 ? 'mid' : 'far'; }
 
         // ========== RADIUS ==========
-        function setRadius(m) {
-            currentRadius = meters = m;
+        function setRadius(meters) {
+            currentRadius = meters;
             document.querySelectorAll('.radius-chip').forEach(function(el) {
                 el.classList.toggle('active', parseInt(el.dataset.r) === meters);
             });
@@ -453,12 +477,6 @@
             setTimeout(function() {
                 userLocation = { lat: 30.2745, lng: 120.1555 };
                 icon.classList.remove('pulsing'); btn.classList.remove('spinning'); pill.classList.add('located');
-
-                var nearestSite = null, nearestDist = Infinity;
-                sites.forEach(function(s) {
-                    var d = calcDistance(userLocation.lat, userLocation.lng, s.lat, s.lng);
-                    if (d < nearestDist) { nearestDist = d; nearestSite = s; }
-                });
                 updateLocPill();
                 renderSiteStrip(); renderDevices();
             }, 1000);
@@ -543,7 +561,6 @@
             document.getElementById('resultHint').textContent = userLocation
                 ? (currentRadius>=1000?(currentRadius/1000)+'km':currentRadius+'m') + '内 · 按距离排序' : '';
 
-            // Empty
             if (devices.length === 0) {
                 var et, ed, ea;
                 if (searchText) { et='未找到匹配的设备'; ed='试试其他关键词'; ea='clearSearch()'; }
@@ -565,7 +582,7 @@
                         '<span class="group-name">'+(site?site.name:'')+'</span><span class="group-count">'+sd.length+'台</span></div>';
                 }
                 var distHtml = d._dist!==undefined ? '<span class="device-dist-badge '+getDistClass(d._dist)+'">'+formatDistance(d._dist)+'</span>' : '';
-                html += '<div class="device-card" onclick="selectDevice(\''+d.id+'\',\''+d.name+'·'+(site?site.name:'')+'·'+d.location+'\')">'+
+                html += '<div class="device-card" onclick="selectDevice(\''+d.id+'\')">'+
                     '<div class="device-status-dot '+(d.status==='offline'?'offline':'online')+'"></div>'+
                     '<div class="device-icon '+d.iconClass+'"><i class="bi '+d.icon+'"></i></div>'+
                     '<div class="device-info"><div class="device-id">'+d.id+'</div><div class="device-detail">'+d.type+' · '+d.location+'</div></div>'+
@@ -600,8 +617,8 @@
             setTimeout(function() {
                 ov.style.opacity='0'; ov.style.transition='opacity .3s';
                 setTimeout(function(){ov.remove()},300);
-                showToast('识别成功：DT-2024-009');
-                setTimeout(function(){selectDevice('DT-2024-009','温度传感器·城东水质监测站·一期生化池')},600);
+                showToast('识别成功：DT-2024-001');
+                setTimeout(function(){selectDevice('DT-2024-001')},600);
             }, 2000);
         }
         function handleQrCapture(event) {}
@@ -611,15 +628,26 @@
             setTimeout(function(){
                 document.getElementById('nfcOverlay').classList.remove('show');
                 showToast('NFC感应成功：DT-2024-002');
-                setTimeout(function(){selectDevice('DT-2024-002','液位计·城东水质监测站·进水口')},600);
+                setTimeout(function(){selectDevice('DT-2024-002')},600);
             },2500);
         }
         function cancelNfc() { document.getElementById('nfcOverlay').classList.remove('show'); }
 
-        // ========== DEVICE SELECTION ==========
-        function selectDevice(id, name) {
-            localStorage.setItem('selectedDevice', JSON.stringify({id:id,name:name}));
-            window.location.href = 'device-comparison.html';
+        // ========== DEVICE SELECTION — 写 localStorage 并跳转主流程 ==========
+        function selectDevice(deviceId) {
+            var device = allDevices.find(function(d) { return d.id === deviceId; });
+            if (!device) return;
+            localStorage.setItem('selectedReplaceDevice', JSON.stringify({
+                id: device.id,
+                name: device.name,
+                type: device.type,
+                location: device.location,
+                status: device.status,
+                paramKeys: device.paramKeys,
+                target: pickTarget
+            }));
+            // 直接跳转到主流程页
+            window.location.href = 'device-replacement.html';
         }
 
         // ========== TOAST ==========

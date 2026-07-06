@@ -16,130 +16,323 @@
             --gray-text: #8E8E93;
             --card-bg: #FFFFFF;
             --border-color: #E5E5EA;
+            --mode-replace: #FF9500;
+            --mode-replace-light: rgba(255,149,0,0.08);
+            --mode-install: #34C759;
+            --mode-install-light: rgba(52,199,89,0.08);
+            --mode-remove: #FF3B30;
+            --mode-remove-light: rgba(255,59,48,0.08);
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: var(--light-bg); color: var(--dark-text);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            min-height: 100vh; padding-top: 48px; padding-bottom: 90px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh; padding-top: 48px; padding-bottom: 82px;
         }
-        
-        /* Header */
+
+        /* ===== 顶部导航 ===== */
         .header {
-            position: fixed; top: 0; left: 0; right: 0;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 48px;
             background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-color); z-index: 100;
-            height: 48px; display: flex; align-items: center;
-            justify-content: space-between; padding: 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; padding: 0 16px; gap: 12px;
         }
-        .header-title { font-size: 18px; font-weight: bold; color: #111; flex: 1; text-align: left; }
         .header-back {
             background: none; border: none; font-size: 20px; color: #666;
-            cursor: pointer; width: 36px; height: 36px;
+            cursor: pointer; width: 32px; height: 32px; display: flex;
+            align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .header-title {
+            font-size: 17px; font-weight: 700; color: #111; flex: 1;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .header-mode-tag {
+            font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 600;
+            white-space: nowrap; flex-shrink: 0;
+        }
+
+        /* ===== 模式选择页 ===== */
+        .mode-screen { padding: 0 16px 24px; }
+        .mode-screen-title {
+            font-size: 22px; font-weight: 700; color: var(--dark-text);
+            margin-bottom: 6px; text-align: center;
+        }
+        .mode-screen-sub {
+            font-size: 13px; color: var(--gray-text); text-align: center; margin-bottom: 28px; line-height: 1.5;
+        }
+        .mode-cards { display: flex; flex-direction: column; gap: 14px; }
+        .mode-card {
+            background: white; border-radius: 14px; padding: 20px; cursor: pointer;
+            border: 2px solid var(--border-color); transition: all 0.25s;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .mode-card:active { transform: scale(0.98); }
+        .mode-card-icon {
+            width: 52px; height: 52px; border-radius: 14px;
             display: flex; align-items: center; justify-content: center;
+            font-size: 24px; flex-shrink: 0;
         }
-        .main-content { padding: 16px; }
-        
-        /* 待完成提示条 */
-        .pending-banner {
-            display: none; align-items: center; gap: 10px;
-            padding: 12px 14px; background: rgba(255, 149, 0, 0.08);
-            border: 1px solid rgba(255, 149, 0, 0.25); border-radius: 10px;
-            margin-bottom: 14px; cursor: pointer; transition: all 0.2s;
+        .mode-card-body { flex: 1; min-width: 0; }
+        .mode-card-name { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+        .mode-card-desc { font-size: 12px; color: var(--gray-text); line-height: 1.5; }
+        .mode-card-steps {
+            display: flex; gap: 6px; margin-top: 8px;
         }
-        .pending-banner:active { background: rgba(255, 149, 0, 0.14); }
-        .pending-banner.show { display: flex; }
-        .pending-banner i { font-size: 20px; color: var(--warning-color); flex-shrink: 0; }
-        .pending-banner-text { flex: 1; }
-        .pending-banner-title { font-size: 14px; font-weight: 500; color: var(--dark-text); }
-        .pending-banner-sub { font-size: 12px; color: var(--gray-text); margin-top: 2px; }
-        .pending-banner-chevron { color: var(--warning-color); font-size: 16px; }
-        
-        /* 模式切换 */
-        .mode-switch {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 14px; background: white; border-radius: 10px;
-            border: 1px solid var(--border-color); margin-bottom: 16px;
+        .mode-card-steps span {
+            font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 500;
         }
-        .mode-switch-label { flex: 1; font-size: 14px; color: var(--dark-text); }
-        .mode-switch-hint { font-size: 12px; color: var(--gray-text); }
-        .toggle-switch {
-            width: 46px; height: 26px; border-radius: 13px;
-            background: #E5E5EA; position: relative; cursor: pointer;
-            transition: background 0.3s; flex-shrink: 0;
+        .mode-card-arrow { color: var(--gray-text); font-size: 18px; flex-shrink: 0; }
+
+        /* 各模式卡片样式 */
+        .mode-card.card-replace { border-color: rgba(255,149,0,0.2); }
+        .mode-card.card-replace:active { border-color: var(--mode-replace); background: #FFFBF5; }
+        .mode-card.card-replace .mode-card-icon { background: #FFF3E0; color: var(--mode-replace); }
+        .mode-card.card-replace .mode-card-name { color: var(--mode-replace); }
+        .mode-card.card-replace .mode-card-steps span {
+            background: rgba(255,149,0,0.08); color: var(--mode-replace);
         }
-        .toggle-switch.on { background: var(--primary-color); }
-        .toggle-switch::after {
-            content: ''; width: 22px; height: 22px; border-radius: 50%;
-            background: white; position: absolute; top: 2px; left: 2px;
-            transition: left 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+
+        .mode-card.card-install { border-color: rgba(52,199,89,0.2); }
+        .mode-card.card-install:active { border-color: var(--mode-install); background: #F6FFF8; }
+        .mode-card.card-install .mode-card-icon { background: #E8F8ED; color: var(--mode-install); }
+        .mode-card.card-install .mode-card-name { color: var(--mode-install); }
+        .mode-card.card-install .mode-card-steps span {
+            background: rgba(52,199,89,0.08); color: var(--mode-install);
         }
-        .toggle-switch.on::after { left: 22px; }
-        
-        /* 区域卡片 */
-        .section-card {
-            background: white; border-radius: 12px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 16px; overflow: hidden;
+
+        .mode-card.card-remove { border-color: rgba(255,59,48,0.2); }
+        .mode-card.card-remove:active { border-color: var(--mode-remove); background: #FFF5F5; }
+        .mode-card.card-remove .mode-card-icon { background: #FEE; color: var(--mode-remove); }
+        .mode-card.card-remove .mode-card-name { color: var(--mode-remove); }
+        .mode-card.card-remove .mode-card-steps span {
+            background: rgba(255,59,48,0.08); color: var(--mode-remove);
         }
-        .section-header {
-            display: flex; align-items: center; gap: 8px;
-            padding: 14px 16px; border-bottom: 1px solid var(--border-color);
-            background: #fafafa;
+
+        /* ===== 流程页 ===== */
+        .flow-screen { display: none; padding-top: 0; }
+        .flow-screen.active { display: block; }
+
+        /* ===== 作业打卡 ===== */
+        .clock-card {
+            margin: 0 16px 12px; background: white; border-radius: 12px;
+            border: 1px solid var(--border-color); overflow: hidden;
         }
-        .section-icon {
-            width: 32px; height: 32px; border-radius: 8px;
+        .clock-card-header {
+            display: flex; align-items: center; gap: 8px; padding: 12px 14px 0;
+            font-size: 13px; font-weight: 600; color: var(--gray-text);
+        }
+        .clock-card-header i { font-size: 16px; }
+        .clock-card-header.doing { color: var(--warning-color); }
+        .clock-card-header.doing .clock-dot {
+            width: 8px; height: 8px; border-radius: 50%; background: var(--warning-color);
+            animation: clockPulse 1.2s infinite;
+        }
+        @keyframes clockPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .clock-card-header.done { color: var(--secondary-color); }
+        .clock-card-body { padding: 10px 14px 14px; }
+        .clock-row {
+            display: flex; align-items: center; gap: 10px; font-size: 14px;
+            color: var(--dark-text); padding: 3px 0;
+        }
+        .clock-row .clock-time {
+            font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums;
+            cursor: pointer; letter-spacing: 1px;
+        }
+        .clock-row .clock-edit {
+            font-size: 13px; color: var(--step-color, #007AFF); cursor: pointer;
+            padding: 2px 6px; flex-shrink: 0;
+        }
+        .clock-row .clock-label { color: var(--gray-text); font-size: 13px; min-width: 28px; }
+        .clock-row .clock-elapsed {
+            font-size: 22px; font-weight: 700; color: var(--warning-color); letter-spacing: 1px;
+        }
+        .clock-btn-row { display: flex; gap: 10px; margin-top: 8px; }
+        .clock-btn {
+            flex: 1; padding: 11px; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .clock-btn:active { transform: scale(0.97); opacity: 0.85; }
+        .clock-btn-start {
+            background: var(--warning-color); color: white;
+        }
+        .clock-btn-end {
+            background: var(--secondary-color); color: white;
+        }
+        .clock-btn-restart {
+            background: #f5f5f5; color: var(--dark-text); border: 1px solid var(--border-color);
+        }
+
+        /* 步骤进度条 */
+        .step-bar {
+            display: flex; align-items: center; padding: 12px 20px 16px;
+            background: white; border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 48px; z-index: 50;
+            margin-bottom: 12px;
+        }
+        .step-item {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 6px; flex: 1; cursor: pointer; min-width: 0;
+        }
+        .step-dot {
+            width: 28px; height: 28px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 16px; flex-shrink: 0;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+            border: 2px solid var(--border-color); background: white; color: var(--gray-text);
+            transition: all 0.3s;
         }
-        .section-icon.removal { background: rgba(255, 149, 0, 0.1); color: var(--warning-color); }
-        .section-icon.install { background: rgba(52, 199, 89, 0.1); color: var(--secondary-color); }
-        .section-title { font-size: 15px; font-weight: 600; color: var(--dark-text); }
-        .section-badge {
-            font-size: 11px; padding: 2px 8px; border-radius: 4px;
-            margin-left: auto; font-weight: 500;
+        .step-label {
+            font-size: 10px; color: var(--gray-text); text-align: center;
+            white-space: nowrap; transition: color 0.3s; max-width: 60px;
+            overflow: hidden; text-overflow: ellipsis;
         }
-        .section-badge.required { background: rgba(255, 59, 48, 0.08); color: var(--danger-color); }
-        .section-badge.optional { background: rgba(142, 142, 147, 0.1); color: var(--gray-text); }
-        .section-badge.done { background: rgba(52, 199, 89, 0.1); color: var(--secondary-color); }
-        .section-body { padding: 16px; }
-        
-        /* 续做模式下的只读区域 */
-        .section-body.readonly { background: #fafafa; }
-        .readonly-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px;
+        .step-line {
+            height: 2px; flex: 1; min-width: 12px; background: var(--border-color);
+            margin: 0 -4px; margin-bottom: 20px; transition: background 0.3s;
         }
-        .readonly-row:last-child { border-bottom: none; }
-        .readonly-label { color: var(--gray-text); }
-        .readonly-value { color: var(--dark-text); font-weight: 500; text-align: right; max-width: 60%; }
-        
-        /* 表单元素 */
-        .form-item { margin-bottom: 14px; }
-        .form-item:last-child { margin-bottom: 0; }
+        /* 三种状态 */
+        .step-item.done .step-dot {
+            background: var(--step-color, #007AFF); color: white; border-color: var(--step-color, #007AFF);
+        }
+        .step-item.done .step-line { background: var(--step-color, #007AFF); }
+        .step-item.done .step-label { color: var(--step-color, #007AFF); font-weight: 600; }
+        .step-item.current .step-dot {
+            border-color: var(--step-color, #007AFF); color: var(--step-color, #007AFF);
+            box-shadow: 0 0 0 3px rgba(0,122,255,0.12);
+            transform: scale(1.1);
+        }
+        .step-item.current .step-label { color: var(--step-color, #007AFF); font-weight: 700; }
+
+        /* 步骤内容 */
+        .step-content { padding: 20px 16px 16px; }
+        .step-panel { display: none; animation: fadeSlideIn 0.3s; }
+        .step-panel.active { display: block; }
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateX(16px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* 设备编号录入行 */
+        .device-id-row { display: flex; gap: 8px; align-items: center; }
+        .device-id-row .form-input { flex: 1; }
+        .scan-btn, .nfc-btn {
+            width: 40px; height: 40px; border-radius: 8px;
+            border: 1px solid var(--border-color); background: white;
+            color: var(--step-color, var(--primary-color)); font-size: 18px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+        .scan-btn:active, .nfc-btn:active { background: rgba(0,0,0,0.04); transform: scale(0.95); }
+
+        /* NFC 覆盖层 */
+        .nfc-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85); z-index: 200;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center; color: white;
+        }
+        .nfc-overlay.show { display: flex; }
+        .nfc-anim {
+            width: 120px; height: 120px; border-radius: 50%;
+            border: 3px solid var(--step-color, var(--primary-color)); position: relative;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 24px;
+        }
+        .nfc-anim i { font-size: 48px; color: var(--step-color, var(--primary-color)); }
+        .nfc-anim::before, .nfc-anim::after {
+            content: ''; position: absolute; border-radius: 50%;
+            border: 2px solid rgba(0,122,255,0.3);
+            animation: nfcRipple 2s ease-out infinite;
+        }
+        .nfc-anim::before { inset: -15px; animation-delay: 0s; }
+        .nfc-anim::after { inset: -30px; animation-delay: 0.6s; }
+        @keyframes nfcRipple {
+            0% { opacity: 1; transform: scale(0.8); }
+            100% { opacity: 0; transform: scale(1.2); }
+        }
+        .nfc-hint { font-size: 14px; color: rgba(255,255,255,0.8); }
+
+        /* 通用卡片 */
+        .card {
+            background: white; border-radius: 12px; padding: 16px;
+            margin-bottom: 14px; border: 1px solid var(--border-color);
+        }
+        .card-title {
+            font-size: 14px; font-weight: 600; color: var(--dark-text);
+            margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+        }
+        .card-title .required::after { content: "*"; color: var(--danger-color); margin-left: 2px; }
+        .card-subtitle {
+            font-size: 12px; color: var(--gray-text); margin-bottom: 12px;
+        }
+
+        /* 表单行 */
+        .form-row {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+        }
+        .form-row:last-child { margin-bottom: 0; }
         .form-label {
-            font-size: 13px; color: var(--gray-text); margin-bottom: 6px; display: block;
+            font-size: 13px; color: var(--gray-text); min-width: 56px; flex-shrink: 0;
         }
-        .form-label.required::after { content: "*"; color: var(--danger-color); margin-left: 2px; }
-        .input-field {
-            width: 100%; padding: 10px 12px; border: 1px solid var(--border-color);
-            border-radius: 8px; font-size: 14px; color: var(--dark-text); background: white;
+        .form-input {
+            flex: 1; padding: 10px 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 15px; color: var(--dark-text);
+            background: #fafafa; transition: border-color 0.2s;
         }
-        .input-field:focus { outline: none; border-color: var(--primary-color); }
-        .input-field::placeholder { color: #C7C7CC; }
-        select.input-field { cursor: pointer; appearance: auto; }
-        .textarea {
+        .form-input:focus { outline: none; border-color: var(--step-color, #007AFF); background: white; }
+        .form-select {
+            flex: 1; padding: 10px 34px 10px 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 15px; color: var(--dark-text);
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 10 6'%3E%3Cpath fill='%23666' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E") no-repeat right 12px center;
+            appearance: none; cursor: pointer; min-height: 42px;
+        }
+        .form-select:focus { outline: none; border-color: var(--step-color, #007AFF); }
+
+        /* 自定义下拉选择框 */
+        .custom-select { position: relative; flex: 1; }
+        .custom-select-trigger {
+            width: 100%; padding: 10px 34px 10px 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 15px; color: var(--dark-text); background: white;
+            display: flex; align-items: center; min-height: 42px; cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 10 6'%3E%3Cpath fill='%23666' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center;
+            transition: border-color 0.2s;
+        }
+        .custom-select-trigger.placeholder { color: var(--gray-text); }
+        .custom-select-trigger.active { border-color: var(--step-color, #007AFF); }
+        .custom-select-options {
+            position: absolute; top: 100%; left: 0; right: 0; margin-top: 6px;
+            background: white; border: 1px solid var(--border-color); border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 95; max-height: 240px; overflow-y: auto;
+            display: none;
+        }
+        .custom-select-options.show { display: block; animation: fadeIn 0.15s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+        .custom-select-option {
+            padding: 13px 14px; font-size: 15px; color: var(--dark-text); cursor: pointer;
+            border-bottom: 1px solid var(--border-color); transition: background 0.15s;
+        }
+        .custom-select-option:last-child { border-bottom: none; }
+        .custom-select-option.selected { background: rgba(0,122,255,0.08); color: var(--step-color, #007AFF); font-weight: 600; }
+        .custom-select-option:active { background: #f5f5f5; }
+        .form-unit { font-size: 14px; color: var(--gray-text); min-width: 30px; text-align: right; flex-shrink: 0; }
+
+        .form-textarea {
             width: 100%; padding: 10px 12px; border: 1px solid var(--border-color);
             border-radius: 8px; font-size: 14px; color: var(--dark-text);
-            font-family: inherit; resize: vertical; min-height: 80px; background: white;
+            font-family: inherit; resize: vertical; min-height: 80px; margin-top: 6px;
         }
-        .textarea:focus { outline: none; border-color: var(--primary-color); }
-        
+        .form-textarea:focus { outline: none; border-color: var(--step-color, #007AFF); }
+
+        /* 语音录入 textarea 容器 */
         .textarea-box {
             border: 1px solid var(--border-color); border-radius: 8px; background: white;
-            position: relative;
+            position: relative; margin-top: 6px;
         }
-        .textarea-box:focus-within { border-color: var(--primary-color); }
+        .textarea-box:focus-within { border-color: var(--step-color, #007AFF); }
         .textarea-box .textarea-inner {
             width: 100%; padding: 10px 44px 10px 12px; border: none; font-size: 14px;
             color: var(--dark-text); font-family: inherit; resize: vertical;
@@ -161,27 +354,13 @@
             position: absolute; right: 44px; bottom: 14px;
             font-size: 11px; color: #FF3B30; white-space: nowrap;
         }
-        
-        /* 语音输入 */
-        .voice-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
-        .voice-btn {
-            display: flex; align-items: center; gap: 4px;
-            padding: 4px 10px; border-radius: 14px; border: 1px solid var(--border-color);
-            background: white; font-size: 12px; color: var(--gray-text);
-            cursor: pointer; transition: all 0.2s;
-        }
-        .voice-btn i { font-size: 14px; }
-        .voice-btn.recording {
-            border-color: #FF3B30; color: #FF3B30; background: #FFF5F5;
-            animation: voicePulse 1s ease-in-out infinite;
-        }
-        .voice-btn.recording i { color: #FF3B30; }
-        .voice-status { font-size: 11px; color: var(--gray-text); }
-        .voice-status.active { color: #FF3B30; }
+
         @keyframes voicePulse {
             0%, 100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.3); }
             50% { box-shadow: 0 0 0 6px rgba(255,59,48,0); }
         }
+
+        /* 录音列表 */
         .audio-list { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
         .audio-chip {
             display: flex; align-items: center; gap: 8px;
@@ -204,1149 +383,1960 @@
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; flex-shrink: 0;
         }
-        
-        /* 设备识别行 */
-        .device-id-row { display: flex; gap: 8px; align-items: center; }
-        .device-id-row .input-field { flex: 1; }
-        .scan-btn {
-            width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--border-color);
-            background: white; color: var(--primary-color); font-size: 18px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; transition: all 0.2s;
+
+        /* 设备选择器 */
+        .device-pick-card {
+            background: white; border: 2px dashed var(--border-color);
+            border-radius: 12px; padding: 20px; text-align: center;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 14px;
         }
-        .scan-btn:active { background: rgba(0,122,255,0.06); }
-        .nfc-btn {
-            width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--border-color);
-            background: white; color: var(--primary-color); font-size: 18px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; transition: all 0.2s;
+        .device-pick-card:active { border-color: var(--step-color, #007AFF); background: #fafafa; }
+        .device-pick-card .pick-icon { font-size: 32px; color: var(--gray-text); margin-bottom: 6px; }
+        .device-pick-card .pick-text { font-size: 13px; color: var(--gray-text); }
+
+        .device-picked {
+            background: white; border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 16px; margin-bottom: 14px;
+            display: flex; align-items: center; gap: 14px;
         }
-        .nfc-btn:active { background: rgba(0,122,255,0.06); }
-        
-        /* NFC 覆盖层 */
-        .nfc-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85); z-index: 200;
-            display: none; flex-direction: column;
-            align-items: center; justify-content: center; color: white;
+        .device-picked-icon {
+            width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
         }
-        .nfc-overlay.show { display: flex; }
-        .nfc-anim {
-            width: 120px; height: 120px; border-radius: 50%;
-            border: 3px solid var(--primary-color); position: relative;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 24px;
+        .device-picked-info { flex: 1; min-width: 0; }
+        .device-picked-id { font-size: 15px; font-weight: 600; line-height: 1.4; }
+        .device-picked-meta { font-size: 13px; color: var(--gray-text); margin-top: 4px; line-height: 1.5; }
+        .device-picked-reselect {
+            font-size: 13px; color: var(--step-color, #007AFF);
+            background: rgba(0,122,255,0.06); border: none; border-radius: 8px;
+            cursor: pointer; flex-shrink: 0; padding: 6px 12px; font-weight: 500;
         }
-        .nfc-anim i { font-size: 48px; color: var(--primary-color); }
-        .nfc-anim::before, .nfc-anim::after {
-            content: ''; position: absolute; border-radius: 50%;
-            border: 2px solid rgba(0,122,255,0.3);
-            animation: nfcRipple 2s ease-out infinite;
+
+        /* 数据填报表格 */
+        .data-grid { margin-top: 8px; }
+        .data-row {
+            display: flex; align-items: center; gap: 8px; padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
         }
-        .nfc-anim::before { inset: -15px; animation-delay: 0s; }
-        .nfc-anim::after { inset: -30px; animation-delay: 0.6s; }
-        @keyframes nfcRipple {
-            0% { opacity: 1; transform: scale(0.8); }
-            100% { opacity: 0; transform: scale(1.2); }
+        .data-row-name { font-size: 13px; color: var(--dark-text); min-width: 60px; font-weight: 500; }
+        .data-row input {
+            flex: 1; padding: 7px 10px; border: 1px solid var(--border-color);
+            border-radius: 6px; font-size: 13px; width: 80px; text-align: right;
         }
-        .nfc-hint { font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 20px; }
-        .nfc-cancel {
-            padding: 8px 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3);
-            background: transparent; color: white; font-size: 14px; cursor: pointer;
+        .data-row input:focus { outline: none; border-color: var(--step-color, #007AFF); }
+        .data-row-unit { font-size: 12px; color: var(--gray-text); min-width: 30px; }
+
+        /* 现场证据 */
+        .photo-grid {
+            display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 8px;
         }
-        
-        /* 原因类型chips */
-        .reason-chips { display: flex; gap: 8px; flex-wrap: wrap; }
-        .reason-chip {
-            padding: 7px 14px; border: 1px solid var(--border-color); border-radius: 18px;
-            font-size: 13px; color: var(--gray-text); background: white;
-            cursor: pointer; transition: all 0.2s; user-select: none;
-        }
-        .reason-chip.active {
-            background: rgba(0, 122, 255, 0.08); border-color: var(--primary-color);
-            color: var(--primary-color); font-weight: 500;
-        }
-        
-        /* 媒体上传 */
-        .watermark-row {
-            display: flex; align-items: center; gap: 8px;
-            margin-bottom: 12px; font-size: 12px; color: var(--gray-text);
-        }
-        .wm-toggle {
-            width: 36px; height: 20px; background: #E5E5EA; border-radius: 10px;
-            position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
-        }
-        .wm-toggle.on { background: var(--secondary-color); }
-        .wm-toggle::after {
-            content: ''; width: 16px; height: 16px; background: white; border-radius: 50%;
-            position: absolute; top: 2px; left: 2px; transition: transform 0.2s;
-        }
-        .wm-toggle.on::after { transform: translateX(16px); }
-        
-        .media-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
-        }
-        .media-header-label { font-size: 13px; color: var(--dark-text); font-weight: 500; }
-        .media-counter { font-size: 12px; color: var(--gray-text); }
-        
-        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
         .photo-item {
             position: relative; padding-top: 100%; background: #f5f5f5;
-            border-radius: 6px; overflow: hidden;
+            border-radius: 8px; overflow: hidden;
         }
-        .photo-item img {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
-        }
-        .photo-delete-btn {
+        .photo-item img { position: absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; }
+        .photo-del {
             position: absolute; top: 4px; right: 4px; width: 22px; height: 22px;
-            background: rgba(255, 59, 48, 0.85); border: none; border-radius: 50%;
-            color: white; font-size: 12px; cursor: pointer; z-index: 2;
-            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,59,48,0.85); border: none; border-radius: 50%;
+            color: white; font-size: 12px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; z-index: 2;
         }
-        .photo-item .watermark-overlay {
-            position: absolute; bottom: 0; left: 0; right: 0;
-            padding: 4px 6px; background: linear-gradient(transparent, rgba(0,0,0,0.5));
-            color: white; font-size: 8px; line-height: 1.3;
+        .upload-area {
+            border: 2px dashed var(--border-color); border-radius: 10px;
+            padding: 18px; text-align: center; background: #fafafa; cursor: pointer;
+            transition: border-color 0.2s;
         }
-        
-        .media-upload-area {
-            border: 2px dashed var(--border-color); border-radius: 8px;
-            padding: 20px 16px; text-align: center; background: #fafafa;
-            cursor: pointer; transition: all 0.2s; margin-bottom: 8px;
+        .upload-area:active { border-color: var(--step-color, #007AFF); }
+        .upload-area.disabled { opacity: 0.4; pointer-events: none; }
+        .upload-icon { font-size: 24px; color: var(--gray-text); margin-bottom: 3px; }
+        .upload-text { font-size: 12px; color: var(--gray-text); }
+        .watermark-row {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+            font-size: 12px; color: var(--gray-text);
         }
-        .media-upload-area:active { border-color: var(--primary-color); }
-        .media-upload-area.disabled { opacity: 0.4; cursor: not-allowed; }
-        .media-upload-icon { font-size: 28px; color: var(--gray-text); margin-bottom: 4px; }
-        .media-upload-text { font-size: 12px; color: var(--gray-text); }
-        
-        .video-card {
+        .toggle { width:36px; height:20px; background:#E5E5EA; border-radius:10px; position:relative; cursor:pointer; transition:background 0.2s; }
+        .toggle.on { background: var(--secondary-color); }
+        .toggle::after {
+            content: ''; width:16px; height:16px; background:white; border-radius:50%;
+            position:absolute; top:2px; left:2px; transition:transform 0.2s;
+        }
+        .toggle.on::after { transform: translateX(16px); }
+
+        .video-preview {
             position: relative; border-radius: 8px; overflow: hidden;
             background: #f5f5f5; border: 1px solid var(--border-color); margin-bottom: 8px;
         }
-        .video-card video { width: 100%; display: block; max-height: 200px; }
-        .video-info {
-            padding: 8px 10px; font-size: 11px; color: var(--gray-text);
+        .video-preview video { width: 100%; display: block; max-height: 180px; }
+        .video-info-bar {
+            padding: 6px 10px; font-size: 11px; color: var(--gray-text);
             display: flex; justify-content: space-between; background: white;
         }
-        .video-delete-btn {
+        .video-del-btn {
             position: absolute; top: 6px; right: 6px; width: 24px; height: 24px;
-            background: rgba(255, 59, 48, 0.85); border: none; border-radius: 50%;
+            background: rgba(255,59,48,0.85); border: none; border-radius: 50%;
             color: white; font-size: 14px; cursor: pointer; z-index: 2;
             display: flex; align-items: center; justify-content: center;
         }
-        
-        /* 来源弹窗 */
-        .source-modal {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4); z-index: 300;
-            display: flex; align-items: flex-end; justify-content: center;
+
+        /* 确认摘要 */
+        .summary-block {
+            background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;
+            border: 1px solid var(--border-color);
         }
-        .source-sheet {
-            background: white; border-radius: 16px 16px 0 0; width: 100%;
-            padding: 20px 16px 32px;
+        .summary-block-title {
+            font-size: 12px; color: var(--gray-text); font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .source-sheet-title {
-            font-size: 15px; font-weight: 600; text-align: center; margin-bottom: 16px;
+        .summary-edit-btn {
+            font-size: 12px; color: var(--step-color, #007AFF);
+            background: none; border: none; cursor: pointer;
         }
-        .source-option {
-            display: flex; align-items: center; gap: 10px;
-            padding: 14px; border: 1px solid var(--border-color); border-radius: 10px;
-            margin-bottom: 8px; cursor: pointer; font-size: 14px; color: var(--dark-text);
-            transition: all 0.2s;
+        .summary-row {
+            display: flex; justify-content: space-between; padding: 5px 0;
+            font-size: 13px;
         }
-        .source-option:active { background: rgba(0,122,255,0.04); border-color: var(--primary-color); }
-        .source-option i { font-size: 20px; color: var(--primary-color); }
-        .source-cancel {
-            width: 100%; padding: 12px; border: none; background: #f5f5f5;
-            border-radius: 10px; font-size: 14px; color: var(--gray-text);
-            cursor: pointer; margin-top: 4px;
+        .summary-row .s-label { color: var(--gray-text); }
+        .summary-row .s-value { color: var(--dark-text); font-weight: 500; text-align: right; }
+        .summary-photos { display: flex; gap: 6px; flex-wrap: wrap; }
+        .summary-thumb {
+            width: 56px; height: 56px; border-radius: 6px; object-fit: cover;
         }
-        
-        /* 底部按钮 */
-        .footer-buttons {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            padding: 10px 16px; background: white;
-            border-top: 1px solid var(--border-color);
-            display: flex; gap: 10px; z-index: 90;
+
+        /* 底栏按钮 */
+        .bottom-bar {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+            padding: 12px 16px; background: white; border-top: 1px solid var(--border-color);
+            display: flex; gap: 10px;
         }
         .btn {
             flex: 1; padding: 12px; border: none; border-radius: 10px;
-            font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s;
         }
-        .btn:active { transform: scale(0.98); }
-        .btn-primary { background: var(--primary-color); color: white; }
-        .btn-warning { background: var(--warning-color); color: white; }
-        .btn-secondary { background: #f5f5f5; color: var(--gray-text); border: 1px solid var(--border-color); }
-        .btn-sm { padding: 8px 16px; font-size: 13px; flex: none; }
-        
-        /* 隐藏区域 */
-        .hidden { display: none !important; }
-        
-        /* 续做列表弹窗 */
-        .pending-list-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4); z-index: 200;
-            display: none; align-items: flex-end; justify-content: center;
+        .btn:active { opacity: 0.8; transform: scale(0.98); }
+        .btn-prev {
+            background: #f5f5f5; color: var(--gray-text); border: 1px solid var(--border-color);
         }
-        .pending-list-overlay.show { display: flex; }
-        .pending-list-sheet {
-            background: white; border-radius: 16px 16px 0 0;
-            width: 100%; max-height: 70vh; overflow-y: auto;
-            padding: 20px 16px 32px;
+        .btn-next { color: white; flex: 2; }
+        .btn-submit { color: white; flex: 2; font-size: 16px; }
+        .btn-save {
+            background: none; color: var(--step-color, #007AFF); border: 1px solid var(--step-color, #007AFF);
         }
-        .pending-list-title {
-            font-size: 16px; font-weight: 600; margin-bottom: 16px;
-            display: flex; align-items: center; justify-content: space-between;
+        /* 模式卡片上的暂存标签 */
+        .mode-card-draft-badge {
+            display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 4px;
+            background: #FF9500; color: white; margin-left: 8px; font-weight: 600;
+            vertical-align: middle;
         }
-        .pending-list-close {
-            background: none; border: none; font-size: 20px;
-            color: var(--gray-text); cursor: pointer; padding: 4px;
+
+        /* 切换模式确认弹窗 */
+        .confirm-overlay {
+            position: fixed; top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.5); z-index: 300; display: none;
+            align-items: center; justify-content: center;
         }
-        .pending-item {
-            padding: 14px; border: 1px solid var(--border-color); border-radius: 10px;
-            margin-bottom: 10px; cursor: pointer; transition: all 0.2s;
+        .confirm-overlay.show { display: flex; }
+        .confirm-box {
+            background: white; border-radius: 14px; padding: 24px 20px;
+            width: 300px; text-align: center;
         }
-        .pending-item:active { border-color: var(--primary-color); background: rgba(0,122,255,0.02); }
-        .pending-item-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+        .confirm-box-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+        .confirm-box-desc { font-size: 13px; color: var(--gray-text); margin-bottom: 20px; }
+        .confirm-box-btns { display: flex; gap: 10px; }
+        .confirm-box-btns button {
+            flex: 1; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600;
+            cursor: pointer; border: none;
         }
-        .pending-item-device { font-size: 14px; font-weight: 600; color: var(--dark-text); }
-        .pending-item-time { font-size: 11px; color: var(--gray-text); }
-        .pending-item-desc { font-size: 12px; color: var(--gray-text); line-height: 1.5; }
-        .pending-item-action {
-            margin-top: 8px; font-size: 13px; color: var(--primary-color); font-weight: 500;
+        .confirm-cancel { background: #f5f5f5; color: var(--dark-text); }
+        .confirm-ok { color: white; }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.78); color: white; padding: 10px 22px;
+            border-radius: 20px; font-size: 13px; z-index: 400;
+            pointer-events: none; animation: toastIn 0.3s;
+        }
+        @keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(10px); } }
+
+        /* 提交动画 */
+        .upload-overlay {
+            position: fixed; top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.55); z-index: 300; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .upload-card {
+            background: white; border-radius: 16px; padding: 28px 24px;
+            text-align: center; width: 290px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner {
+            width: 44px; height: 44px; border: 4px solid #E5E5EA;
+            border-top-color: var(--step-color, #007AFF); border-radius: 50%;
+            margin: 0 auto 16px; animation: spin 0.8s linear infinite;
+        }
+        .upload-success-icon { font-size: 48px; color: var(--secondary-color); margin-bottom: 12px; }
+        .upload-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .upload-desc { font-size: 13px; color: var(--gray-text); margin-bottom: 16px; }
+        .upload-detail {
+            text-align: left; background: #f5f5f7; border-radius: 10px;
+            padding: 12px; font-size: 12px; color: #666; line-height: 1.7; margin-bottom: 16px;
+        }
+        .upload-btns { display: flex; gap: 8px; }
+        .upload-btns button {
+            flex: 1; padding: 10px; border-radius: 8px; font-size: 14px;
+            font-weight: 600; cursor: pointer; border: none;
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <button class="header-back" onclick="goBack()"><i class="bi bi-chevron-left"></i></button>
-        <h1 class="header-title" id="pageTitle">设备更换</h1>
-        <div style="width:36px;"></div>
-    </header>
 
-    <main class="main-content">
-        <!-- 待完成提示条 -->
-        <div class="pending-banner" id="pendingBanner" onclick="showPendingList()">
-            <i class="bi bi-clock-history"></i>
-            <div class="pending-banner-text">
-                <div class="pending-banner-title" id="pendingTitle">你有 0 条待完成安装</div>
-                <div class="pending-banner-sub">点击查看并继续安装</div>
+<!-- ==================== 顶部导航 ==================== -->
+<header class="header">
+    <button class="header-back" onclick="goBackOrMode()"><i class="bi bi-chevron-left"></i></button>
+    <h1 class="header-title" id="headerTitle">设备更换</h1>
+    <span class="header-mode-tag" id="headerModeTag" style="display:none;"></span>
+</header>
+
+<!-- ==================== 模式选择页 ==================== -->
+<div class="mode-screen" id="modeScreen">
+    <div class="mode-screen-title">选择模式</div>
+    <div class="mode-screen-sub">请根据本次任务类型选择对应的操作模式</div>
+    <div class="mode-cards">
+        <div class="mode-card card-replace" onclick="selectMode('replace')">
+            <div class="mode-card-icon"><i class="bi bi-arrow-repeat"></i></div>
+            <div class="mode-card-body">
+                <div class="mode-card-name">设备更换</div>
+                <div class="mode-card-desc">拆除旧设备并安装新设备，适用于设备升级、故障替换</div>
+                <div class="mode-card-steps"><span>拆除</span><span>安装</span><span>数据</span><span>证据</span><span>确认</span></div>
             </div>
-            <i class="bi bi-chevron-right pending-banner-chevron"></i>
+            <div class="mode-card-arrow"><i class="bi bi-chevron-right"></i></div>
         </div>
-        
-        <!-- 模式切换 -->
-        <div class="mode-switch" id="modeSwitch">
-            <div>
-                <div class="mode-switch-label">仅新增安装</div>
-                <div class="mode-switch-hint">无需拆除旧设备，直接安装新设备</div>
+        <div class="mode-card card-install" onclick="selectMode('install')">
+            <div class="mode-card-icon"><i class="bi bi-plus-circle"></i></div>
+            <div class="mode-card-body">
+                <div class="mode-card-name">新设备安装</div>
+                <div class="mode-card-desc">全新位置安装设备，适用于新建站点、扩容部署</div>
+                <div class="mode-card-steps"><span>安装</span><span>数据</span><span>证据</span><span>确认</span></div>
             </div>
-            <div class="toggle-switch" id="installOnlyToggle" onclick="toggleInstallOnly()"></div>
+            <div class="mode-card-arrow"><i class="bi bi-chevron-right"></i></div>
         </div>
-        
-        <!-- ========== 旧设备拆除区 ========== -->
-        <div class="section-card" id="removalSection">
-            <div class="section-header">
-                <div class="section-icon removal"><i class="bi bi-box-arrow-up"></i></div>
-                <span class="section-title">旧设备拆除</span>
-                <span class="section-badge required" id="removalBadge">必填</span>
+        <div class="mode-card card-remove" onclick="selectMode('remove')">
+            <div class="mode-card-icon"><i class="bi bi-trash"></i></div>
+            <div class="mode-card-body">
+                <div class="mode-card-name">设备拆除</div>
+                <div class="mode-card-desc">仅拆除设备，适用于退役、裁撤、返厂维修</div>
+                <div class="mode-card-steps"><span>拆除</span><span>证据</span><span>确认</span></div>
             </div>
-            <div class="section-body" id="removalBody">
-                <!-- 设备识别 -->
-                <div class="form-item">
-                    <label class="form-label required">设备编号</label>
-                    <div class="device-id-row">
-                        <input type="text" class="input-field" id="oldDeviceId" placeholder="输入、扫描或NFC感应设备编号">
-                        <button class="scan-btn" onclick="simulateScan('oldDeviceId')"><i class="bi bi-qr-code-scan"></i></button>
-                        <button class="nfc-btn" onclick="startNfc('oldDeviceId')"><i class="bi bi-wifi"></i></button>
-                    </div>
-                </div>
-                <!-- 更换原因类型 -->
-                <div class="form-item">
-                    <label class="form-label required">更换类型</label>
-                    <div class="reason-chips" id="reasonTypeChips">
-                        <div class="reason-chip active" onclick="selectReason(this,'fault')" data-value="fault">故障更换</div>
-                        <div class="reason-chip" onclick="selectReason(this,'prevent')" data-value="prevent">预防更换</div>
-                        <div class="reason-chip" onclick="selectReason(this,'upgrade')" data-value="upgrade">升级更换</div>
-                    </div>
-                </div>
-                <!-- 更换原因 -->
-                <div class="form-item">
-                    <label class="form-label required">更换原因</label>
-                    <select class="input-field" id="replaceReason">
-                        <option value="">请选择</option>
-                        <option value="lifecycle">寿命到期</option>
-                        <option value="damage">故障损坏</option>
-                        <option value="drift">数据漂移/不准确</option>
-                        <option value="corrosion">腐蚀/老化</option>
-                        <option value="other">其他</option>
-                    </select>
-                </div>
-                <!-- 原因详情 -->
-                <div class="form-item">
-                    <label class="form-label">原因详情</label>
-                    <div class="textarea-box">
-                        <textarea class="textarea-inner" id="reasonDetail" placeholder="描述故障现象、拆除情况等"></textarea>
-                        <button class="voice-fab" id="voiceBtn_reasonDetail" onclick="toggleRecord('reasonDetail', this)">
-                            <i class="bi bi-mic-fill"></i>
-                        </button>
-                        <span class="voice-fab-status" id="voiceStatus_reasonDetail"></span>
-                    </div>
-                    <div class="audio-list" id="audioList_reasonDetail"></div>
-                </div>
-                <!-- 旧设备状态 -->
-                <div class="form-item">
-                    <label class="form-label">旧设备状态</label>
-                    <select class="input-field" id="oldDeviceStatus">
-                        <option value="repair">返厂维修</option>
-                        <option value="scrap">报废处理</option>
-                        <option value="stock">回库待检</option>
-                    </select>
-                </div>
-                <!-- 拆除照片 -->
-                <div class="form-item">
-                    <div class="watermark-row">
-                        <div class="wm-toggle on" data-wm="removal" onclick="toggleWatermark(this)"></div>
-                        <span>照片自动添加水印（时间+设备+定位）</span>
-                    </div>
-                    <div class="media-header">
-                        <span class="media-header-label">现场照片</span>
-                        <span class="media-counter" id="removalPhotoCounter">0/9</span>
-                    </div>
-                    <div class="photo-grid" id="removalPhotos"></div>
-                    <div class="media-upload-area" id="removalUploadArea" onclick="showPhotoSource('removal')">
-                        <div class="media-upload-icon"><i class="bi bi-camera"></i></div>
-                        <div class="media-upload-text">拍照或从相册选择</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ========== 新设备安装区 ========== -->
-        <div class="section-card" id="installSection">
-            <div class="section-header">
-                <div class="section-icon install"><i class="bi bi-box-arrow-in-down"></i></div>
-                <span class="section-title">新设备安装</span>
-                <span class="section-badge optional" id="installBadge">可选 · 可稍后填写</span>
-            </div>
-            <div class="section-body" id="installBody">
-                <!-- 新设备识别 -->
-                <div class="form-item">
-                    <label class="form-label" id="newDeviceLabel">新设备编号</label>
-                    <div class="device-id-row">
-                        <input type="text" class="input-field" id="newDeviceId" placeholder="输入、扫描或NFC感应新设备编号">
-                        <button class="scan-btn" onclick="simulateScan('newDeviceId')"><i class="bi bi-qr-code-scan"></i></button>
-                        <button class="nfc-btn" onclick="startNfc('newDeviceId')"><i class="bi bi-wifi"></i></button>
-                    </div>
-                </div>
-                <!-- 安装位置 -->
-                <div class="form-item">
-                    <label class="form-label">安装位置</label>
-                    <input type="text" class="input-field" id="installLocation" placeholder="安装位置（可与旧设备不同）">
-                </div>
-                <!-- 安装照片 -->
-                <div class="form-item">
-                    <div class="watermark-row">
-                        <div class="wm-toggle on" data-wm="install" onclick="toggleWatermark(this)"></div>
-                        <span>照片自动添加水印（时间+设备+定位）</span>
-                    </div>
-                    <div class="media-header">
-                        <span class="media-header-label">安装照片</span>
-                        <span class="media-counter" id="installPhotoCounter">0/9</span>
-                    </div>
-                    <div class="photo-grid" id="installPhotos"></div>
-                    <div class="media-upload-area" id="installUploadArea" onclick="showPhotoSource('install')">
-                        <div class="media-upload-icon"><i class="bi bi-camera"></i></div>
-                        <div class="media-upload-text">拍照或从相册选择</div>
-                    </div>
-                </div>
-                <!-- 安装视频 -->
-                <div class="form-item">
-                    <div class="media-header" style="margin-top:6px;">
-                        <span class="media-header-label">现场视频</span>
-                        <span class="media-counter" id="videoCounter">0/1</span>
-                    </div>
-                    <div id="videoPreview"></div>
-                    <div class="media-upload-area" id="videoUploadArea" onclick="startVideoRecord()">
-                        <div class="media-upload-icon"><i class="bi bi-camera-video"></i></div>
-                        <div class="media-upload-text">点击录制视频（请控制在60秒以内）</div>
-                    </div>
-                </div>
-                <!-- 安装备注 -->
-                <div class="form-item">
-                    <label class="form-label">安装备注</label>
-                    <div class="textarea-box">
-                        <textarea class="textarea-inner" id="installRemark" placeholder="安装参数配置、调试情况、注意事项等"></textarea>
-                        <button class="voice-fab" id="voiceBtn_installRemark" onclick="toggleRecord('installRemark', this)">
-                            <i class="bi bi-mic-fill"></i>
-                        </button>
-                        <span class="voice-fab-status" id="voiceStatus_installRemark"></span>
-                    </div>
-                    <div class="audio-list" id="audioList_installRemark"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div style="height:20px;"></div>
-    </main>
-    
-    <!-- 底部按钮 -->
-    <div class="footer-buttons" id="footerButtons">
-        <button class="btn btn-secondary" onclick="saveDraft()">存草稿</button>
-        <button class="btn btn-warning" id="submitRemovalBtn" onclick="submitRemoval()">提交拆除</button>
-        <button class="btn btn-primary" id="submitFullBtn" onclick="submitFull()">提交更换</button>
-    </div>
-    
-    <!-- 续做列表弹窗 -->
-    <div class="pending-list-overlay" id="pendingOverlay" onclick="closePendingList(event)">
-        <div class="pending-list-sheet" onclick="event.stopPropagation()">
-            <div class="pending-list-title">
-                <span>待完成安装</span>
-                <button class="pending-list-close" onclick="closePendingList()"><i class="bi bi-x"></i></button>
-            </div>
-            <div id="pendingListContent"></div>
+            <div class="mode-card-arrow"><i class="bi bi-chevron-right"></i></div>
         </div>
     </div>
-    
-    <!-- NFC 覆盖层 -->
-    <div class="nfc-overlay" id="nfcOverlay">
-        <div class="nfc-anim"><i class="bi bi-wifi"></i></div>
-        <div class="nfc-hint">请将手机靠近设备NFC标签</div>
-        <button class="nfc-cancel" onclick="cancelNfc()">取消</button>
+</div>
+
+<!-- ==================== 流程页 ==================== -->
+<div class="flow-screen" id="flowScreen">
+    <!-- 作业打卡 -->
+    <div class="clock-card" id="clockCard">
+        <div class="clock-card-header" id="clockCardHeader">
+            <i class="bi bi-stopwatch"></i><span id="clockCardTitle">作业打卡</span>
+        </div>
+        <div class="clock-card-body" id="clockCardBody"></div>
     </div>
-    
-    <!-- 隐藏文件输入 -->
-    <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)">
-    <input type="file" id="photoCameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoUpload(event)">
-    <input type="file" id="videoCameraInput" accept="video/*" capture="environment" style="display:none" onchange="handleVideoUpload(event)">
-    
-    <script>
-        // ========== 状态 ==========
-        var isInstallOnly = false;    // 仅新增安装模式
-        var isResumeMode = false;     // 续做模式
-        var resumeTaskId = null;      // 续做的工单ID
-        var currentReasonType = 'fault';
-        var photoTarget = '';         // 当前照片上传目标
-        var removalPhotoCount = 0;
-        var installPhotoCount = 0;
-        
-        // ========== 页面初始化 ==========
-        function initPage() {
-            // 检查待完成工单
-            checkPendingTasks();
+    <!-- 步骤进度条 -->
+    <div class="step-bar" id="stepBar"></div>
+    <!-- 步骤内容 -->
+    <div class="step-content" id="stepContent"></div>
+</div>
+
+<!-- ==================== 底栏按钮 ==================== -->
+<div class="bottom-bar" id="bottomBar" style="display:none;">
+    <button class="btn btn-prev" id="btnPrev" onclick="prevStep()">上一步</button>
+    <button class="btn btn-save" id="btnSave" onclick="saveDraft()">暂存</button>
+    <button class="btn btn-next" id="btnNext" onclick="nextStep()">下一步</button>
+</div>
+
+<!-- ==================== NFC 感应覆盖层 ==================== -->
+<div class="nfc-overlay" id="nfcOverlay">
+    <div class="nfc-anim"><i class="bi bi-wifi"></i></div>
+    <div class="nfc-hint">请将手机靠近设备NFC标签</div>
+    <button class="scan-cancel" onclick="cancelNfc()" style="margin-top:32px;padding:10px 32px;border:1px solid rgba(255,255,255,0.4);border-radius:8px;background:none;color:white;font-size:14px;cursor:pointer;">取消</button>
+</div>
+
+<!-- 隐藏的文件输入 -->
+<input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)">
+<input type="file" id="photoCamera" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoUpload(event)">
+<input type="file" id="videoCamera" accept="video/*" capture="environment" style="display:none" onchange="handleVideoUpload(event)">
+
+<script>
+// ============================
+//  全局状态
+// ============================
+var currentMode = null;        // 'replace' | 'install' | 'remove'
+var currentStep = 0;
+var modeConfig = {};
+
+// 模式配置
+var MODES = {
+    replace: {
+        color: '#FF9500', lightBg: '#FFFBF5', iconBg: '#FFF3E0',
+        name: '设备更换', tag: '更换模式',
+        steps: [
+            { key: 'old-device', label: '旧设备拆除', icon: 'bi-dash-circle' },
+            { key: 'new-device', label: '新设备安装', icon: 'bi-plus-circle' },
+            { key: 'data', label: '数据填报', icon: 'bi-clipboard-data' },
+            { key: 'evidence', label: '现场证据', icon: 'bi-camera' },
+            { key: 'confirm', label: '确认提交', icon: 'bi-check2-circle' }
+        ]
+    },
+    install: {
+        color: '#34C759', lightBg: '#F6FFF8', iconBg: '#E8F8ED',
+        name: '新设备安装', tag: '安装模式',
+        steps: [
+            { key: 'new-device', label: '设备安装', icon: 'bi-plus-circle' },
+            { key: 'data', label: '数据填报', icon: 'bi-clipboard-data' },
+            { key: 'evidence', label: '现场证据', icon: 'bi-camera' },
+            { key: 'confirm', label: '确认提交', icon: 'bi-check2-circle' }
+        ]
+    },
+    remove: {
+        color: '#FF3B30', lightBg: '#FFF5F5', iconBg: '#FEE',
+        name: '设备拆除', tag: '拆除模式',
+        steps: [
+            { key: 'old-device', label: '设备拆除', icon: 'bi-dash-circle' },
+            { key: 'evidence', label: '现场证据', icon: 'bi-camera' },
+            { key: 'confirm', label: '确认提交', icon: 'bi-check2-circle' }
+        ]
+    }
+};
+
+// 用户填写数据
+var formData = {
+    oldDevice: null,     // 旧设备（更换/拆除模式）
+    newDevice: null,     // 新设备（更换/安装模式）
+    manualOldId: '',     // 旧设备手动输入编号
+    manualNewId: '',     // 新设备手动输入编号
+    oldRemoveType: '',   // 拆除类型（升级/故障/到期/退役/裁撤/返厂/其他）
+    oldRemoveReason: '', // 拆除原因
+    oldRemoveTo: '',     // 拆除去向（报废/返厂/入库/其他）
+    installType: '',     // 安装类型（新建/扩容/替换/其他）
+    installLocation: '', // 安装位置
+    dataRows: {},        // 数据填报 {key: value}
+    remark: '',          // 备注
+    voiceAudios: {},     // 语音录音 {targetId: [{id, url, duration, blob}]}
+    photos: [],          // 照片 [{dataUrl, fileName}]
+    video: null,         // 视频 {url, file, duration, sizeMB}
+    watermark: true,
+    jobStartTime: null,  // 打卡开始时间 ISO
+    jobEndTime: null     // 打卡结束时间 ISO
+};
+
+// 打卡计时器
+var jobTimerInterval = null;
+
+// ============================
+//  暂存管理
+// ============================
+function getDraftData() {
+    // 先同步当前步骤数据
+    if (currentMode) saveCurrentStepData();
+    // 统计语音录音数量（二进制数据不存）
+    var ac = {};
+    if (audioRecordings) {
+        Object.keys(audioRecordings).forEach(function(k) {
+            ac[k] = (audioRecordings[k] && audioRecordings[k].length) || 0;
+        });
+    }
+    return {
+        mode: currentMode,
+        step: currentStep,
+        oldDevice: formData.oldDevice,
+        newDevice: formData.newDevice,
+        manualOldId: formData.manualOldId,
+        manualNewId: formData.manualNewId,
+        oldRemoveType: formData.oldRemoveType,
+        oldRemoveReason: formData.oldRemoveReason,
+        oldRemoveTo: formData.oldRemoveTo,
+        installType: formData.installType,
+        installLocation: formData.installLocation,
+        dataRows: formData.dataRows,
+        remark: formData.remark,
+        watermark: formData.watermark,
+        jobStartTime: formData.jobStartTime,
+        jobEndTime: formData.jobEndTime,
+        photoCount: formData.photos.length,
+        hadVideo: !!formData.video,
+        audioCounts: ac,
+        savedAt: new Date().toISOString()
+    };
+}
+
+function applyDraftData(draft) {
+    formData.oldDevice = draft.oldDevice || null;
+    formData.newDevice = draft.newDevice || null;
+    formData.manualOldId = draft.manualOldId || '';
+    formData.manualNewId = draft.manualNewId || '';
+    formData.oldRemoveType = draft.oldRemoveType || '';
+    formData.oldRemoveReason = draft.oldRemoveReason || '';
+    formData.oldRemoveTo = draft.oldRemoveTo || '';
+    formData.installType = draft.installType || '';
+    formData.installLocation = draft.installLocation || '';
+    formData.dataRows = draft.dataRows || {};
+    formData.remark = draft.remark || '';
+    formData.watermark = draft.watermark !== undefined ? draft.watermark : true;
+    // 打卡时间保留当前的，不被暂存覆盖
+    // （暂存时可能没打卡，恢复后如果已打卡则保留）
+    if (!formData.jobStartTime) formData.jobStartTime = draft.jobStartTime || null;
+    if (!formData.jobEndTime) formData.jobEndTime = draft.jobEndTime || null;
+    // 媒体文件需要重新采集
+    formData.photos = [];
+    formData.video = null;
+    formData.voiceAudios = {};
+    audioRecordings = {};
+    if (jobTimerInterval) { clearInterval(jobTimerInterval); jobTimerInterval = null; }
+
+    currentMode = draft.mode;
+    modeConfig = MODES[currentMode];
+    currentStep = draft.step || 0;
+}
+
+// 静默恢复暂存（从设备选择页返回时使用，不弹 toast）
+function restoreDraftSilently() {
+    var key = 'draft_' + currentMode;
+    var raw = localStorage.getItem(key);
+    if (!raw) return;
+    try {
+        var draft = JSON.parse(raw);
+        // 只恢复表单数据，不覆盖打卡和媒体
+        formData.oldDevice = draft.oldDevice || formData.oldDevice;
+        formData.newDevice = draft.newDevice || formData.newDevice;
+        formData.manualOldId = draft.manualOldId || formData.manualOldId;
+        formData.manualNewId = draft.manualNewId || formData.manualNewId;
+        formData.oldRemoveType = draft.oldRemoveType || formData.oldRemoveType;
+        formData.oldRemoveReason = draft.oldRemoveReason || formData.oldRemoveReason;
+        formData.oldRemoveTo = draft.oldRemoveTo || formData.oldRemoveTo;
+        formData.installType = draft.installType || formData.installType;
+        formData.installLocation = draft.installLocation || formData.installLocation;
+        formData.dataRows = draft.dataRows || formData.dataRows;
+        formData.remark = draft.remark || formData.remark;
+        currentStep = draft.step || 0;
+    } catch(e) {}
+}
+
+function saveDraftInternal() {
+    if (!currentMode) return;
+    var draft = getDraftData();
+    try {
+        localStorage.setItem('draft_' + currentMode, JSON.stringify(draft));
+    } catch(e) { /* 静默失败，存储空间不足 */ }
+}
+
+function saveDraft() {
+    if (!currentMode) return;
+    saveDraftInternal();
+    showToast('已暂存');
+}
+
+function hasDraft(mode) {
+    return !!localStorage.getItem('draft_' + mode);
+}
+
+function getDraftInfo(mode) {
+    var raw = localStorage.getItem('draft_' + mode);
+    if (!raw) return null;
+    try {
+        var d = JSON.parse(raw);
+        return { savedAt: d.savedAt, photoCount: d.photoCount || 0, hadVideo: d.hadVideo || false };
+    } catch(e) { return null; }
+}
+
+function clearDraft(mode) {
+    localStorage.removeItem('draft_' + mode);
+}
+
+function formatTimeAgo(isoStr) {
+    if (!isoStr) return '';
+    var diff = Math.floor((new Date() - new Date(isoStr)) / 1000);
+    if (diff < 60) return '刚刚';
+    if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
+    if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
+    var d = new Date(isoStr);
+    return (d.getMonth() + 1) + '/' + d.getDate() + ' ' +
+        String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+// 更新模式卡片上的暂存标签
+function updateDraftBadges() {
+    ['replace', 'install', 'remove'].forEach(function(mode) {
+        var nameEl = document.querySelector('.mode-card.card-' + mode + ' .mode-card-name');
+        if (!nameEl) return;
+        var existing = nameEl.querySelector('.mode-card-draft-badge');
+        if (hasDraft(mode)) {
+            if (!existing) {
+                var badge = document.createElement('span');
+                badge.className = 'mode-card-draft-badge';
+                badge.textContent = '有暂存';
+                nameEl.appendChild(badge);
+            }
+        } else {
+            if (existing) existing.remove();
         }
-        
-        // ========== 待完成工单管理 ==========
-        function getPendingTasks() {
-            return JSON.parse(localStorage.getItem('replacementPending') || '[]');
+    });
+}
+
+// ============================
+//  设备数据（模拟）
+// ============================
+var allDevices = [
+    { id:'DT-2024-009', name:'温度传感器', type:'温感传感器', location:'城东水质监测站·一期生化池', status:'online', paramKeys:['temperature','humidity'] },
+    { id:'DT-2024-001', name:'温度传感器', type:'温感传感器', location:'城东水质监测站·二期沉淀池', status:'online', paramKeys:['temperature'] },
+    { id:'DT-2024-002', name:'液位计', type:'超声波液位计', location:'城东水质监测站·进水口', status:'online', paramKeys:['level','flow'] },
+    { id:'DT-2024-010', name:'水质分析仪', type:'多参数水质监测仪', location:'城东水质监测站·出水口', status:'offline', paramKeys:['ph','turbidity','temperature'] },
+    { id:'DT-2024-011', name:'流量计', type:'电磁流量计', location:'城西泵站·主泵房', status:'online', paramKeys:['flow','pressure'] },
+    { id:'DT-2024-012', name:'压力传感器', type:'压阻式压力变送器', location:'城西泵站·出水管道', status:'online', paramKeys:['pressure'] },
+    { id:'DT-2024-013', name:'液位计', type:'雷达液位计', location:'城西泵站·集水井', status:'online', paramKeys:['level'] },
+    { id:'DT-2024-014', name:'流量计', type:'超声波流量计', location:'北区管网·主管段', status:'online', paramKeys:['flow'] },
+    { id:'DT-2024-015', name:'压力传感器', type:'压力变送器', location:'北区管网·分支管段', status:'online', paramKeys:['pressure'] },
+    { id:'DT-2024-016', name:'温度传感器', type:'红外温度传感器', location:'城西泵站·配电室', status:'online', paramKeys:['temperature','humidity'] },
+    { id:'DT-2024-017', name:'水质分析仪', type:'在线水质监测仪', location:'北区管网·监测点B', status:'online', paramKeys:['ph','turbidity'] },
+    { id:'DT-2024-018', name:'液位计', type:'静压液位计', location:'城东水质监测站·蓄水池', status:'offline', paramKeys:['level'] }
+];
+// 参数名称映射
+var PARAM_LABELS = { temperature:'温度', humidity:'湿度', level:'液位', flow:'流量', ph:'pH值', turbidity:'浊度', pressure:'压力' };
+var PARAM_UNITS = { temperature:'°C', humidity:'%RH', level:'m', flow:'L/s', ph:'pH', turbidity:'NTU', pressure:'MPa' };
+
+// ============================
+//  作业打卡
+// ============================
+function renderClockCard() {
+    var header = document.getElementById('clockCardHeader');
+    var body = document.getElementById('clockCardBody');
+
+    var st = formData.jobStartTime;
+    var et = formData.jobEndTime;
+
+    if (!st) {
+        // 未打卡
+        header.className = 'clock-card-header';
+        header.innerHTML = '<i class="bi bi-stopwatch"></i><span>作业打卡</span>';
+        body.innerHTML = '<div class="clock-btn-row">' +
+            '<button class="clock-btn clock-btn-start" onclick="startClock()">开始打卡</button>' +
+            '</div>';
+    } else if (st && !et) {
+        // 打卡中
+        header.className = 'clock-card-header doing';
+        header.innerHTML = '<span class="clock-dot"></span><span>打卡中</span>';
+        body.innerHTML = '<div class="clock-row">' +
+            '<span class="clock-label">开始</span>' +
+            '<span class="clock-time" onclick="editClockTime(\'start\')">' + formatClockTime(st) + '</span>' +
+            '<span class="clock-edit" onclick="editClockTime(\'start\')">修改</span>' +
+            '</div>' +
+            '<div class="clock-row">' +
+            '<span class="clock-label">已用</span>' +
+            '<span class="clock-elapsed" id="clockElapsed">--:--:--</span>' +
+            '</div>' +
+            '<div class="clock-btn-row">' +
+            '<button class="clock-btn clock-btn-end" onclick="endClock()">结束打卡</button>' +
+            '</div>';
+        // 启动实时计时
+        updateClockTimer();
+        if (jobTimerInterval) clearInterval(jobTimerInterval);
+        jobTimerInterval = setInterval(updateClockTimer, 1000);
+    } else {
+        // 已打卡
+        header.className = 'clock-card-header done';
+        header.innerHTML = '<i class="bi bi-check-circle-fill"></i><span>已打卡</span>';
+        var totalMinutes = Math.floor((new Date(et) - new Date(st)) / 60000);
+        var durationText = totalMinutes < 60 ? totalMinutes + '分钟' :
+            Math.floor(totalMinutes / 60) + '小时' + (totalMinutes % 60) + '分钟';
+        body.innerHTML = '<div class="clock-row">' +
+            '<span class="clock-label">开始</span>' +
+            '<span class="clock-time" onclick="editClockTime(\'start\')">' + formatClockTime(st) + '</span>' +
+            '<span class="clock-edit" onclick="editClockTime(\'start\')">修改</span>' +
+            '</div>' +
+            '<div class="clock-row">' +
+            '<span class="clock-label">结束</span>' +
+            '<span class="clock-time" onclick="editClockTime(\'end\')">' + formatClockTime(et) + '</span>' +
+            '<span class="clock-edit" onclick="editClockTime(\'end\')">修改</span>' +
+            '</div>' +
+            '<div class="clock-row">' +
+            '<span class="clock-label">耗时</span>' +
+            '<span style="font-size:16px;font-weight:600;color:var(--secondary-color);">' + durationText + '</span>' +
+            '</div>' +
+            '<div class="clock-btn-row">' +
+            '<button class="clock-btn clock-btn-restart" onclick="restartClock()">重新打卡</button>' +
+            '</div>';
+        if (jobTimerInterval) { clearInterval(jobTimerInterval); jobTimerInterval = null; }
+    }
+}
+
+function startClock() {
+    formData.jobStartTime = new Date().toISOString();
+    formData.jobEndTime = null;
+    renderClockCard();
+}
+
+function endClock() {
+    formData.jobEndTime = new Date().toISOString();
+    renderClockCard();
+}
+
+function restartClock() {
+    formData.jobStartTime = null;
+    formData.jobEndTime = null;
+    if (jobTimerInterval) { clearInterval(jobTimerInterval); jobTimerInterval = null; }
+    renderClockCard();
+}
+
+function updateClockTimer() {
+    if (!formData.jobStartTime || formData.jobEndTime) return;
+    var elapsed = document.getElementById('clockElapsed');
+    if (!elapsed) return;
+    var diff = Math.floor((new Date() - new Date(formData.jobStartTime)) / 1000);
+    var h = Math.floor(diff / 3600);
+    var m = Math.floor((diff % 3600) / 60);
+    var s = diff % 60;
+    elapsed.textContent = String(h).padStart(2, '0') + ':' +
+        String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+function editClockTime(which) {
+    var currentVal = which === 'start' ? formData.jobStartTime : formData.jobEndTime;
+    var d = currentVal ? new Date(currentVal) : new Date();
+    var currentStr = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+
+    // 创建时间选择弹层
+    var overlay = document.createElement('div');
+    overlay.className = 'confirm-overlay show';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+    var label = which === 'start' ? '开始时间' : '结束时间';
+    overlay.innerHTML = '<div class="confirm-box">' +
+        '<div class="confirm-box-title">修改' + label + '</div>' +
+        '<div style="padding:12px 0;text-align:center;">' +
+        '<input type="time" id="timePickerInput" value="' + currentStr + '" ' +
+        'style="font-size:24px;padding:10px 16px;border:2px solid #e0e0e0;border-radius:12px;' +
+        'width:160px;text-align:center;font-family:inherit;color:var(--dark-text);">' +
+        '</div>' +
+        '<div class="confirm-box-btns">' +
+        '<button class="confirm-cancel" onclick="this.closest(\'.confirm-overlay\').remove();">取消</button>' +
+        '<button class="confirm-ok" style="background:var(--step-color);" onclick="confirmTimeEdit(\'' + which + '\', document.getElementById(\'timePickerInput\').value);this.closest(\'.confirm-overlay\').remove();">确定</button>' +
+        '</div></div>';
+    document.body.appendChild(overlay);
+
+    // 聚焦输入框
+    setTimeout(function() {
+        var input = document.getElementById('timePickerInput');
+        if (input) input.focus();
+    }, 100);
+}
+
+function confirmTimeEdit(which, timeStr) {
+    if (!timeStr) return;
+    var parts = timeStr.split(':');
+    var hh = parseInt(parts[0]), mm = parseInt(parts[1]);
+
+    var d = new Date();
+    var currentVal = which === 'start' ? formData.jobStartTime : formData.jobEndTime;
+    if (currentVal) d = new Date(currentVal);
+    d.setHours(hh, mm, 0, 0);
+
+    if (which === 'start') {
+        formData.jobStartTime = d.toISOString();
+    } else {
+        formData.jobEndTime = d.toISOString();
+    }
+    renderClockCard();
+}
+
+function formatClockTime(isoStr) {
+    var d = new Date(isoStr);
+    return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' +
+        String(d.getSeconds()).padStart(2, '0');
+}
+
+// ============================
+//  选择模式
+// ============================
+function selectMode(mode) {
+    if (hasDraft(mode)) {
+        // 有暂存 → 弹出恢复确认对话框
+        showDraftRestoreDialog(mode);
+    } else {
+        enterMode(mode, false);
+    }
+}
+
+function enterMode(mode, isRestore) {
+    if (isRestore) {
+        var raw = localStorage.getItem('draft_' + mode);
+        var draft = JSON.parse(raw);
+        applyDraftData(draft);
+        // 恢复后显示提示
+        var mediaNote = '';
+        if (draft.photoCount > 0 || draft.hadVideo) {
+            mediaNote = '（照片/视频需重新拍摄）';
         }
-        
-        function savePendingTasks(tasks) {
-            localStorage.setItem('replacementPending', JSON.stringify(tasks));
+        if (Object.values(draft.audioCounts || {}).some(function(c) { return c > 0; })) {
+            mediaNote = mediaNote || '（录音需重新录制）';
         }
-        
-        function checkPendingTasks() {
-            var tasks = getPendingTasks();
-            var banner = document.getElementById('pendingBanner');
-            if (tasks.length > 0) {
-                document.getElementById('pendingTitle').textContent =
-                    '你有 ' + tasks.length + ' 条待完成安装';
-                banner.classList.add('show');
+        if (mediaNote) showToast('已恢复暂存' + mediaNote);
+    } else {
+        currentMode = mode;
+        modeConfig = MODES[mode];
+        currentStep = 0;
+    }
+
+    // 隐藏模式选择页，显示流程页
+    document.getElementById('modeScreen').style.display = 'none';
+    document.getElementById('flowScreen').classList.add('active');
+    document.getElementById('bottomBar').style.display = 'flex';
+    document.getElementById('headerModeTag').style.display = '';
+    document.getElementById('headerModeTag').textContent = modeConfig.tag;
+    document.getElementById('headerModeTag').style.background = modeConfig.color + '18';
+    document.getElementById('headerModeTag').style.color = modeConfig.color;
+    document.getElementById('headerTitle').textContent = modeConfig.name;
+
+    // 设置CSS变量
+    document.documentElement.style.setProperty('--step-color', modeConfig.color);
+
+    renderStepBar();
+    renderCurrentStep();
+    renderClockCard();
+    updateButtons();
+}
+
+function showDraftRestoreDialog(mode) {
+    var info = getDraftInfo(mode);
+    var timeAgo = formatTimeAgo(info ? info.savedAt : '');
+    var cfg = MODES[mode];
+
+    var overlay = document.createElement('div');
+    overlay.className = 'confirm-overlay show';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+    overlay.innerHTML = '<div class="confirm-box">' +
+        '<div class="confirm-box-title" style="color:' + cfg.color + ';">恢复暂存记录</div>' +
+        '<div class="confirm-box-desc">检测到 <b>' + cfg.name + '</b> 模式下有未完成的暂存记录' +
+        (timeAgo ? '<br><span style="font-size:12px;color:var(--gray-text);">暂存时间：' + timeAgo + '</span>' : '') + '</div>' +
+        '<div class="confirm-box-btns">' +
+        '<button class="confirm-cancel" onclick="clearDraft(\'' + mode + '\');this.closest(\'.confirm-overlay\').remove();enterMode(\'' + mode + '\', false);">重新开始</button>' +
+        '<button class="confirm-ok" style="background:' + cfg.color + ';" onclick="this.closest(\'.confirm-overlay\').remove();enterMode(\'' + mode + '\', true);">恢复暂存</button>' +
+        '</div></div>';
+    document.body.appendChild(overlay);
+}
+
+// ============================
+//  步骤进度条
+// ============================
+function renderStepBar() {
+    var steps = modeConfig.steps;
+    var html = '';
+    for (var i = 0; i < steps.length; i++) {
+        if (i > 0) {
+            html += '<div class="step-line' + (i <= currentStep ? ' done' : '') + '" style="' +
+                (i <= currentStep ? 'background:' + modeConfig.color : '') + '"></div>';
+        }
+        var stateClass = '';
+        if (i < currentStep) stateClass = 'step-item done';
+        else if (i === currentStep) stateClass = 'step-item current';
+        else stateClass = 'step-item';
+
+        var iconHtml = '';
+        if (i < currentStep) iconHtml = '<i class="bi bi-check-lg"></i>';
+        else iconHtml = '<span>' + (i + 1) + '</span>';
+
+        html += '<div class="' + stateClass + '" onclick="goToStep(' + i + ')" style="--step-color:' + modeConfig.color + '">';
+        html += '<div class="step-dot">' + iconHtml + '</div>';
+        html += '<div class="step-label">' + steps[i].label + '</div>';
+        html += '</div>';
+    }
+    document.getElementById('stepBar').innerHTML = html;
+}
+
+// ============================
+//  渲染当前步骤内容
+// ============================
+function renderCurrentStep() {
+    var key = modeConfig.steps[currentStep].key;
+    var container = document.getElementById('stepContent');
+
+    switch (key) {
+        case 'old-device': container.innerHTML = renderOldDeviceStep(); break;
+        case 'new-device': container.innerHTML = renderNewDeviceStep(); break;
+        case 'data': container.innerHTML = renderDataStep(); break;
+        case 'evidence': container.innerHTML = renderEvidenceStep(); break;
+        case 'confirm': container.innerHTML = renderConfirmStep(); break;
+    }
+}
+
+// ============================
+//  步骤1：旧设备拆除
+// ============================
+function renderOldDeviceStep() {
+    var dev = formData.oldDevice;
+    var html = '';
+
+    // 设备选择
+    if (dev) {
+        var statusColor = dev.status === 'offline' ? 'var(--danger-color)' : 'var(--secondary-color)';
+        html += '<div class="device-picked">';
+        html += '<div class="device-picked-icon" style="background:' + modeConfig.color + '18;color:' + modeConfig.color + ';">';
+        html += '<i class="bi bi-gear"></i></div>';
+        html += '<div class="device-picked-info">';
+        html += '<div class="device-picked-id">' + dev.id + ' <span style="font-size:12px;font-weight:400;color:var(--gray-text);">' + dev.name + '</span></div>';
+        html += '<div class="device-picked-meta">' + dev.type + ' · ' + dev.location + ' · <span style="color:' + statusColor + '">' + (dev.status === 'offline' ? '故障中' : '在线') + '</span></div>';
+        html += '</div>';
+        html += '<button class="device-picked-reselect" onclick="resetDevice(\'old\')" style="color:' + modeConfig.color + '">重选</button>';
+        html += '</div>';
+    } else {
+        html += '<div class="card">';
+        html += '<div class="card-title"><span class="required">设备编号</span></div>';
+        html += '<div class="device-id-row">';
+        html += '<input type="text" class="form-input" id="oldDeviceId" placeholder="输入、扫描或NFC感应设备编号" value="' + (formData.manualOldId || '') + '" onchange="manualDeviceInput(\'old\', this.value)">';
+        html += '<button class="scan-btn" onclick="simulateScan(\'old\')" title="扫码"><i class="bi bi-qr-code-scan"></i></button>';
+        html += '<button class="nfc-btn" onclick="startNfc(\'old\')" title="NFC感应"><i class="bi bi-wifi"></i></button>';
+        html += '</div>';
+        html += '<div style="margin-top:12px;font-size:12px;color:var(--gray-text);text-align:center;">— 或 —</div>';
+        html += '<div class="device-pick-card" style="margin-top:10px;margin-bottom:0;" onclick="openDeviceSelection(\'old\')">';
+        html += '<div class="pick-icon" style="font-size:24px;margin-bottom:4px;color:' + modeConfig.color + ';"><i class="bi bi-list-ul"></i></div>';
+        html += '<div class="pick-text">从附近设备列表中选择</div>';
+        html += '</div>';
+        html += '</div>';
+    }
+
+    // 拆除信息表单
+    html += '<div class="card">';
+    html += '<div class="card-title"><span class="required">拆除类型</span></div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" id="oldRemoveTypeChips">';
+    var types = ['升级更换','故障更换','到期更换','退役拆除','裁撤拆除','返厂维修'];
+    types.forEach(function(t) {
+        var active = formData.oldRemoveType === t ? ' active' : '';
+        html += '<div class="type-chip' + active + '" onclick="selectOldRemoveType(\'' + t + '\', this)" data-val="' + t + '">' + t + '</div>';
+    });
+    html += '</div>';
+
+    html += '<div class="form-row" style="align-items:flex-start;">';
+    html += '<span class="form-label" style="padding-top:10px;">拆除原因</span>';
+    html += '<div style="flex:1;">';
+    html += '<div class="textarea-box">';
+    html += '<textarea class="textarea-inner" id="oldRemoveReason" placeholder="请描述拆除原因（选填）">' + (formData.oldRemoveReason || '') + '</textarea>';
+    html += '<button class="voice-fab" id="voiceBtn_oldRemoveReason" onclick="toggleRecord(\'oldRemoveReason\', this)">';
+    html += '<i class="bi bi-mic-fill"></i></button>';
+    html += '<span class="voice-fab-status" id="voiceStatus_oldRemoveReason"></span>';
+    html += '</div>';
+    html += '<div class="audio-list" id="audioList_oldRemoveReason"></div>';
+    html += '</div>';
+    html += '</div>';
+    html += '<div class="form-row" style="margin-top:10px;">';
+    html += '<span class="form-label">设备去向</span>';
+    html += '<div class="custom-select" id="oldRemoveToSelect">';
+    html += '<div class="custom-select-trigger' + (formData.oldRemoveTo ? '' : ' placeholder') + '" id="oldRemoveToTrigger" onclick="toggleOldRemoveTo(event)">';
+    html += '<span id="oldRemoveToText">' + (formData.oldRemoveTo || '请选择去向') + '</span>';
+    html += '</div>';
+    html += '<div class="custom-select-options" id="oldRemoveToOptions">';
+    var toOptions = ['请选择去向','报废处理','返厂维修','入库备用','其他'];
+    toOptions.forEach(function(to) {
+        var val = to === '请选择去向' ? '' : to;
+        var selected = formData.oldRemoveTo === val ? ' selected' : '';
+        html += '<div class="custom-select-option' + selected + '" data-val="' + val + '" onclick="selectOldRemoveTo(\'' + val + '\')">' + to + '</div>';
+    });
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    return html;
+}
+
+// 类型标签点击样式（注入style）
+function selectOldRemoveType(val, el) {
+    // 移除所有active
+    var chips = document.querySelectorAll('#oldRemoveTypeChips .type-chip');
+    chips.forEach(function(c) { c.classList.remove('active'); });
+    el.classList.add('active');
+    formData.oldRemoveType = val;
+}
+
+// 设备去向自定义下拉
+function toggleOldRemoveTo(e) {
+    if (e) e.stopPropagation();
+    var opts = document.getElementById('oldRemoveToOptions');
+    var trigger = document.getElementById('oldRemoveToTrigger');
+    if (!opts || !trigger) return;
+    var isOpen = opts.classList.contains('show');
+    // 关闭所有自定义下拉
+    document.querySelectorAll('.custom-select-options.show').forEach(function(el) { el.classList.remove('show'); });
+    document.querySelectorAll('.custom-select-trigger').forEach(function(el) { el.classList.remove('active'); });
+    if (!isOpen) {
+        opts.classList.add('show');
+        trigger.classList.add('active');
+    }
+}
+
+function selectOldRemoveTo(val) {
+    formData.oldRemoveTo = val;
+    var textEl = document.getElementById('oldRemoveToText');
+    var trigger = document.getElementById('oldRemoveToTrigger');
+    if (textEl) textEl.textContent = val || '请选择去向';
+    if (trigger) trigger.classList.toggle('placeholder', !val);
+    var opts = document.getElementById('oldRemoveToOptions');
+    if (opts) opts.classList.remove('show');
+    if (trigger) trigger.classList.remove('active');
+    document.querySelectorAll('#oldRemoveToOptions .custom-select-option').forEach(function(opt) {
+        opt.classList.toggle('selected', opt.getAttribute('data-val') === val);
+    });
+}
+
+// 点击外部关闭自定义下拉
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.custom-select')) {
+        document.querySelectorAll('.custom-select-options.show').forEach(function(el) { el.classList.remove('show'); });
+        document.querySelectorAll('.custom-select-trigger.active').forEach(function(el) { el.classList.remove('active'); });
+    }
+});
+
+// ============================
+//  步骤2/1：新设备安装
+// ============================
+function renderNewDeviceStep() {
+    var dev = formData.newDevice;
+    var html = '';
+
+    // 设备选择
+    if (dev) {
+        var statusColor = dev.status === 'offline' ? 'var(--danger-color)' : 'var(--secondary-color)';
+        html += '<div class="device-picked">';
+        html += '<div class="device-picked-icon" style="background:' + modeConfig.color + '18;color:' + modeConfig.color + ';">';
+        html += '<i class="bi bi-gear"></i></div>';
+        html += '<div class="device-picked-info">';
+        html += '<div class="device-picked-id">' + dev.id + ' <span style="font-size:12px;font-weight:400;color:var(--gray-text);">' + dev.name + '</span></div>';
+        html += '<div class="device-picked-meta">' + dev.type + ' · ' + dev.location + ' · <span style="color:' + statusColor + '">' + (dev.status === 'offline' ? '故障中' : '在线') + '</span></div>';
+        html += '</div>';
+        html += '<button class="device-picked-reselect" onclick="resetDevice(\'new\')" style="color:' + modeConfig.color + '">重选</button>';
+        html += '</div>';
+    } else {
+        html += '<div class="card">';
+        html += '<div class="card-title"><span class="required">设备编号</span></div>';
+        html += '<div class="device-id-row">';
+        html += '<input type="text" class="form-input" id="newDeviceId" placeholder="输入、扫描或NFC感应设备编号" value="' + (formData.manualNewId || '') + '" onchange="manualDeviceInput(\'new\', this.value)">';
+        html += '<button class="scan-btn" onclick="simulateScan(\'new\')" title="扫码"><i class="bi bi-qr-code-scan"></i></button>';
+        html += '<button class="nfc-btn" onclick="startNfc(\'new\')" title="NFC感应"><i class="bi bi-wifi"></i></button>';
+        html += '</div>';
+        html += '<div style="margin-top:12px;font-size:12px;color:var(--gray-text);text-align:center;">— 或 —</div>';
+        html += '<div class="device-pick-card" style="margin-top:10px;margin-bottom:0;" onclick="openDeviceSelection(\'new\')">';
+        html += '<div class="pick-icon" style="font-size:24px;margin-bottom:4px;color:' + modeConfig.color + ';"><i class="bi bi-list-ul"></i></div>';
+        html += '<div class="pick-text">从附近设备列表中选择</div>';
+        html += '</div>';
+        html += '</div>';
+    }
+
+    // 安装信息表单
+    html += '<div class="card">';
+    html += '<div class="card-title"><span class="required">安装类型</span></div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" id="installTypeChips">';
+    var types = ['新建安装','扩容安装','替换安装','其他'];
+    types.forEach(function(t) {
+        var active = formData.installType === t ? ' active' : '';
+        html += '<div class="type-chip' + active + '" onclick="selectInstallType(\'' + t + '\', this)" data-val="' + t + '">' + t + '</div>';
+    });
+    html += '</div>';
+
+    html += '<div class="form-row">';
+    html += '<span class="form-label">安装位置</span>';
+    html += '<input class="form-input" id="installLocation" placeholder="如：一期生化池·A区" value="' + (formData.installLocation || '') + '">';
+    html += '</div>';
+    html += '</div>';
+
+    return html;
+}
+
+function selectInstallType(val, el) {
+    var chips = document.querySelectorAll('#installTypeChips .type-chip');
+    chips.forEach(function(c) { c.classList.remove('active'); });
+    el.classList.add('active');
+    formData.installType = val;
+}
+
+// ============================
+//  步骤：数据填报
+// ============================
+function renderDataStep() {
+    // 确定是哪个设备的数据
+    var targetDevice = null;
+    if (currentMode === 'replace') {
+        targetDevice = formData.newDevice; // 更换模式：填新设备数据
+    } else if (currentMode === 'install') {
+        targetDevice = formData.newDevice;
+    } else {
+        // 拆除模式没有数据填报步骤，这段代码不会执行到
+        return '';
+    }
+
+    if (!targetDevice) {
+        return '<div class="card" style="text-align:center;padding:40px 16px;">' +
+            '<div style="font-size:36px;margin-bottom:10px;opacity:0.3;">📊</div>' +
+            '<div style="font-size:14px;color:var(--gray-text);">请先在设备安装步骤中选择设备</div>' +
+            '<div style="font-size:12px;color:var(--gray-text);margin-top:4px;">设备参数将在选择设备后自动加载</div></div>';
+    }
+
+    var params = targetDevice.paramKeys || [];
+    var html = '<div class="card">';
+    html += '<div class="card-title"><i class="bi bi-clipboard-data"></i> 设备参数填报</div>';
+    html += '<div class="card-subtitle">设备：<b>' + targetDevice.id + '</b> ' + targetDevice.name + '（共 ' + params.length + ' 项参数）</div>';
+
+    if (params.length === 0) {
+        html += '<div style="text-align:center;padding:20px;color:var(--gray-text);">该设备无参数数据</div>';
+    } else {
+        html += '<div class="data-grid">';
+        params.forEach(function(key) {
+            var val = formData.dataRows[key] || '';
+            html += '<div class="data-row">';
+            html += '<span class="data-row-name">' + (PARAM_LABELS[key] || key) + '</span>';
+            html += '<input type="number" placeholder="输入值" step="0.01" value="' + val + '" onchange="saveDataRow(\'' + key + '\', this.value)">';
+            html += '<span class="data-row-unit">' + (PARAM_UNITS[key] || '') + '</span>';
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+    html += '</div>';
+
+    // 备注
+    html += '<div class="card">';
+    html += '<div class="card-title">备注</div>';
+    html += '<div class="textarea-box">';
+    html += '<textarea class="textarea-inner" id="remarkArea" placeholder="其他需要说明的情况...">' + (formData.remark || '') + '</textarea>';
+    html += '<button class="voice-fab" id="voiceBtn_remarkArea" onclick="toggleRecord(\'remarkArea\', this)">';
+    html += '<i class="bi bi-mic-fill"></i></button>';
+    html += '<span class="voice-fab-status" id="voiceStatus_remarkArea"></span>';
+    html += '</div>';
+    html += '<div class="audio-list" id="audioList_remarkArea"></div>';
+    html += '</div>';
+
+    return html;
+}
+
+function saveDataRow(key, value) {
+    formData.dataRows[key] = value;
+}
+
+// ============================
+//  步骤：现场证据
+// ============================
+function renderEvidenceStep() {
+    var html = '';
+
+    // 水印开关
+    html += '<div class="card">';
+    html += '<div class="watermark-row">';
+    html += '<div class="toggle' + (formData.watermark ? ' on' : '') + '" id="watermarkToggle" onclick="toggleWatermark()"></div>';
+    html += '<span>照片自动添加水印（时间+设备+定位）</span>';
+    html += '</div>';
+
+    // 照片
+    html += '<div style="font-size:13px;font-weight:500;margin-bottom:6px;display:flex;justify-content:space-between;">';
+    html += '<span>照片</span><span style="color:var(--gray-text);font-size:11px;" id="photoCounter">' + formData.photos.length + '/9</span></div>';
+    html += '<div class="photo-grid" id="photoGrid">';
+    formData.photos.forEach(function(photo, i) {
+        html += '<div class="photo-item">';
+        html += '<img src="' + photo.dataUrl + '" alt="photo">';
+        html += '<button class="photo-del" onclick="deletePhoto(' + i + ')"><i class="bi bi-x"></i></button>';
+        html += '</div>';
+    });
+    html += '</div>';
+    var photoDisabled = formData.photos.length >= 9 ? ' disabled' : '';
+    html += '<div class="upload-area' + photoDisabled + '" id="photoUploadArea" onclick="showPhotoSource()">';
+    html += '<div class="upload-icon"><i class="bi bi-camera"></i></div>';
+    html += '<div class="upload-text">拍照或从相册选择</div></div>';
+    html += '</div>';
+
+    // 视频
+    html += '<div class="card">';
+    html += '<div style="font-size:13px;font-weight:500;margin-bottom:8px;display:flex;justify-content:space-between;">';
+    html += '<span>视频</span><span style="color:var(--gray-text);font-size:11px;">' + (formData.video ? '1/1' : '0/1') + '</span></div>';
+    if (formData.video) {
+        html += '<div class="video-preview">';
+        html += '<button class="video-del-btn" onclick="deleteVideo()"><i class="bi bi-x"></i></button>';
+        html += '<video src="' + formData.video.url + '" controls></video>';
+        html += '<div class="video-info-bar"><span>' + formData.video.duration + '</span><span>' + formData.video.sizeMB + ' MB</span><span style="color:var(--secondary-color);">✓ 已就绪</span></div>';
+        html += '</div>';
+    }
+    var videoDisabled = formData.video ? ' disabled' : '';
+    html += '<div class="upload-area' + videoDisabled + '" onclick="startVideoRecord()">';
+    html += '<div class="upload-icon"><i class="bi bi-camera-video"></i></div>';
+    html += '<div class="upload-text">点击录制视频（限60秒）</div></div>';
+    html += '</div>';
+
+    return html;
+}
+
+// ============================
+//  步骤：确认提交
+// ============================
+function renderConfirmStep() {
+    var steps = modeConfig.steps;
+    var html = '<div style="text-align:center;padding:8px 0 16px;">';
+    html += '<div style="font-size:20px;font-weight:700;color:' + modeConfig.color + ';">确认信息</div>';
+    html += '<div style="font-size:12px;color:var(--gray-text);margin-top:4px;">请核对以下内容，确认无误后提交</div>';
+    html += '</div>';
+
+    // 遍历已完成的步骤生成摘要
+    for (var i = 0; i < steps.length - 1; i++) {
+        var key = steps[i].key;
+        html += '<div class="summary-block">';
+        html += '<div class="summary-block-title">';
+        html += '<span>' + (i + 1) + '. ' + steps[i].label + '</span>';
+        html += '<button class="summary-edit-btn" onclick="goToStep(' + i + ')" style="color:' + modeConfig.color + ';">修改</button>';
+        html += '</div>';
+
+        if (key === 'old-device') {
+            if (formData.oldDevice) {
+                html += '<div class="summary-row"><span class="s-label">设备编号</span><span class="s-value">' + formData.oldDevice.id + '</span></div>';
+                html += '<div class="summary-row"><span class="s-label">设备名称</span><span class="s-value">' + formData.oldDevice.name + '</span></div>';
+                html += '<div class="summary-row"><span class="s-label">所在位置</span><span class="s-value">' + formData.oldDevice.location + '</span></div>';
+                if (formData.oldRemoveType) html += '<div class="summary-row"><span class="s-label">' + (currentMode === 'replace' ? '更换' : '拆除') + '类型</span><span class="s-value">' + formData.oldRemoveType + '</span></div>';
+                if (formData.oldRemoveReason) html += '<div class="summary-row"><span class="s-label">拆除原因</span><span class="s-value">' + formData.oldRemoveReason + '</span></div>';
+                if (formData.oldRemoveTo) html += '<div class="summary-row"><span class="s-label">设备去向</span><span class="s-value">' + formData.oldRemoveTo + '</span></div>';
             } else {
-                banner.classList.remove('show');
+                html += '<div style="font-size:12px;color:var(--danger-color);">⚠ 未选择设备</div>';
             }
         }
-        
-        function showPendingList() {
-            var tasks = getPendingTasks();
-            var container = document.getElementById('pendingListContent');
-            if (tasks.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-text);">暂无待完成工单</div>';
+
+        if (key === 'new-device') {
+            if (formData.newDevice) {
+                html += '<div class="summary-row"><span class="s-label">设备编号</span><span class="s-value">' + formData.newDevice.id + '</span></div>';
+                html += '<div class="summary-row"><span class="s-label">设备名称</span><span class="s-value">' + formData.newDevice.name + '</span></div>';
+                if (formData.installType) html += '<div class="summary-row"><span class="s-label">安装类型</span><span class="s-value">' + formData.installType + '</span></div>';
+                if (formData.installLocation) html += '<div class="summary-row"><span class="s-label">安装位置</span><span class="s-value">' + formData.installLocation + '</span></div>';
             } else {
-                var html = '';
-                tasks.forEach(function(t) {
-                    var time = new Date(t.removalTime).toLocaleDateString('zh-CN');
-                    html += '<div class="pending-item" onclick="resumeTask(\'' + t.id + '\')">' +
-                        '<div class="pending-item-header">' +
-                            '<span class="pending-item-device">' + t.oldDeviceId + '</span>' +
-                            '<span class="pending-item-time">' + time + '</span>' +
-                        '</div>' +
-                        '<div class="pending-item-desc">' +
-                            '原因：' + (t.reasonText || t.reasonType) +
-                            (t.oldDeviceStatus ? ' · 状态：' + t.oldDeviceStatus : '') +
-                            (t.removalPhotoCount ? ' · ' + t.removalPhotoCount + '张照片' : '') +
-                        '</div>' +
-                        '<div class="pending-item-action">点击继续安装 <i class="bi bi-chevron-right"></i></div>' +
-                    '</div>';
+                html += '<div style="font-size:12px;color:var(--danger-color);">⚠ 未选择设备</div>';
+            }
+        }
+
+        if (key === 'data') {
+            var targetDevice = (currentMode === 'replace') ? formData.newDevice : formData.newDevice;
+            if (targetDevice) {
+                var params = targetDevice.paramKeys || [];
+                html += '<div class="summary-row"><span class="s-label">关联设备</span><span class="s-value">' + targetDevice.id + '</span></div>';
+                var hasData = false;
+                params.forEach(function(k) {
+                    if (formData.dataRows[k]) {
+                        html += '<div class="summary-row"><span class="s-label">' + (PARAM_LABELS[k] || k) + '</span><span class="s-value">' + formData.dataRows[k] + ' ' + (PARAM_UNITS[k] || '') + '</span></div>';
+                        hasData = true;
+                    }
                 });
-                container.innerHTML = html;
+                if (!hasData) {
+                    html += '<div style="font-size:12px;color:var(--gray-text);">尚未填写参数数据</div>';
+                }
             }
-            document.getElementById('pendingOverlay').classList.add('show');
-        }
-        
-        function closePendingList(e) {
-            if (!e || e.target === document.getElementById('pendingOverlay')) {
-                document.getElementById('pendingOverlay').classList.remove('show');
+            if (formData.remark) {
+                html += '<div class="summary-row"><span class="s-label">备注</span><span class="s-value">' + formData.remark + '</span></div>';
             }
-        }
-        
-        // ========== 续做模式 ==========
-        function resumeTask(taskId) {
-            var tasks = getPendingTasks();
-            var task = tasks.find(function(t) { return t.id === taskId; });
-            if (!task) return;
-            
-            isResumeMode = true;
-            resumeTaskId = taskId;
-            
-            // 关闭弹窗
-            document.getElementById('pendingOverlay').classList.remove('show');
-            
-            // 隐藏模式切换
-            document.getElementById('modeSwitch').classList.add('hidden');
-            
-            // 将旧设备区设为只读
-            var removalBody = document.getElementById('removalBody');
-            removalBody.classList.add('readonly');
-            removalBody.innerHTML =
-                '<div class="readonly-row"><span class="readonly-label">设备编号</span><span class="readonly-value">' + task.oldDeviceId + '</span></div>' +
-                '<div class="readonly-row"><span class="readonly-label">更换类型</span><span class="readonly-value">' + ({fault:'故障更换',prevent:'预防更换',upgrade:'升级更换'}[task.reasonType] || task.reasonType) + '</span></div>' +
-                '<div class="readonly-row"><span class="readonly-label">更换原因</span><span class="readonly-value">' + (task.reasonText || '--') + '</span></div>' +
-                '<div class="readonly-row"><span class="readonly-label">旧设备状态</span><span class="readonly-value">' + ({repair:'返厂维修',scrap:'报废处理',stock:'回库待检'}[task.oldDeviceStatus] || '--') + '</span></div>' +
-                '<div class="readonly-row"><span class="readonly-label">拆除时间</span><span class="readonly-value">' + new Date(task.removalTime).toLocaleString('zh-CN') + '</span></div>' +
-                (task.removalPhotoCount ? '<div class="readonly-row"><span class="readonly-label">现场照片</span><span class="readonly-value">' + task.removalPhotoCount + ' 张</span></div>' : '');
-            
-            // 更新拆除区badge
-            document.getElementById('removalBadge').textContent = '已完成';
-            document.getElementById('removalBadge').className = 'section-badge done';
-            
-            // 更新安装区badge
-            document.getElementById('installBadge').textContent = '请填写';
-            document.getElementById('installBadge').className = 'section-badge required';
-            document.getElementById('newDeviceLabel').classList.add('required');
-            
-            // 更新页面标题
-            document.getElementById('pageTitle').textContent = '继续安装';
-            
-            // 更新底部按钮：只显示提交更换
-            document.getElementById('submitRemovalBtn').classList.add('hidden');
-            document.getElementById('submitFullBtn').textContent = '提交安装';
-            
-            // 滚动到安装区
-            document.getElementById('installSection').scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        // ========== 模式切换 ==========
-        function toggleInstallOnly() {
-            isInstallOnly = !isInstallOnly;
-            var toggle = document.getElementById('installOnlyToggle');
-            toggle.classList.toggle('on', isInstallOnly);
-            
-            var removalSection = document.getElementById('removalSection');
-            if (isInstallOnly) {
-                removalSection.classList.add('hidden');
-                document.getElementById('installBadge').textContent = '必填';
-                document.getElementById('installBadge').className = 'section-badge required';
-                document.getElementById('newDeviceLabel').classList.add('required');
-                // 底部按钮：只显示提交安装
-                document.getElementById('submitRemovalBtn').classList.add('hidden');
-                document.getElementById('submitFullBtn').textContent = '提交安装';
-            } else {
-                removalSection.classList.remove('hidden');
-                document.getElementById('installBadge').textContent = '可选 · 可稍后填写';
-                document.getElementById('installBadge').className = 'section-badge optional';
-                document.getElementById('newDeviceLabel').classList.remove('required');
-                document.getElementById('submitRemovalBtn').classList.remove('hidden');
-                document.getElementById('submitFullBtn').textContent = '提交更换';
-            }
-        }
-        
-        // ========== 原因类型选择 ==========
-        function selectReason(el, value) {
-            currentReasonType = value;
-            document.querySelectorAll('#reasonTypeChips .reason-chip').forEach(function(c) {
-                c.classList.remove('active');
+            // 语音录音统计
+            var totalVoiceCount = 0;
+            var va = formData.voiceAudios || {};
+            Object.keys(va).forEach(function(k) {
+                if (va[k] && va[k].length) totalVoiceCount += va[k].length;
             });
-            el.classList.add('active');
-        }
-        
-        // ========== 模拟扫码 ==========
-        function simulateScan(targetId) {
-            var sample = prompt('模拟扫码输入：', 'DT-2024-009');
-            if (sample) document.getElementById(targetId).value = sample;
-        }
-        
-        // ========== NFC 感应 ==========
-        var nfcTargetId = null;
-        
-        function startNfc(targetId) {
-            nfcTargetId = targetId;
-            document.getElementById('nfcOverlay').classList.add('show');
-            
-            // 模拟3秒后感应成功
-            setTimeout(function() {
-                if (!document.getElementById('nfcOverlay').classList.contains('show')) return;
-                document.getElementById('nfcOverlay').classList.remove('show');
-                // 模拟感应到设备编号
-                var nfcDeviceId = 'DT-2024-002';
-                document.getElementById(nfcTargetId).value = nfcDeviceId;
-                showToast('NFC感应成功：' + nfcDeviceId);
-                nfcTargetId = null;
-            }, 3000);
-        }
-        
-        function cancelNfc() {
-            document.getElementById('nfcOverlay').classList.remove('show');
-            nfcTargetId = null;
-        }
-        
-        // ========== 语音录音 ==========
-        var mediaRecorder = null;
-        var recordTargetId = null;
-        var recordBtnEl = null;
-        var recordChunks = [];
-        var recordTimer = null;
-        var recordSeconds = 0;
-        // 每个targetId的录音列表: { id, url, duration, blob }
-        var audioRecordings = {};
-        var currentPlayingAudio = null;
-        var currentPlayingBtn = null;
-        
-        function toggleRecord(targetId, btnEl) {
-            // 如果正在播放，先停止
-            if (currentPlayingAudio) {
-                currentPlayingAudio.pause();
-                currentPlayingAudio.currentTime = 0;
-                if (currentPlayingBtn) currentPlayingBtn.classList.remove('playing');
-                if (currentPlayingBtn) currentPlayingBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
-                currentPlayingAudio = null;
-                currentPlayingBtn = null;
+            if (totalVoiceCount > 0) {
+                html += '<div class="summary-row"><span class="s-label">语音录音</span><span class="s-value">共 ' + totalVoiceCount + ' 条录音</span></div>';
             }
-            
-            if (mediaRecorder && recordTargetId === targetId) {
-                mediaRecorder.stop();
-                return;
-            }
-            
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                showToast('当前浏览器不支持录音');
-                return;
-            }
-            
-            recordTargetId = targetId;
-            recordBtnEl = btnEl;
-            recordChunks = [];
-            recordSeconds = 0;
-            
-            var statusEl = document.getElementById('voiceStatus_' + targetId);
-            
-            navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
-                mediaRecorder = new MediaRecorder(stream);
-                
-                mediaRecorder.ondataavailable = function(e) {
-                    if (e.data.size > 0) recordChunks.push(e.data);
-                };
-                
-                mediaRecorder.onstop = function() {
-                    stream.getTracks().forEach(function(t) { t.stop(); });
-                    clearInterval(recordTimer);
-                    
-                    btnEl.classList.remove('recording');
-                    btnEl.innerHTML = '<i class="bi bi-mic-fill"></i>';
-                    statusEl.textContent = '';
-                    
-                    if (recordChunks.length > 0) {
-                        var blob = new Blob(recordChunks, { type: 'audio/webm' });
-                        var url = URL.createObjectURL(blob);
-                        var dur = formatDuration(recordSeconds);
-                        var idx = Date.now();
-                        
-                        if (!audioRecordings[targetId]) audioRecordings[targetId] = [];
-                        audioRecordings[targetId].push({ id: idx, url: url, duration: dur, blob: blob });
-                        
-                        renderAudioList(targetId);
-                    }
-                    
-                    mediaRecorder = null;
-                    recordTargetId = null;
-                    recordBtnEl = null;
-                    recordChunks = [];
-                };
-                
-                mediaRecorder.start();
-                btnEl.classList.add('recording');
-                btnEl.innerHTML = '<i class="bi bi-stop-fill"></i>';
-                statusEl.textContent = '00:00';
-                
-                recordTimer = setInterval(function() {
-                    recordSeconds++;
-                    statusEl.textContent = formatDuration(recordSeconds);
-                }, 1000);
-                
-            }).catch(function(err) {
-                showToast('无法获取麦克风权限');
-                btnEl.classList.remove('recording');
-                btnEl.innerHTML = '<i class="bi bi-mic-fill"></i>';
-            });
         }
-        
-        function formatDuration(sec) {
-            var m = Math.floor(sec / 60);
-            var s = sec % 60;
-            return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-        }
-        
-        function renderAudioList(targetId) {
-            var container = document.getElementById('audioList_' + targetId);
-            if (!container) return;
-            var list = audioRecordings[targetId] || [];
-            if (list.length === 0) { container.innerHTML = ''; return; }
-            
-            var html = '';
-            list.forEach(function(item, i) {
-                html += '<div class="audio-chip" id="audioChip_' + targetId + '_' + item.id + '">';
-                html += '  <button class="audio-play" onclick="playAudio(\'' + targetId + '\', ' + item.id + ', this)">';
-                html += '    <i class="bi bi-play-fill"></i>';
-                html += '  </button>';
-                html += '  <div class="audio-info">';
-                html += '    <div class="audio-name">录音 ' + (i + 1) + '</div>';
-                html += '    <div class="audio-dur">' + item.duration + '</div>';
-                html += '  </div>';
-                html += '  <button class="audio-del" onclick="deleteAudio(\'' + targetId + '\', ' + item.id + ')">';
-                html += '    <i class="bi bi-x"></i>';
-                html += '  </button>';
+
+        if (key === 'evidence') {
+            html += '<div class="summary-row"><span class="s-label">现场照片</span><span class="s-value">' + formData.photos.length + ' 张</span></div>';
+            if (formData.photos.length > 0) {
+                html += '<div class="summary-photos">';
+                formData.photos.forEach(function(photo) {
+                    html += '<img class="summary-thumb" src="' + photo.dataUrl + '">';
+                });
                 html += '</div>';
-            });
-            container.innerHTML = html;
-        }
-        
-        function playAudio(targetId, audioId, btnEl) {
-            // 如果正在播放同一个，暂停
-            if (currentPlayingAudio && currentPlayingBtn === btnEl) {
-                currentPlayingAudio.pause();
-                currentPlayingAudio.currentTime = 0;
-                btnEl.classList.remove('playing');
-                btnEl.innerHTML = '<i class="bi bi-play-fill"></i>';
-                currentPlayingAudio = null;
-                currentPlayingBtn = null;
-                return;
             }
-            
-            // 停止之前的播放
-            if (currentPlayingAudio) {
-                currentPlayingAudio.pause();
-                currentPlayingAudio.currentTime = 0;
-                if (currentPlayingBtn) {
-                    currentPlayingBtn.classList.remove('playing');
-                    currentPlayingBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
-                }
-            }
-            
-            var list = audioRecordings[targetId] || [];
-            var item = list.find(function(r) { return r.id === audioId; });
-            if (!item) return;
-            
-            var audio = new Audio(item.url);
-            currentPlayingAudio = audio;
-            currentPlayingBtn = btnEl;
-            
-            btnEl.classList.add('playing');
-            btnEl.innerHTML = '<i class="bi bi-pause-fill"></i>';
-            
-            audio.onended = function() {
-                btnEl.classList.remove('playing');
-                btnEl.innerHTML = '<i class="bi bi-play-fill"></i>';
-                currentPlayingAudio = null;
-                currentPlayingBtn = null;
-            };
-            
-            audio.play();
+            html += '<div class="summary-row"><span class="s-label">现场视频</span><span class="s-value">' + (formData.video ? '已录制（' + formData.video.duration + '）' : '无') + '</span></div>';
+            html += '<div class="summary-row"><span class="s-label">水印</span><span class="s-value">' + (formData.watermark ? '已开启' : '已关闭') + '</span></div>';
         }
-        
-        function deleteAudio(targetId, audioId) {
-            var list = audioRecordings[targetId] || [];
-            audioRecordings[targetId] = list.filter(function(r) { return r.id !== audioId; });
-            
-            // 如果正在播放这个录音，停止
-            if (currentPlayingAudio) {
-                currentPlayingAudio.pause();
-                currentPlayingAudio.currentTime = 0;
-                if (currentPlayingBtn) {
-                    currentPlayingBtn.classList.remove('playing');
-                    currentPlayingBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
-                }
-                currentPlayingAudio = null;
-                currentPlayingBtn = null;
-            }
-            
-            renderAudioList(targetId);
+
+        html += '</div>';
+    }
+
+    html += '<div style="height:16px;"></div>';
+    return html;
+}
+
+// ============================
+//  步骤导航
+// ============================
+function goToStep(index) {
+    // 只能回退到已完成的步骤
+    if (index > currentStep) return;
+
+    // 离开当前步骤前保存数据
+    saveCurrentStepData();
+
+    currentStep = index;
+    renderStepBar();
+    renderCurrentStep();
+    updateButtons();
+    scrollToTop();
+    saveDraftInternal();
+}
+
+function nextStep() {
+    // 未打卡时提示，引导用户先打卡
+    if (!formData.jobStartTime) {
+        showToast('请先完成作业打卡'); return;
+    }
+    // 验证当前步骤
+    if (!validateCurrentStep()) return;
+
+    // 保存数据
+    saveCurrentStepData();
+
+    var totalSteps = modeConfig.steps.length;
+    if (currentStep < totalSteps - 1) {
+        currentStep++;
+        renderStepBar();
+        renderCurrentStep();
+        updateButtons();
+        scrollToTop();
+    }
+    saveDraftInternal();
+}
+
+function prevStep() {
+    if (currentStep > 0) {
+        saveCurrentStepData();
+        currentStep--;
+        renderStepBar();
+        renderCurrentStep();
+        updateButtons();
+        scrollToTop();
+        saveDraftInternal();
+    }
+}
+
+function updateButtons() {
+    var totalSteps = modeConfig.steps.length;
+    var btnPrev = document.getElementById('btnPrev');
+    var btnNext = document.getElementById('btnNext');
+
+    if (currentStep === 0) {
+        btnPrev.style.display = 'none';
+        btnNext.style.flex = '1';
+    } else {
+        btnPrev.style.display = '';
+        btnNext.style.flex = '2';
+    }
+
+    if (currentStep === totalSteps - 1) {
+        // 最后一步：确认提交
+        btnNext.textContent = '确认提交';
+        btnNext.className = 'btn btn-submit';
+        btnNext.style.background = modeConfig.color;
+        btnNext.onclick = submitOrder;
+    } else {
+        btnNext.textContent = '下一步';
+        btnNext.className = 'btn btn-next';
+        btnNext.style.background = modeConfig.color;
+        btnNext.onclick = nextStep;
+    }
+}
+
+// ============================
+//  步骤验证
+// ============================
+function validateCurrentStep() {
+    var key = modeConfig.steps[currentStep].key;
+
+    if (key === 'old-device') {
+        if (!formData.oldDevice) { showToast('请先选择待拆除的设备'); return false; }
+        var typeActive = document.querySelector('#oldRemoveTypeChips .type-chip.active');
+        if (!typeActive) { showToast('请选择拆除类型'); return false; }
+        formData.oldRemoveType = typeActive.getAttribute('data-val');
+    }
+
+    if (key === 'new-device') {
+        if (!formData.newDevice) { showToast('请先选择要安装的设备'); return false; }
+        var typeActive2 = document.querySelector('#installTypeChips .type-chip.active');
+        if (!typeActive2) { showToast('请选择安装类型'); return false; }
+        formData.installType = typeActive2.getAttribute('data-val');
+    }
+
+    return true;
+}
+
+// ============================
+//  保存当前步骤数据
+// ============================
+function saveCurrentStepData() {
+    var key = modeConfig.steps[currentStep].key;
+
+    if (key === 'old-device') {
+        var reasonEl = document.getElementById('oldRemoveReason');
+        if (reasonEl) formData.oldRemoveReason = reasonEl.value;
+        // 设备去向由自定义下拉组件直接维护到 formData.oldRemoveTo
+        var oldIdEl = document.getElementById('oldDeviceId');
+        if (oldIdEl && !formData.oldDevice) formData.manualOldId = oldIdEl.value;
+    }
+
+    if (key === 'new-device') {
+        var locEl = document.getElementById('installLocation');
+        if (locEl) formData.installLocation = locEl.value;
+        var newIdEl = document.getElementById('newDeviceId');
+        if (newIdEl && !formData.newDevice) formData.manualNewId = newIdEl.value;
+    }
+
+    if (key === 'data') {
+        var remarkEl = document.getElementById('remarkArea');
+        if (remarkEl) formData.remark = remarkEl.value;
+    }
+
+    // 同步语音录音数据
+    if (audioRecordings && Object.keys(audioRecordings).length > 0) {
+        formData.voiceAudios = JSON.parse(JSON.stringify(audioRecordings));
+    }
+}
+
+// ============================
+//  设备选择 — 跳转独立设备选择页
+// ============================
+function openDeviceSelection(target) {
+    // 静默保存当前表单状态（用于从设备选择页返回后恢复）
+    saveDraftInternal();
+    var url = 'device-selection.html?target=' + target;
+    // 排除已选设备
+    if (target === 'new' && formData.oldDevice) {
+        url += '&exclude=' + formData.oldDevice.id;
+    }
+    if (target === 'old' && formData.newDevice) {
+        url += '&exclude=' + formData.newDevice.id;
+    }
+    window.location.href = url;
+}
+
+// ============================
+//  设备编号手动输入 / 扫码 / NFC
+// ============================
+function manualDeviceInput(target, value) {
+    value = (value || '').trim();
+    if (target === 'old') formData.manualOldId = value;
+    else formData.manualNewId = value;
+
+    if (!value) return;
+
+    // 尝试从设备库匹配
+    var device = allDevices.find(function(d) { return d.id.toLowerCase() === value.toLowerCase(); });
+    if (device) {
+        if (target === 'old') {
+            formData.oldDevice = device;
+            formData.manualOldId = '';
+        } else {
+            formData.newDevice = device;
+            formData.manualNewId = '';
         }
-        
-        // ========== 水印开关 ==========
-        var watermarkEnabled = true;
-        function toggleWatermark(el) {
-            watermarkEnabled = !watermarkEnabled;
-            document.querySelectorAll('.wm-toggle').forEach(function(t) {
-                t.classList.toggle('on', watermarkEnabled);
-            });
-        }
-        
-        // ========== 照片来源选择 ==========
-        function showPhotoSource(target) {
-            photoTarget = target;
-            var gridId = target === 'removal' ? 'removalPhotos' : 'installPhotos';
-            var count = document.getElementById(gridId).querySelectorAll('.photo-item').length;
-            if (count >= 9) { showToast('最多上传9张照片'); return; }
-            
-            var modal = document.createElement('div');
-            modal.className = 'source-modal';
-            modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
-            modal.innerHTML = '<div class="source-sheet">' +
-                '<div class="source-sheet-title">选择照片来源</div>' +
-                '<div class="source-option" onclick="document.getElementById(\'photoCameraInput\').click();this.closest(\'.source-modal\').remove();">' +
-                    '<i class="bi bi-camera"></i>拍照</div>' +
-                '<div class="source-option" onclick="document.getElementById(\'photoInput\').click();this.closest(\'.source-modal\').remove();">' +
-                    '<i class="bi bi-images"></i>从相册选择</div>' +
-                '<button class="source-cancel" onclick="this.closest(\'.source-modal\').remove()">取消</button>' +
-                '</div>';
-            document.body.appendChild(modal);
-        }
-        
-        // ========== 照片上传+水印 ==========
-        function handlePhotoUpload(event) {
-            var files = event.target.files;
-            var gridId = photoTarget === 'removal' ? 'removalPhotos' : 'installPhotos';
-            var grid = document.getElementById(gridId);
-            var currentCount = grid.querySelectorAll('.photo-item').length;
-            var remaining = 9 - currentCount;
-            var filesToProcess = Array.from(files).slice(0, remaining);
-            
-            filesToProcess.forEach(function(file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    if (watermarkEnabled) {
-                        applyWatermark(e.target.result, function(dataUrl) {
-                            addPhotoItem(grid, dataUrl);
-                        });
-                    } else {
-                        addPhotoItem(grid, e.target.result);
-                    }
-                };
-                reader.readAsDataURL(file);
-            });
-            event.target.value = '';
-        }
-        
-        function applyWatermark(imageDataUrl, callback) {
-            var img = new Image();
-            img.onload = function() {
-                var canvas = document.createElement('canvas');
-                canvas.width = img.width; canvas.height = img.height;
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                
-                var deviceId = document.getElementById('oldDeviceId').value || '--';
-                var now = new Date();
-                var timeStr = now.getFullYear() + '-' +
-                    String(now.getMonth()+1).padStart(2,'0') + '-' +
-                    String(now.getDate()).padStart(2,'0') + ' ' +
-                    String(now.getHours()).padStart(2,'0') + ':' +
-                    String(now.getMinutes()).padStart(2,'0') + ':' +
-                    String(now.getSeconds()).padStart(2,'0');
-                var gpsStr = 'N30.27° E120.15°（模拟）';
-                
-                var barH = Math.max(60, Math.floor(canvas.height * 0.10));
-                var padL = Math.max(10, Math.floor(canvas.width * 0.02));
-                ctx.fillStyle = 'rgba(0,0,0,0.50)';
-                ctx.fillRect(0, canvas.height - barH, canvas.width, barH);
-                
-                var fontSize = Math.max(14, Math.floor(canvas.height * 0.032));
-                var smallFont = Math.max(12, Math.floor(canvas.height * 0.026));
-                var lineGap = Math.floor(fontSize * 1.5);
-                var baseY = canvas.height - barH + Math.floor((barH - lineGap - smallFont) / 2) + fontSize;
-                
-                ctx.fillStyle = 'white';
-                ctx.font = 'bold ' + fontSize + 'px sans-serif';
-                ctx.fillText(timeStr + '  ' + deviceId, padL, baseY);
-                ctx.font = smallFont + 'px sans-serif';
-                ctx.fillText(gpsStr, padL, baseY + lineGap);
-                
-                callback(canvas.toDataURL('image/jpeg', 0.85));
-            };
-            img.src = imageDataUrl;
-        }
-        
-        function addPhotoItem(grid, dataUrl) {
-            var count = grid.querySelectorAll('.photo-item').length;
-            if (count >= 9) return;
-            var item = document.createElement('div');
-            item.className = 'photo-item';
-            item.innerHTML = '<img src="' + dataUrl + '" alt="photo">' +
-                '<button class="photo-delete-btn" onclick="deletePhoto(this)"><i class="bi bi-x"></i></button>';
-            grid.appendChild(item);
-            updateCounters();
-        }
-        
-        function deletePhoto(btn) {
-            btn.parentElement.remove();
-            updateCounters();
-        }
-        
-        function updateCounters() {
-            var rc = document.getElementById('removalPhotos').querySelectorAll('.photo-item').length;
-            var ic = document.getElementById('installPhotos').querySelectorAll('.photo-item').length;
-            removalPhotoCount = rc;
-            installPhotoCount = ic;
-            document.getElementById('removalPhotoCounter').textContent = rc + '/9';
-            document.getElementById('installPhotoCounter').textContent = ic + '/9';
-            var ra = document.getElementById('removalUploadArea');
-            var ia = document.getElementById('installUploadArea');
-            if (ra) ra.classList.toggle('disabled', rc >= 9);
-            if (ia) ia.classList.toggle('disabled', ic >= 9);
-        }
-        
-        // ========== 视频上传 ==========
-        var MAX_VIDEO_DURATION = 60;
-        var MAX_VIDEO_SIZE_MB = 50;
-        
-        function startVideoRecord() {
-            if (document.getElementById('videoPreview').children.length > 0) {
-                showToast('仅支持上传1个视频'); return;
-            }
-            document.getElementById('videoCameraInput').click();
-        }
-        
-        function handleVideoUpload(event) {
-            var file = event.target.files[0];
-            if (!file) return;
-            event.target.value = '';
-            
-            var sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-            if (parseFloat(sizeMB) > MAX_VIDEO_SIZE_MB) {
-                showToast('视频文件过大（' + sizeMB + 'MB），限' + MAX_VIDEO_SIZE_MB + 'MB'); return;
-            }
-            
-            var video = document.createElement('video');
-            video.preload = 'metadata';
-            video.onloadedmetadata = function() {
-                URL.revokeObjectURL(video.src);
-                var duration = Math.round(video.duration);
-                if (duration > MAX_VIDEO_DURATION) {
-                    showToast('视频时长 ' + duration + 's 超出限制（限' + MAX_VIDEO_DURATION + '秒）'); return;
-                }
-                showVideoPreview(file, duration, sizeMB);
-            };
-            video.src = URL.createObjectURL(file);
-        }
-        
-        function showVideoPreview(file, duration, sizeMB) {
-            var container = document.getElementById('videoPreview');
-            var url = URL.createObjectURL(file);
-            var min = Math.floor(duration / 60);
-            var sec = String(duration % 60).padStart(2, '0');
-            container.innerHTML = '<div class="video-card">' +
-                '<button class="video-delete-btn" onclick="deleteVideo()"><i class="bi bi-x"></i></button>' +
-                '<video src="' + url + '" controls style="width:100%;max-height:200px;border-radius:8px 8px 0 0;"></video>' +
-                '<div class="video-info"><span>' + min + ':' + sec + '</span><span>' + sizeMB + ' MB</span><span style="color:var(--secondary-color);">✓ 已就绪</span></div>' +
-                '</div>';
-            document.getElementById('videoUploadArea').classList.add('disabled');
-            document.getElementById('videoCounter').textContent = '1/1';
-        }
-        
-        function deleteVideo() {
-            document.getElementById('videoPreview').innerHTML = '';
-            document.getElementById('videoUploadArea').classList.remove('disabled');
-            document.getElementById('videoCounter').textContent = '0/1';
-        }
-        
-        // ========== 提交：仅拆除 ==========
-        function submitRemoval() {
-            var oldId = document.getElementById('oldDeviceId').value.trim();
-            if (!oldId) { alert('请填写旧设备编号'); return; }
-            var reason = document.getElementById('replaceReason').value;
-            if (!reason) { alert('请选择更换原因'); return; }
-            
-            var task = {
-                id: 'RP-' + Date.now(),
-                oldDeviceId: oldId,
-                reasonType: currentReasonType,
-                reasonText: document.getElementById('replaceReason').selectedOptions[0].textContent,
-                reasonDetail: document.getElementById('reasonDetail').value,
-                oldDeviceStatus: document.getElementById('oldDeviceStatus').value,
-                removalPhotoCount: removalPhotoCount,
-                removalTime: new Date().toISOString(),
-                operator: JSON.parse(localStorage.getItem('currentUser') || '{}').name || '未知',
-                // 安装部分为空
-                newDeviceId: '',
-                installLocation: '',
-                installRemark: '',
-                installPhotoCount: 0,
-                installTime: null,
-                status: 'pending_install'
-            };
-            
-            var tasks = getPendingTasks();
-            tasks.unshift(task);
-            savePendingTasks(tasks);
-            
-            showToast('拆除已提交，待安装工单已创建');
-            setTimeout(function() { goBack(); }, 1200);
-        }
-        
-        // ========== 提交：完整更换 / 续做安装 / 仅新增 ==========
-        function submitFull() {
-            if (isInstallOnly) {
-                // 仅新增安装
-                var newId = document.getElementById('newDeviceId').value.trim();
-                if (!newId) { alert('请填写新设备编号'); return; }
-                var record = buildInstallOnlyRecord();
-                showSubmitSuccess(record);
-                return;
-            }
-            
-            if (isResumeMode) {
-                // 续做安装
-                var newId = document.getElementById('newDeviceId').value.trim();
-                if (!newId) { alert('请填写新设备编号'); return; }
-                completePendingTask();
-                return;
-            }
-            
-            // 一次性完整更换
-            var oldId = document.getElementById('oldDeviceId').value.trim();
-            var newId = document.getElementById('newDeviceId').value.trim();
-            if (!oldId) { alert('请填写旧设备编号'); return; }
-            var reason = document.getElementById('replaceReason').value;
-            if (!reason) { alert('请选择更换原因'); return; }
-            if (!newId) {
-                // 提示用户：新设备未填，是否只提交拆除？
-                if (confirm('新设备信息未填写，是否仅提交拆除记录？\n（后续可从待完成列表继续安装）')) {
-                    submitRemoval();
-                    return;
-                }
-                return;
-            }
-            
-            var record = buildFullRecord();
-            showSubmitSuccess(record);
-        }
-        
-        function buildFullRecord() {
-            return {
-                id: 'RR-' + Date.now(),
-                type: 'full_replacement',
-                oldDeviceId: document.getElementById('oldDeviceId').value,
-                reasonType: currentReasonType,
-                reasonText: document.getElementById('replaceReason').selectedOptions[0].textContent,
-                reasonDetail: document.getElementById('reasonDetail').value,
-                oldDeviceStatus: document.getElementById('oldDeviceStatus').value,
-                removalPhotoCount: removalPhotoCount,
-                newDeviceId: document.getElementById('newDeviceId').value,
-                installLocation: document.getElementById('installLocation').value,
-                installRemark: document.getElementById('installRemark').value,
-                installPhotoCount: installPhotoCount,
-                operator: JSON.parse(localStorage.getItem('currentUser') || '{}').name || '未知',
-                timestamp: new Date().toISOString(),
-                status: 'completed'
-            };
-        }
-        
-        function buildInstallOnlyRecord() {
-            return {
-                id: 'RI-' + Date.now(),
-                type: 'install_only',
-                newDeviceId: document.getElementById('newDeviceId').value,
-                installLocation: document.getElementById('installLocation').value,
-                installRemark: document.getElementById('installRemark').value,
-                installPhotoCount: installPhotoCount,
-                operator: JSON.parse(localStorage.getItem('currentUser') || '{}').name || '未知',
-                timestamp: new Date().toISOString(),
-                status: 'completed'
-            };
-        }
-        
-        function completePendingTask() {
-            var tasks = getPendingTasks();
-            var task = tasks.find(function(t) { return t.id === resumeTaskId; });
-            if (!task) { alert('工单不存在'); return; }
-            
-            // 合并安装信息
-            task.newDeviceId = document.getElementById('newDeviceId').value;
-            task.installLocation = document.getElementById('installLocation').value;
-            task.installRemark = document.getElementById('installRemark').value;
-            task.installPhotoCount = installPhotoCount;
-            task.installTime = new Date().toISOString();
-            task.status = 'completed';
-            
-            // 从待完成列表移除
-            var remaining = tasks.filter(function(t) { return t.id !== resumeTaskId; });
-            savePendingTasks(remaining);
-            
-            showSubmitSuccess(task);
-        }
-        
-        // ========== 存草稿 ==========
-        function saveDraft() {
-            var draft = {
-                oldDeviceId: document.getElementById('oldDeviceId').value,
-                reasonType: currentReasonType,
-                reason: document.getElementById('replaceReason').value,
-                reasonDetail: document.getElementById('reasonDetail').value,
-                oldDeviceStatus: document.getElementById('oldDeviceStatus').value,
-                newDeviceId: document.getElementById('newDeviceId').value,
-                installLocation: document.getElementById('installLocation').value,
-                installRemark: document.getElementById('installRemark').value,
-                isInstallOnly: isInstallOnly,
-                savedAt: new Date().toISOString()
-            };
-            localStorage.setItem('replacementDraft', JSON.stringify(draft));
-            showToast('草稿已保存');
-        }
-        
-        // ========== 提交成功展示 ==========
-        function showSubmitSuccess(record) {
-            var overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:300;display:flex;align-items:center;justify-content:center;';
-            
-            var summary = '';
-            if (record.type === 'install_only') {
-                summary = '<div style="margin-bottom:4px;"><b>新设备：</b>' + record.newDeviceId + '</div>' +
-                    (record.installLocation ? '<div style="margin-bottom:4px;"><b>安装位置：</b>' + record.installLocation + '</div>' : '');
+        showToast('已匹配设备：' + device.id);
+        renderCurrentStep();
+    } else {
+        showToast('未找到该设备，请检查编号或从列表选择');
+    }
+}
+
+function resetDevice(target) {
+    if (target === 'old') {
+        formData.oldDevice = null;
+        formData.manualOldId = '';
+    } else {
+        formData.newDevice = null;
+        formData.manualNewId = '';
+    }
+    renderCurrentStep();
+}
+
+function simulateScan(target) {
+    var sample = prompt('模拟扫码输入：', 'DT-2024-009');
+    if (sample) manualDeviceInput(target, sample);
+}
+
+var nfcTarget = null;
+function startNfc(target) {
+    nfcTarget = target;
+    document.getElementById('nfcOverlay').classList.add('show');
+
+    // 模拟3秒后感应成功
+    setTimeout(function() {
+        if (!document.getElementById('nfcOverlay').classList.contains('show')) return;
+        document.getElementById('nfcOverlay').classList.remove('show');
+        var nfcDeviceId = target === 'old' ? 'DT-2024-009' : 'DT-2024-002';
+        manualDeviceInput(target, nfcDeviceId);
+        nfcTarget = null;
+    }, 3000);
+}
+
+function cancelNfc() {
+    document.getElementById('nfcOverlay').classList.remove('show');
+    nfcTarget = null;
+}
+
+// ============================
+//  照片处理
+// ============================
+function showPhotoSource() {
+    if (formData.photos.length >= 9) { showToast('最多上传9张照片'); return; }
+    // 创建弹窗
+    var overlay = document.createElement('div');
+    overlay.className = 'confirm-overlay show';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = '<div class="confirm-box"><div class="confirm-box-title">选择照片来源</div>' +
+        '<div class="confirm-box-btns" style="flex-direction:column;gap:8px;">' +
+        '<button style="background:#f5f5f5;color:var(--dark-text);padding:12px;border:none;border-radius:8px;font-size:14px;cursor:pointer;" onclick="document.getElementById(\'photoCamera\').click();this.closest(\'.confirm-overlay\').remove();"><i class="bi bi-camera"></i> 拍照</button>' +
+        '<button style="background:#f5f5f5;color:var(--dark-text);padding:12px;border:none;border-radius:8px;font-size:14px;cursor:pointer;" onclick="document.getElementById(\'photoInput\').click();this.closest(\'.confirm-overlay\').remove();"><i class="bi bi-images"></i> 从相册选择</button>' +
+        '<button style="background:var(--light-bg);color:var(--gray-text);padding:10px;border:none;border-radius:8px;font-size:13px;cursor:pointer;" onclick="this.closest(\'.confirm-overlay\').remove();">取消</button>' +
+        '</div></div>';
+    document.body.appendChild(overlay);
+}
+
+function handlePhotoUpload(event) {
+    var files = event.target.files;
+    var remaining = 9 - formData.photos.length;
+    var toProcess = Array.from(files).slice(0, remaining);
+
+    var processed = 0;
+    toProcess.forEach(function(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            if (formData.watermark) {
+                applyWatermark(e.target.result, function(watermarked) {
+                    formData.photos.push({ dataUrl: watermarked, fileName: file.name });
+                    processed++;
+                    if (processed === toProcess.length) finishPhotos();
+                });
             } else {
-                summary = '<div style="margin-bottom:4px;"><b>旧设备：</b>' + record.oldDeviceId + '</div>' +
-                    '<div style="margin-bottom:4px;"><b>新设备：</b>' + record.newDeviceId + '</div>';
+                formData.photos.push({ dataUrl: e.target.result, fileName: file.name });
+                processed++;
+                if (processed === toProcess.length) finishPhotos();
             }
-            
-            overlay.innerHTML = '<div style="background:white;border-radius:12px;padding:32px 24px;text-align:center;width:300px;">' +
-                '<i class="bi bi-check-circle-fill" style="font-size:48px;color:#34C759;margin-bottom:16px;display:block;"></i>' +
-                '<div style="font-size:18px;font-weight:600;margin-bottom:12px;">提交成功</div>' +
-                '<div style="text-align:left;padding:12px;background:#f5f5f5;border-radius:8px;font-size:12px;color:#666;">' +
-                    summary +
-                    '<div style="margin-bottom:4px;"><b>操作人员：</b>' + record.operator + '</div>' +
-                    '<div><b>状态：</b><span style="color:#34C759;">✓ 已完成</span></div>' +
-                '</div>' +
-                '<div style="display:flex;gap:8px;margin-top:16px;">' +
-                    '<button onclick="this.closest(\'div[style]\').parentElement.remove();goBack();" style="flex:1;padding:10px;border:1px solid #E5E5EA;background:#f5f5f5;border-radius:8px;font-size:14px;cursor:pointer;">返回</button>' +
-                    '<button onclick="this.closest(\'div[style]\').parentElement.remove();location.reload();" style="flex:1;padding:10px;border:none;background:#007AFF;color:white;border-radius:8px;font-size:14px;cursor:pointer;">继续</button>' +
-                '</div></div>';
-            document.body.appendChild(overlay);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    event.target.value = '';
+
+    if (toProcess.length === 0) {
+        showToast('已达上限（9张）');
+    }
+}
+
+function finishPhotos() {
+    renderCurrentStep();
+    updatePhotoUploadState();
+}
+
+function applyWatermark(imageDataUrl, callback) {
+    var img = new Image();
+    img.onload = function() {
+        var canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        var deviceId = formData.oldDevice ? formData.oldDevice.id : (formData.newDevice ? formData.newDevice.id : '——');
+        var now = new Date();
+        var timeStr = now.getFullYear() + '-' +
+            String(now.getMonth()+1).padStart(2,'0') + '-' +
+            String(now.getDate()).padStart(2,'0') + ' ' +
+            String(now.getHours()).padStart(2,'0') + ':' +
+            String(now.getMinutes()).padStart(2,'0') + ':' +
+            String(now.getSeconds()).padStart(2,'0');
+
+        var barH = Math.max(50, Math.floor(canvas.height * 0.10));
+        var padL = Math.max(10, Math.floor(canvas.width * 0.02));
+        ctx.fillStyle = 'rgba(0,0,0,0.50)';
+        ctx.fillRect(0, canvas.height - barH, canvas.width, barH);
+
+        var fontSize = Math.max(13, Math.floor(canvas.height * 0.03));
+        var smallFont = Math.max(11, Math.floor(canvas.height * 0.024));
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold ' + fontSize + 'px sans-serif';
+        ctx.fillText(timeStr + '  ' + deviceId, padL, canvas.height - barH + fontSize + 8);
+        ctx.font = smallFont + 'px sans-serif';
+        ctx.fillText('GPS: N30.27° E120.15°', padL, canvas.height - barH + fontSize + smallFont + 14);
+
+        callback(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.src = imageDataUrl;
+}
+
+function deletePhoto(index) {
+    formData.photos.splice(index, 1);
+    renderCurrentStep();
+    updatePhotoUploadState();
+}
+
+function updatePhotoUploadState() {
+    var area = document.getElementById('photoUploadArea');
+    if (area) {
+        if (formData.photos.length >= 9) area.classList.add('disabled');
+        else area.classList.remove('disabled');
+    }
+    var counter = document.getElementById('photoCounter');
+    if (counter) counter.textContent = formData.photos.length + '/9';
+}
+
+function toggleWatermark() {
+    formData.watermark = !formData.watermark;
+    var toggle = document.getElementById('watermarkToggle');
+    if (toggle) toggle.classList.toggle('on', formData.watermark);
+}
+
+// ============================
+//  视频处理
+// ============================
+function startVideoRecord() {
+    if (formData.video) { showToast('仅支持1个视频'); return; }
+    document.getElementById('videoCamera').click();
+}
+
+function handleVideoUpload(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    event.target.value = '';
+
+    var sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+    if (parseFloat(sizeMB) > 50) { showToast('视频过大（限50MB）'); return; }
+
+    var video = document.createElement('video');
+    video.preload = 'metadata';
+    video.onloadedmetadata = function() {
+        URL.revokeObjectURL(video.src);
+        var duration = Math.round(video.duration);
+        if (duration > 60) { showToast('视频时长超限（限60秒）'); return; }
+
+        var url = URL.createObjectURL(file);
+        var min = Math.floor(duration / 60);
+        var sec = String(duration % 60).padStart(2, '0');
+        formData.video = { url: url, file: file, duration: min + ':' + sec, sizeMB: sizeMB };
+        renderCurrentStep();
+    };
+    video.src = URL.createObjectURL(file);
+}
+
+function deleteVideo() {
+    if (formData.video && formData.video.url) URL.revokeObjectURL(formData.video.url);
+    formData.video = null;
+    renderCurrentStep();
+}
+
+// ============================
+//  提交信息
+// ============================
+function submitOrder() {
+    // 最终校验
+    if ((currentMode === 'replace' || currentMode === 'remove') && !formData.oldDevice) {
+        showToast('请选择待拆除设备'); return;
+    }
+    if ((currentMode === 'replace' || currentMode === 'install') && !formData.newDevice) {
+        showToast('请选择要安装的设备'); return;
+    }
+
+    // 打卡状态校验
+    if (!formData.jobStartTime) {
+        showToast('请先完成作业打卡'); return;
+    }
+    if (formData.jobStartTime && !formData.jobEndTime) {
+        showToast('作业仍在打卡中，请先结束打卡'); return;
+    }
+
+    // 显示上报动画
+    showSubmitOverlay();
+}
+
+function showSubmitOverlay() {
+    var overlay = document.createElement('div');
+    overlay.className = 'upload-overlay';
+    overlay.id = 'submitOverlay';
+    overlay.innerHTML = '<div class="upload-card">' +
+        '<div class="spinner" id="submitSpinner"></div>' +
+        '<div class="upload-title" id="submitTitle">正在提交...</div>' +
+        '<div class="upload-desc" id="submitDesc">数据上传中，请稍候</div>' +
+        '</div>';
+    document.body.appendChild(overlay);
+
+    // 模拟上传
+    setTimeout(function() {
+        // 生成记录
+        var prefix = { replace: 'RP', install: 'IN', remove: 'RM' }[currentMode];
+        var record = {
+            id: prefix + '-' + Date.now(),
+            mode: currentMode,
+            modeName: modeConfig.name,
+            oldDevice: formData.oldDevice ? formData.oldDevice.id : null,
+            oldDeviceName: formData.oldDevice ? formData.oldDevice.name : null,
+            newDevice: formData.newDevice ? formData.newDevice.id : null,
+            newDeviceName: formData.newDevice ? formData.newDevice.name : null,
+            oldRemoveType: formData.oldRemoveType,
+            oldRemoveReason: formData.oldRemoveReason,
+            oldRemoveTo: formData.oldRemoveTo,
+            installType: formData.installType,
+            installLocation: formData.installLocation,
+            dataRows: formData.dataRows,
+            remark: formData.remark,
+            voiceAudios: formData.voiceAudios,
+            photoCount: formData.photos.length,
+            hasVideo: !!formData.video,
+            watermark: formData.watermark,
+            timestamp: new Date().toISOString(),
+            operator: '当前用户',
+            jobStartTime: formData.jobStartTime,
+            jobEndTime: formData.jobEndTime
+        };
+
+        // 存储记录
+        var records = JSON.parse(localStorage.getItem('deviceOrders') || '[]');
+        records.unshift(record);
+        localStorage.setItem('deviceOrders', JSON.stringify(records));
+
+        // 提交成功后清除暂存
+        clearDraft(currentMode);
+
+        // 切换为成功界面
+        var card = overlay.querySelector('.upload-card');
+        card.innerHTML = '<div class="upload-success-icon"><i class="bi bi-check-circle-fill"></i></div>' +
+            '<div class="upload-title" style="color:var(--secondary-color);">提交成功</div>' +
+            '<div class="upload-detail">' +
+            '<div><b>操作模式：</b>' + record.modeName + '</div>' +
+            (record.oldDevice ? '<div><b>拆除设备：</b>' + record.oldDevice + ' ' + (record.oldDeviceName || '') + '</div>' : '') +
+            (record.newDevice ? '<div><b>安装设备：</b>' + record.newDevice + ' ' + (record.newDeviceName || '') + '</div>' : '') +
+            '<div><b>现场证据：</b>' + record.photoCount + ' 张照片' + (record.hasVideo ? ' + 1 视频' : '') + (record.watermark ? '（已加水印）' : '') + '</div>' +
+            '<div><b>操作时间：</b>' + new Date(record.timestamp).toLocaleString('zh-CN') + '</div>' +
+            '<div><b>作业打卡：</b>' + formatClockTime(record.jobStartTime) + ' ~ ' + formatClockTime(record.jobEndTime) + '</div>' +
+            '</div>' +
+            '<div class="upload-btns">' +
+            '<button style="background:#f5f5f5;color:var(--dark-text);" onclick="location.reload();">继续更换</button>' +
+            '<button style="background:' + modeConfig.color + ';color:white;" onclick="window.history.back();">返回</button>' +
+            '</div>';
+    }, 1600);
+}
+
+// ============================
+//  切换模式 / 返回
+// ============================
+function goBackOrMode() {
+    if (!currentMode) {
+        // 在模式选择页
+        window.history.back();
+        return;
+    }
+    // 在流程页 → 返回模式选择
+    showModeSwitchConfirm();
+}
+
+function showModeSwitchConfirm() {
+    // 先自动暂存
+    saveDraftInternal();
+
+    var overlay = document.createElement('div');
+    overlay.className = 'confirm-overlay show';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = '<div class="confirm-box">' +
+        '<div class="confirm-box-title">返回模式选择？</div>' +
+        '<div class="confirm-box-desc">当前进度已自动暂存，返回后可随时恢复继续填写</div>' +
+        '<div class="confirm-box-btns">' +
+        '<button class="confirm-cancel" onclick="this.closest(\'.confirm-overlay\').remove();">取消</button>' +
+        '<button class="confirm-ok" style="background:' + (modeConfig ? modeConfig.color : '#FF9500') + ';" onclick="resetToModeSelection();this.closest(\'.confirm-overlay\').remove();">确定返回</button>' +
+        '</div></div>';
+    document.body.appendChild(overlay);
+}
+
+function resetToModeSelection() {
+    currentMode = null;
+    currentStep = 0;
+    formData = {
+        oldDevice: null, newDevice: null,
+        manualOldId: '', manualNewId: '',
+        oldRemoveType: '', oldRemoveReason: '', oldRemoveTo: '',
+        installType: '', installLocation: '',
+        dataRows: {}, remark: '', voiceAudios: {},
+        photos: [], video: null, watermark: true,
+        jobStartTime: null, jobEndTime: null
+    };
+    if (jobTimerInterval) { clearInterval(jobTimerInterval); jobTimerInterval = null; }
+    audioRecordings = {};
+    document.getElementById('modeScreen').style.display = '';
+    document.getElementById('flowScreen').classList.remove('active');
+    document.getElementById('bottomBar').style.display = 'none';
+    document.getElementById('headerModeTag').style.display = 'none';
+    document.getElementById('headerTitle').textContent = '设备更换';
+}
+
+// ============================
+//  语音录音
+// ============================
+var mediaRecorder = null;
+var recordTargetId = null;
+var recordBtnEl = null;
+var recordChunks = [];
+var recordTimer = null;
+var recordSeconds = 0;
+var audioRecordings = {};
+var currentPlayingAudio = null;
+var currentPlayingBtn = null;
+
+function toggleRecord(targetId, btnEl) {
+    // 停止正在播放的录音
+    if (currentPlayingAudio) {
+        currentPlayingAudio.pause();
+        currentPlayingAudio.currentTime = 0;
+        if (currentPlayingBtn) currentPlayingBtn.classList.remove('playing');
+        if (currentPlayingBtn) currentPlayingBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+        currentPlayingAudio = null;
+        currentPlayingBtn = null;
+    }
+
+    // 正在录音中，再次点击则停止
+    if (mediaRecorder && recordTargetId === targetId) {
+        mediaRecorder.stop();
+        return;
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showToast('当前浏览器不支持录音');
+        return;
+    }
+
+    recordTargetId = targetId;
+    recordBtnEl = btnEl;
+    recordChunks = [];
+    recordSeconds = 0;
+
+    var statusEl = document.getElementById('voiceStatus_' + targetId);
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = function(e) {
+            if (e.data.size > 0) recordChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = function() {
+            stream.getTracks().forEach(function(t) { t.stop(); });
+            clearInterval(recordTimer);
+
+            btnEl.classList.remove('recording');
+            btnEl.innerHTML = '<i class="bi bi-mic-fill"></i>';
+            if (statusEl) statusEl.textContent = '';
+
+            if (recordChunks.length > 0) {
+                var blob = new Blob(recordChunks, { type: 'audio/webm' });
+                var url = URL.createObjectURL(blob);
+                var dur = formatDuration(recordSeconds);
+                var idx = Date.now();
+
+                if (!audioRecordings[targetId]) audioRecordings[targetId] = [];
+                audioRecordings[targetId].push({ id: idx, url: url, duration: dur, blob: blob });
+
+                renderAudioList(targetId);
+            }
+
+            mediaRecorder = null;
+            recordTargetId = null;
+            recordBtnEl = null;
+            recordChunks = [];
+        };
+
+        mediaRecorder.start();
+        btnEl.classList.add('recording');
+        btnEl.innerHTML = '<i class="bi bi-stop-fill"></i>';
+        if (statusEl) statusEl.textContent = '00:00';
+
+        recordTimer = setInterval(function() {
+            recordSeconds++;
+            if (statusEl) statusEl.textContent = formatDuration(recordSeconds);
+        }, 1000);
+
+    }).catch(function(err) {
+        showToast('无法获取麦克风权限');
+        btnEl.classList.remove('recording');
+        btnEl.innerHTML = '<i class="bi bi-mic-fill"></i>';
+    });
+}
+
+function formatDuration(sec) {
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function renderAudioList(targetId) {
+    var container = document.getElementById('audioList_' + targetId);
+    if (!container) return;
+    var list = audioRecordings[targetId] || [];
+    if (list.length === 0) { container.innerHTML = ''; return; }
+
+    var html = '';
+    list.forEach(function(item, i) {
+        html += '<div class="audio-chip" id="audioChip_' + targetId + '_' + item.id + '">';
+        html += '  <button class="audio-play" onclick="playAudio(\'' + targetId + '\', ' + item.id + ', this)">';
+        html += '    <i class="bi bi-play-fill"></i>';
+        html += '  </button>';
+        html += '  <div class="audio-info">';
+        html += '    <div class="audio-name">录音 ' + (i + 1) + '</div>';
+        html += '    <div class="audio-dur">' + item.duration + '</div>';
+        html += '  </div>';
+        html += '  <button class="audio-del" onclick="deleteAudio(\'' + targetId + '\', ' + item.id + ')">';
+        html += '    <i class="bi bi-x"></i>';
+        html += '  </button>';
+        html += '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function playAudio(targetId, audioId, btnEl) {
+    if (currentPlayingAudio && currentPlayingBtn === btnEl) {
+        currentPlayingAudio.pause();
+        currentPlayingAudio.currentTime = 0;
+        btnEl.classList.remove('playing');
+        btnEl.innerHTML = '<i class="bi bi-play-fill"></i>';
+        currentPlayingAudio = null;
+        currentPlayingBtn = null;
+        return;
+    }
+
+    if (currentPlayingAudio) {
+        currentPlayingAudio.pause();
+        currentPlayingAudio.currentTime = 0;
+        if (currentPlayingBtn) currentPlayingBtn.classList.remove('playing');
+        if (currentPlayingBtn) currentPlayingBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+    }
+
+    var list = audioRecordings[targetId] || [];
+    var item = list.find(function(a) { return a.id === audioId; });
+    if (!item) return;
+
+    currentPlayingAudio = new Audio(item.url);
+    currentPlayingBtn = btnEl;
+
+    currentPlayingAudio.onloadeddata = function() {
+        currentPlayingAudio.play();
+        btnEl.classList.add('playing');
+        btnEl.innerHTML = '<i class="bi bi-pause-fill"></i>';
+    };
+
+    currentPlayingAudio.onended = function() {
+        btnEl.classList.remove('playing');
+        btnEl.innerHTML = '<i class="bi bi-play-fill"></i>';
+        currentPlayingAudio = null;
+        currentPlayingBtn = null;
+    };
+
+    currentPlayingAudio.onerror = function() {
+        btnEl.classList.remove('playing');
+        btnEl.innerHTML = '<i class="bi bi-play-fill"></i>';
+        currentPlayingAudio = null;
+        currentPlayingBtn = null;
+    };
+}
+
+function deleteAudio(targetId, audioId) {
+    if (currentPlayingAudio) {
+        currentPlayingAudio.pause();
+        currentPlayingAudio.currentTime = 0;
+        if (currentPlayingBtn) currentPlayingBtn.classList.remove('playing');
+        if (currentPlayingBtn) currentPlayingBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+        currentPlayingAudio = null;
+        currentPlayingBtn = null;
+    }
+
+    var list = audioRecordings[targetId] || [];
+    audioRecordings[targetId] = list.filter(function(a) { return a.id !== audioId; });
+    renderAudioList(targetId);
+}
+
+// ============================
+//  工具函数
+// ============================
+function showToast(msg) {
+    var toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(function() { toast.remove(); }, 2500);
+}
+
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 全局注入type-chip样式
+(function injectStyles() {
+    var styleEl = document.createElement('style');
+    styleEl.textContent =
+        '.type-chip { padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 18px;' +
+        'font-size: 14px; color: var(--gray-text); background: white; cursor: pointer; ' +
+        'white-space: nowrap; transition: all 0.2s; user-select: none; }' +
+        '.type-chip.active { background: rgba(255,149,0,0.08); border-color: var(--step-color, #FF9500); ' +
+        'color: var(--step-color, #FF9500); font-weight: 600; }' +
+        '.type-chip:active { transform: scale(0.95); }';
+    document.head.appendChild(styleEl);
+})();
+
+// ============================
+//  初始化
+// ============================
+window.addEventListener('load', function() {
+    // 默认显示模式选择
+    document.getElementById('bottomBar').style.display = 'none';
+    document.getElementById('flowScreen').classList.remove('active');
+    document.getElementById('modeScreen').style.display = '';
+
+    // 检测各模式暂存状态，更新卡片标签
+    updateDraftBadges();
+
+    // 检查是否有从设备选择页带过来的设备
+    var preselected = JSON.parse(localStorage.getItem('selectedReplaceDevice') || 'null');
+    if (preselected) {
+        localStorage.removeItem('selectedReplaceDevice');
+        var device = allDevices.find(function(d) { return d.id === preselected.id; });
+        if (device) {
+            if (preselected.target === 'new') {
+                formData.newDevice = device;
+                formData.manualNewId = '';
+            } else {
+                formData.oldDevice = device;
+                formData.manualOldId = '';
+            }
+            // 如果当前在流程中，刷新步骤
+            if (currentMode) renderCurrentStep();
         }
-        
-        // ========== Toast ==========
-        function showToast(msg) {
-            var toast = document.createElement('div');
-            toast.textContent = msg;
-            toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:white;padding:10px 20px;border-radius:8px;font-size:14px;z-index:400;white-space:nowrap;';
-            document.body.appendChild(toast);
-            setTimeout(function() { toast.remove(); }, 2000);
+    }
+});
+
+// 从设备选择页返回时（pageshow 比 load 更可靠，包括 bfcache 恢复）
+window.addEventListener('pageshow', function(e) {
+    var preselected = JSON.parse(localStorage.getItem('selectedReplaceDevice') || 'null');
+    if (preselected) {
+        localStorage.removeItem('selectedReplaceDevice');
+        var device = allDevices.find(function(d) { return d.id === preselected.id; });
+        if (device) {
+            if (preselected.target === 'new') {
+                formData.newDevice = device;
+                formData.manualNewId = '';
+            } else {
+                formData.oldDevice = device;
+                formData.manualOldId = '';
+            }
+            // 恢复暂存状态
+            if (currentMode) {
+                restoreDraftSilently();
+                renderCurrentStep();
+            }
         }
-        
-        // ========== 返回 ==========
-        function goBack() { window.history.back(); }
-        
-        // ========== 启动 ==========
-        initPage();
-    </script>
+    }
+});
+
+// 页面关闭/刷新前自动暂存
+window.addEventListener('beforeunload', function() {
+    if (currentMode) saveDraftInternal();
+});
+</script>
 </body>
 </html>

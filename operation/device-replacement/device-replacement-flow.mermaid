@@ -1,57 +1,129 @@
 flowchart TD
-    Start([打开「设备更换」]) --> CheckPending{有待完成<br>安装工单?}
+    Start([运维中心 · 点击「更换」]) --> SelectPage[设备选择页]
 
-    CheckPending -->|有| Banner[顶部橙色提示条<br>你有 X 条待完成安装]
-    CheckPending -->|无| Page[进入更换表单]
+    %% ===== 第一步：设备选择 =====
+    subgraph DeviceSelect [第一步：选择设备]
+        direction TB
+        AutoGPS[自动GPS定位<br>检测当前位置] --> RadiusFilter[范围过滤<br>500m / 1km / 3km / 5km]
+        RadiusFilter --> NearbyList[只显示范围内的<br>站点和设备]
 
-    Banner --> Choice{工人选择操作}
-    Choice -->|点击提示条<br>继续安装| ResumeMode
-    Choice -->|新建更换| Page
+        QuickAction{快速识别?}
+        QuickAction -->|扫一扫| QRScan[扫描设备二维码<br>自动识别设备]
+        QuickAction -->|NFC感应| NFCTap[贴近设备NFC标签<br>自动识别设备]
+        QuickAction -->|手动选择| BrowseList[浏览站点芯标<br>按距离排序的设备列表]
 
-    Page --> ModeToggle{是否<br>仅新增安装?}
+        QRScan --> SelectDevice
+        NFCTap --> SelectDevice
+        BrowseList --> SelectDevice
+        NearbyList --> SelectDevice
+        SelectDevice[选中设备<br>存入 localStorage] --> NextPage([跳转更换操作页])
+    end
 
-    %% ===== 场景一：一次到场 =====
-    ModeToggle -->|否 · 默认| Scene1
+    SelectPage --> DeviceSelect
+
+    %% ===== 第二步：更换操作 =====
+    NextPage --> FormPage[设备更换操作表单]
+
+    subgraph AutoFill [自动填充]
+        direction TB
+        AutoDevice[设备信息<br>从选择页带入] --- AutoType[更换类型默认<br>故障更换]
+    end
+
+    FormPage --> AutoFill
+
+    AutoFill --> CheckPending{是否有待完成<br>安装工单?}
+
+    CheckPending -->|有| PendingBanner[顶部橙色提示条<br>点击继续安装]
+    CheckPending -->|无| ModeChoice{选择操作模式}
+
+    PendingBanner --> LoadOrder[选择待完成工单]
+    LoadOrder --> ResumeMode[续做模式<br>拆除信息只读 · 直接填安装]
+
+    ModeChoice -->|默认| Scene1
+    ModeChoice -->|打开开关| Scene3
+
+    %% ===== 场景一：一次搞定 =====
     subgraph Scene1 [场景一：带了新设备 · 一次搞定]
         direction TB
-        A1[填写旧设备拆除区<br>设备编号 · 更换类型 · 原因<br>设备状态 · 现场照片] --> A2[填写新设备安装区<br>新设备编号 · 安装位置<br>安装备注 · 安装照片]
-        A2 --> A3([提交更换<br>一条完整记录 ✓])
+        S1_Type[选择更换类型<br>故障/预防/升级] --> S1_Old[旧设备拆除区<br>设备编号 · 拆除原因 · 旧设备去向]
+        S1_Old --> S1_New[新设备安装区<br>新设备编号扫码/NFC · 安装位置<br>原因详情语音]
+        S1_New --> S1_Evidence[现场证据<br>水印照片+视频]
+        S1_Evidence --> S1_Report[数据填报验证<br>选指标 → 人工填值]
+        S1_Report --> S1_Submit([提交更换 ✓])
     end
 
-    Scene1 -.->|新设备未填时<br>弹窗提醒| Scene2Entry
+    %% ===== 场景二：分两次到场 =====
+    Scene1 -.->|新设备未填时<br>可用下方按钮| Scene2Entry
+    modeSwitch["「仅提交拆除」按钮"] --> Scene2
 
-    %% ===== 场景二：分两次 =====
-    ModeToggle -->|否 · 默认| Scene2Entry[也可只填拆除区]
     subgraph Scene2 [场景二：没带新设备 · 分两次到场]
         direction TB
-        B1[填写旧设备拆除区] --> B2([提交拆除<br>生成「待安装」工单])
-        B2 --> B3[工单存入待完成列表<br>页面顶部显示提示条]
-        B3 --> B4["下次带新设备到现场<br>点击提示条 → 选择工单"]
-        B4 --> B5[自动加载拆除记录<br>只读展示 · 不可修改]
-        B5 --> B6[填写新设备安装区<br>新设备编号 · 安装位置<br>安装备注 · 安装照片]
-        B6 --> B7([提交安装<br>两次数据合并为完整记录 ✓])
+        S2_Old[只填旧设备拆除区<br>设备编号 · 拆除原因 · 旧设备去向] --> S2_Submit([提交拆除记录])
+        S2_Submit --> S2_Pending[生成「待安装」工单<br>存入待完成列表]
+        S2_Pending --> S2_Banner[下次进场时<br>页面顶部显示橙色提示条]
+        S2_Banner --> S2_Load[点击提示条 → 选择工单]
+        S2_Load --> S2_Resume[加载拆除记录 · 只读展示]
+        S2_Resume --> S2_Install[填写新设备安装区<br>新设备编号 · 安装位置 · 备注]
+        S2_Install --> S2_Report[数据填报验证]
+        S2_Report --> S2_Done([提交安装<br>两次数据合并 ✓])
     end
-    Scene2Entry --> B1
+
+    Scene2Entry --> Scene2
 
     %% ===== 场景三：仅新增 =====
-    ModeToggle -->|是 · 打开开关| Scene3
     subgraph Scene3 [场景三：全新位置加装 · 无旧设备]
         direction TB
-        C0[旧设备拆除区隐藏] --> C1[只填新设备安装区<br>新设备编号 · 安装位置<br>安装备注 · 安装照片]
-        C1 --> C2([提交安装 ✓])
+        S3_Toggle[打开仅新增安装开关] --> S3_Hide[旧设备拆除区隐藏]
+        S3_Hide --> S3_Install[只填新设备安装区<br>新设备编号 · 安装位置 · 备注]
+        S3_Install --> S3_Evidence[现场证据]
+        S3_Evidence --> S3_Report[数据填报验证]
+        S3_Report --> S3_Submit([提交安装 ✓])
     end
+
+    ResumeMode --> S2_Install
+
+    %% ===== 数据填报验证（三种场景公用） =====
+    S1_Report --> ReportDetail
+    S2_Report --> ReportDetail
+    S3_Report --> ReportDetail
+
+    subgraph ReportDetail [数据填报验证 · 简化版]
+        direction TB
+        R1[选择测量指标<br>pH值/浊度/COD/氨氮<br>温度/液位/流量/压力<br>多选标签] --> R2[逐一手动填写实测值<br>每个指标一个输入框]
+        R2 --> R3[选填环境参数标签<br>高温/高湿/雨天等]
+        R3 --> R4[填写备注<br>支持语音输入]
+        R4 --> R5{提交校验}
+        R5 -->|指标值未填| R5_Err[提醒填写指标值]
+        R5 -->|通过| R6([上报云平台 ✓])
+        R5_Err --> R2
+    end
+
+    %% ===== 提交 =====
+    S1_Submit --> CloudUpload
+    S2_Done --> CloudUpload
+    S3_Submit --> CloudUpload
+
+    subgraph CloudUpload [云上报]
+        direction TB
+        UploadAnim[上报动画<br>数据打包中...] --> UploadDone[上报成功]
+        UploadDone --> Summary["摘要展示<br>记录编号 · 操作模式<br>设备信息 · 填报指标<br>照片/视频 · 水印状态"]
+    end
+
+    %% ===== 底部操作 =====
+    S1_Submit -.->|可选操作| SaveDraft[保存草稿 → localStorage]
+    S1_Submit -.->|可选操作| ResetForm[重置表单]
 
     %% ===== 样式 =====
     style Start fill:#007AFF,color:#fff,stroke:none
-    style A3 fill:#34C759,color:#fff,stroke:none
-    style B2 fill:#FF9500,color:#fff,stroke:none
-    style B7 fill:#34C759,color:#fff,stroke:none
-    style C2 fill:#34C759,color:#fff,stroke:none
-    style Banner fill:#FFF3E0,color:#E65100,stroke:#FFB74D
-    style ResumeMode fill:#FFF3E0,color:#E65100,stroke:#FFB74D
+    style NextPage fill:#007AFF,color:#fff,stroke:none
+    style DeviceSelect fill:#F0F8FF,stroke:#007AFF
+    style AutoFill fill:#F5F5F5,stroke:#E5E5EA
     style Scene1 fill:#F0FFF0,stroke:#34C759
     style Scene2 fill:#FFF8F0,stroke:#FF9500
     style Scene3 fill:#F0F0FF,stroke:#007AFF
-
-    ResumeMode[选择待完成工单<br>进入续做模式]
-    ResumeMode --> B5
+    style ReportDetail fill:#FAFAFA,stroke:#E5E5EA
+    style CloudUpload fill:#F0F0FF,stroke:#007AFF
+    style PendingBanner fill:#FFF3E0,color:#E65100,stroke:#FFB74D
+    style SaveDraft fill:#FF9500,color:#fff,stroke:none
+    style ResetForm fill:#E5E5EA,color:#666,stroke:none
+    style modeSwitch fill:#FF9500,color:#fff,stroke:none

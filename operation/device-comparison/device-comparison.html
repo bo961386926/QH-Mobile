@@ -190,14 +190,27 @@
             cursor: pointer;
         }
         
-        /* 偏差显示 */
+        /* 偏差显示 - 支持三色状态 */
         .deviation-display {
-            background-color: #f5f5f5;
             padding: 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             text-align: center;
-            margin-top: 12px;
-            border: 1px dashed var(--border-color);
+            margin-top: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #f5f5f5;
+            transition: all 0.3s;
+        }
+        .deviation-display.normal {
+            background-color: rgba(52,199,89,0.06);
+            border-color: rgba(52,199,89,0.25);
+        }
+        .deviation-display.warn {
+            background-color: rgba(255,149,0,0.06);
+            border-color: rgba(255,149,0,0.25);
+        }
+        .deviation-display.error {
+            background-color: rgba(255,59,48,0.06);
+            border-color: rgba(255,59,48,0.25);
         }
         
         .deviation-label {
@@ -209,17 +222,51 @@
         .deviation-value {
             font-size: 18px;
             font-weight: 600;
-            color: var(--warning-color);
+            color: var(--gray-text);
         }
-        
         .deviation-value.normal {
             color: var(--secondary-color);
+        }
+        .deviation-value.warn {
+            color: var(--warning-color);
+        }
+        .deviation-value.error {
+            color: var(--danger-color);
         }
         
         .deviation-range {
             font-size: 11px;
             color: var(--gray-text);
             margin-top: 4px;
+        }
+
+        .deviation-percent {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .deviation-percent.normal {
+            background: rgba(52,199,89,0.12);
+            color: var(--secondary-color);
+        }
+        .deviation-percent.warn {
+            background: rgba(255,149,0,0.12);
+            color: var(--warning-color);
+        }
+        .deviation-percent.error {
+            background: rgba(255,59,48,0.12);
+            color: var(--danger-color);
+        }
+
+        /* 参数卡片整体状态边框 */
+        .param-card.status-warn {
+            border-color: rgba(255,149,0,0.4);
+        }
+        .param-card.status-error {
+            border-color: rgba(255,59,48,0.4);
         }
         
         /* 文本区域 */
@@ -960,8 +1007,8 @@
         <div class="form-group">
             <div class="form-label required">比对类型</div>
             <div class="type-chips">
-                <div class="type-chip active" onclick="selectType(this)" data-value="periodic">周期性校准</div>
-                <div class="type-chip" onclick="selectType(this)" data-value="fault">故障排查</div>
+              <!-- <div class="type-chip active" onclick="selectType(this)" data-value="periodic">周期性校准</div>--> 
+                <div class="type-chip active" onclick="selectType(this)" data-value="periodic">故障排查</div>
                 <div class="type-chip" onclick="selectType(this)" data-value="acceptance">验收测试</div>
             </div>
         </div>
@@ -979,7 +1026,7 @@
                 <div class="input-label"></div>
                 <div class="input-field">
                     <button id="fetchStandardBtn" onclick="fetchStandardFromPlatform()" style="flex:1; padding:8px 12px; border:1px solid var(--primary-color); background:rgba(0,122,255,0.06); border-radius:6px; font-size:13px; color:var(--primary-color); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
-                        <i class="bi bi-cloud-arrow-down" id="fetchIcon"></i> <span id="fetchText">从平台获取</span>
+                        <i class="bi bi-cloud-arrow-down" id="fetchIcon"></i> <span id="fetchText">获取平台值</span>
                     </button>
                 </div>
             </div>
@@ -1144,7 +1191,7 @@
             }
         }
         
-        // ========== 从平台获取标准值 ==========
+        // ========== 从平台获取平台值 ==========
         function fetchStandardFromPlatform() {
             var btn = document.getElementById('fetchStandardBtn');
             var icon = document.getElementById('fetchIcon');
@@ -1201,7 +1248,7 @@
                 
                 setTimeout(function() {
                     icon.className = 'bi bi-cloud-arrow-down';
-                    text.textContent = '从平台获取';
+                    text.textContent = '获取平台值';
                     btn.style.borderColor = 'var(--primary-color)';
                     btn.style.color = 'var(--primary-color)';
                     btn.style.background = 'rgba(0,122,255,0.06)';
@@ -1247,9 +1294,9 @@
                 html += '    <span class="param-card-badge pending" id="badge-' + key + '">待测量</span>';
                 html += '  </div>';
                 
-                // 标准值行
+                // 平台值行
                 html += '  <div class="input-row">';
-                html += '    <div class="input-label">标准值</div>';
+                html += '    <div class="input-label">平台值</div>';
                 html += '    <div class="input-field">';
                 html += '      <input type="number" value="' + param.value + '" step="0.01" id="std-' + key + '" oninput="calcParamDeviation(\'' + key + '\')">';
                 html += '      <div class="input-unit">' + param.unit + '</div>';
@@ -1266,9 +1313,9 @@
                 // 手动输入面板
                 html += '  <div class="card-mode-panel active" id="panel-manual-' + key + '">';
                 html += '    <div class="input-row">';
-                html += '      <div class="input-label">实测值</div>';
+                html += '      <div class="input-label">第三方设备值</div>';
                 html += '      <div class="input-field">';
-                html += '        <input type="number" placeholder="输入实测值" step="0.01" id="mea-' + key + '" oninput="calcParamDeviation(\'' + key + '\')">';
+                html += '        <input type="number" placeholder="输入第三方设备值" step="0.01" id="mea-' + key + '" oninput="calcParamDeviation(\'' + key + '\')">';
                 html += '        <div class="input-unit">' + param.unit + '</div>';
                 html += '      </div>';
                 html += '    </div>';
@@ -1316,8 +1363,8 @@
                 
                 // 偏差显示
                 html += '  <div class="deviation-display" id="dev-' + key + '" style="margin-top:8px;">';
-                html += '    <div class="deviation-label">等待输入实测值</div>';
-                html += '    <div class="deviation-range">允许偏差：±' + param.tolerance + ' ' + param.unit + '</div>';
+                html += '    <div class="deviation-label">等待输入第三方设备值</div>';
+                html += '    <div class="deviation-range">允许偏差范围：±5%</div>';
                 html += '  </div>';
                 
                 // 偏差原因
@@ -1350,7 +1397,12 @@
             });
         }
         
-        // ========== 单参数偏差计算 ==========
+        // ========== 单参数偏差计算（百分比制） ==========
+        // 绿色：≤5%  黄色：5%-15%  红色：>15%
+        var DEVIATION_NORMAL = 5;   // 5%以内正常
+        var DEVIATION_WARN = 15;    // 5%-15%警告
+        // >15% 红色异常
+
         function calcParamDeviation(key) {
             var param = allParams.find(function(p) { return p.key === key; });
             if (!param) return;
@@ -1360,47 +1412,67 @@
             var devEl = document.getElementById('dev-' + key);
             var badgeEl = document.getElementById('badge-' + key);
             var reasonEl = document.getElementById('reason-' + key);
+            var cardEl = document.getElementById('card-' + key);
             
             var stdVal = parseFloat(stdEl.value) || 0;
             var meaVal = parseFloat(meaEl.value);
             
             if (!meaEl.value || isNaN(meaVal)) {
-                devEl.innerHTML = '<div class="deviation-label">等待输入实测值</div><div class="deviation-range">允许偏差：±' + param.tolerance + ' ' + param.unit + '</div>';
+                devEl.className = 'deviation-display';
+                devEl.innerHTML = '<div class="deviation-label">等待输入第三方设备值</div><div class="deviation-range">允许偏差范围：±5%</div>';
                 badgeEl.className = 'param-card-badge pending';
                 badgeEl.textContent = '待测量';
                 reasonEl.style.display = 'none';
+                cardEl.classList.remove('status-warn', 'status-error');
                 return;
             }
             
+            // 计算偏差百分比
             var deviation = meaVal - stdVal;
-            var absDev = Math.abs(deviation);
-            var statusText, statusClass, badgeClass;
+            var percentDeviation = stdVal !== 0 ? (Math.abs(deviation) / Math.abs(stdVal)) * 100 : (Math.abs(deviation) * 100);
             
-            if (absDev <= param.tolerance) {
-                statusText = '正常';
+            var statusText, statusClass, badgeClass, badgeText, displayClass;
+            
+            if (percentDeviation <= DEVIATION_NORMAL) {
+                // 绿色：偏差在5%以内，正常
+                statusText = '偏差正常';
                 statusClass = 'normal';
                 badgeClass = 'normal';
-                badgeEl.textContent = '正常';
+                badgeText = '合格';
+                displayClass = 'normal';
                 reasonEl.style.display = 'none';
-            } else if (absDev <= param.tolerance * 2) {
-                statusText = '偏差（待复核）';
-                statusClass = '';
+                cardEl.classList.remove('status-warn', 'status-error');
+            } else if (percentDeviation <= DEVIATION_WARN) {
+                // 黄色：偏差5%-15%，需关注
+                statusText = '偏差偏大（需关注）';
+                statusClass = 'warn';
                 badgeClass = 'warn';
-                badgeEl.textContent = '待复核';
+                badgeText = '需关注';
+                displayClass = 'warn';
                 reasonEl.style.display = '';
+                cardEl.classList.add('status-warn');
+                cardEl.classList.remove('status-error');
             } else {
-                statusText = '偏差（异常）';
-                statusClass = '';
+                // 红色：偏差>15%，异常
+                statusText = '偏差严重（异常）';
+                statusClass = 'error';
                 badgeClass = 'error';
-                badgeEl.textContent = '异常';
+                badgeText = '异常';
+                displayClass = 'error';
                 reasonEl.style.display = '';
+                cardEl.classList.add('status-error');
+                cardEl.classList.remove('status-warn');
             }
             
             var html = '<div class="deviation-label">' + statusText + '</div>';
             html += '<div class="deviation-value ' + statusClass + '">' + (deviation > 0 ? '+' : '') + deviation.toFixed(2) + ' ' + param.unit + '</div>';
-            html += '<div class="deviation-range">允许：±' + param.tolerance + ' ' + param.unit + '（当前：' + (deviation > 0 ? '+' : '') + deviation.toFixed(2) + ' ' + param.unit + '）</div>';
+            html += '<div class="deviation-percent ' + statusClass + '">偏差 ' + percentDeviation.toFixed(1) + '%</div>';
+            html += '<div class="deviation-range">允许偏差范围：±5%</div>';
+            
+            devEl.className = 'deviation-display ' + displayClass;
             devEl.innerHTML = html;
             badgeEl.className = 'param-card-badge ' + badgeClass;
+            badgeEl.textContent = badgeText;
         }
         
         // ========== 蓝牙采集（单参数，卡片内面板） ==========
@@ -1430,7 +1502,7 @@
                 document.getElementById('btDev-' + key).textContent = btDevices[key] || '检测设备';
                 document.getElementById('btVal-' + key).textContent = reading + ' ' + param.unit;
                 
-                // 自动填入实测值（写入手动面板的输入框）
+                // 自动填入第三方设备值（写入手动面板的输入框）
                 document.getElementById('mea-' + key).value = reading;
                 calcParamDeviation(key);
                 
@@ -1466,7 +1538,7 @@
                 document.getElementById('ocrConf-' + key).textContent = confidence;
                 document.getElementById('ocrVal-' + key).textContent = reading + ' ' + param.unit;
                 
-                // 自动填入实测值
+                // 自动填入第三方设备值
                 document.getElementById('mea-' + key).value = reading;
                 calcParamDeviation(key);
                 
@@ -1933,7 +2005,7 @@
             btn.style.opacity = '1';
             document.getElementById('fetchIcon').className = 'bi bi-cloud-arrow-down';
             document.getElementById('fetchIcon').style.animation = 'none';
-            document.getElementById('fetchText').textContent = '从平台获取';
+            document.getElementById('fetchText').textContent = '获取平台值';
             btn.style.borderColor = 'var(--primary-color)';
             btn.style.color = 'var(--primary-color)';
             btn.style.background = 'rgba(0,122,255,0.06)';
@@ -2013,7 +2085,7 @@
             }
             
             // 注意：参数值需要先 fetchStandard 才能恢复，这里仅标记
-            showToast('已恢复草稿（请点击"从平台获取"后自动填充）');
+            showToast('已恢复草稿（请点击"获取平台值"后自动填充）');
             window._pendingDraft = draft;
             localStorage.removeItem('comparisonDraft');
         }
@@ -2021,7 +2093,7 @@
         // ========== 提交表单 ==========
         function submitForm() {
             if (selectedParams.length === 0) {
-                alert('请先从平台获取比对指标');
+                alert('请先获取平台值进行比对');
                 return;
             }
             
@@ -2035,24 +2107,35 @@
             // 收集所有参数数据并验证
             var paramsResults = [];
             var hasEmpty = false;
-            var hasDeviationWithoutReason = false;
+            var hasMissingReason = false;
+            var warnItems = [];  // 黄色偏差项
+            var errorItems = []; // 红色偏差项
             
             selectedParams.forEach(function(key) {
                 var param = allParams.find(function(p) { return p.key === key; });
                 var stdVal = document.getElementById('std-' + key).value;
                 var meaVal = document.getElementById('mea-' + key).value;
                 var reasonEl = document.getElementById('reasonText-' + key);
-                var reason = reasonEl ? reasonEl.value : '';
+                var reason = reasonEl ? reasonEl.value.trim() : '';
                 
                 if (!meaVal) { hasEmpty = true; }
                 
                 var std = parseFloat(stdVal) || 0;
                 var mea = parseFloat(meaVal) || 0;
-                var dev = (mea - std).toFixed(2);
-                var absDev = Math.abs(parseFloat(dev));
+                var dev = mea - std;
+                var absDev = Math.abs(dev);
+                var percentDev = std !== 0 ? (absDev / Math.abs(std)) * 100 : (absDev * 100);
                 
-                if (absDev > param.tolerance && !reason) {
-                    hasDeviationWithoutReason = true;
+                // 判断偏差等级
+                var level = 'normal';
+                if (percentDev > DEVIATION_WARN) {
+                    level = 'error';
+                    if (!reason) hasMissingReason = true;
+                    errorItems.push({ label: param.label, percent: percentDev, deviation: dev, unit: param.unit });
+                } else if (percentDev > DEVIATION_NORMAL) {
+                    level = 'warn';
+                    if (!reason) hasMissingReason = true;
+                    warnItems.push({ label: param.label, percent: percentDev, deviation: dev, unit: param.unit });
                 }
                 
                 paramsResults.push({
@@ -2060,22 +2143,117 @@
                     label: param.label,
                     standardValue: stdVal,
                     measureValue: meaVal,
-                    deviation: dev,
+                    deviation: dev.toFixed(2),
+                    percentDeviation: percentDev.toFixed(1),
                     unit: param.unit,
                     tolerance: param.tolerance,
-                    reason: reason
+                    reason: reason,
+                    level: level
                 });
             });
             
+            // 验证：有未填写的值
             if (hasEmpty) {
-                alert('请填写所有已选指标的实测值');
-                return;
-            }
-            if (hasDeviationWithoutReason) {
-                alert('存在偏差超出允许范围的指标，请填写偏差原因');
+                alert('请填写所有已选指标的第三方设备值');
                 return;
             }
             
+            // 验证：偏差异常但未填写原因
+            if (hasMissingReason) {
+                alert('存在偏差超出允许范围的指标（黄色/红色标记），请填写偏差原因后再提交');
+                return;
+            }
+            
+            // 有黄色或红色偏差项 → 弹出确认对话框
+            if (errorItems.length > 0 || warnItems.length > 0) {
+                showDeviationConfirmDialog(errorItems, warnItems, function(confirmed) {
+                    if (confirmed) {
+                        doSubmit(deviceInfo, typeLabel, paramsResults, envSelected, photoCount, hasVideo);
+                    }
+                });
+                return;
+            }
+            
+            // 全部正常，直接提交
+            doSubmit(deviceInfo, typeLabel, paramsResults, envSelected, photoCount, hasVideo);
+        }
+        
+        // ========== 偏差确认弹窗 ==========
+        function showDeviationConfirmDialog(errorItems, warnItems, callback) {
+            var overlay = document.createElement('div');
+            overlay.id = 'deviationConfirmOverlay';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:350;display:flex;align-items:center;justify-content:center;';
+            
+            var contentHtml = '<div style="background:white;border-radius:14px;padding:24px 20px;width:90%;max-width:360px;max-height:70vh;overflow-y:auto;">';
+            
+            // 标题
+            if (errorItems.length > 0) {
+                contentHtml += '<div style="text-align:center;margin-bottom:16px;">';
+                contentHtml += '<div style="font-size:40px;margin-bottom:8px;">⚠️</div>';
+                contentHtml += '<div style="font-size:17px;font-weight:700;color:var(--danger-color);">偏差异常警告</div>';
+                contentHtml += '<div style="font-size:13px;color:var(--gray-text);margin-top:4px;">以下指标偏差超出允许范围，提交后可能被标记为不合格</div>';
+                contentHtml += '</div>';
+            } else {
+                contentHtml += '<div style="text-align:center;margin-bottom:16px;">';
+                contentHtml += '<div style="font-size:40px;margin-bottom:8px;">⚡</div>';
+                contentHtml += '<div style="font-size:17px;font-weight:700;color:var(--warning-color);">偏差偏大提醒</div>';
+                contentHtml += '<div style="font-size:13px;color:var(--gray-text);margin-top:4px;">以下指标存在一定偏差，请确认是否继续提交</div>';
+                contentHtml += '</div>';
+            }
+            
+            // 红色项
+            if (errorItems.length > 0) {
+                contentHtml += '<div style="font-size:12px;font-weight:600;color:var(--danger-color);margin-bottom:6px;">🔴 严重偏差（>15%）</div>';
+                errorItems.forEach(function(item) {
+                    contentHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(255,59,48,0.06);border:1px solid rgba(255,59,48,0.2);border-radius:8px;margin-bottom:6px;font-size:13px;">';
+                    contentHtml += '<span style="color:var(--dark-text);">' + item.label + '</span>';
+                    contentHtml += '<span style="color:var(--danger-color);font-weight:600;">' + (item.deviation > 0 ? '+' : '') + item.deviation.toFixed(2) + ' ' + item.unit + ' (' + item.percent.toFixed(1) + '%)</span>';
+                    contentHtml += '</div>';
+                });
+            }
+            
+            // 黄色项
+            if (warnItems.length > 0) {
+                contentHtml += '<div style="font-size:12px;font-weight:600;color:var(--warning-color);margin-bottom:6px;margin-top:10px;">🟡 偏差偏大（5%-15%）</div>';
+                warnItems.forEach(function(item) {
+                    contentHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(255,149,0,0.06);border:1px solid rgba(255,149,0,0.2);border-radius:8px;margin-bottom:6px;font-size:13px;">';
+                    contentHtml += '<span style="color:var(--dark-text);">' + item.label + '</span>';
+                    contentHtml += '<span style="color:var(--warning-color);font-weight:600;">' + (item.deviation > 0 ? '+' : '') + item.deviation.toFixed(2) + ' ' + item.unit + ' (' + item.percent.toFixed(1) + '%)</span>';
+                    contentHtml += '</div>';
+                });
+            }
+            
+            // 按钮
+            contentHtml += '<div style="display:flex;gap:10px;margin-top:16px;">';
+            contentHtml += '<button id="devCancelBtn" style="flex:1;padding:12px;border:1px solid var(--border-color);background:#f5f5f5;border-radius:10px;font-size:14px;font-weight:500;color:var(--dark-text);cursor:pointer;">返回修改</button>';
+            contentHtml += '<button id="devConfirmBtn" style="flex:1;padding:12px;border:none;background:var(--danger-color);color:white;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">仍要提交</button>';
+            contentHtml += '</div>';
+            
+            contentHtml += '</div>';
+            overlay.innerHTML = contentHtml;
+            document.body.appendChild(overlay);
+            
+            // 点击遮罩关闭
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    overlay.remove();
+                    callback(false);
+                }
+            });
+            
+            document.getElementById('devCancelBtn').addEventListener('click', function() {
+                overlay.remove();
+                callback(false);
+            });
+            
+            document.getElementById('devConfirmBtn').addEventListener('click', function() {
+                overlay.remove();
+                callback(true);
+            });
+        }
+        
+        // ========== 执行提交 ==========
+        function doSubmit(deviceInfo, typeLabel, paramsResults, envSelected, photoCount, hasVideo) {
             var record = {
                 id: 'CR-' + Date.now(),
                 deviceId: deviceInfo.id || document.getElementById('selectedDeviceId').textContent,
@@ -2117,8 +2295,19 @@
                 var devSummary = '';
                 record.params.forEach(function(p) {
                     var devNum = parseFloat(p.deviation);
-                    var icon = Math.abs(devNum) <= p.tolerance ? '<span style="color:#34C759;">✓</span>' : '<span style="color:#FF9500;">!</span>';
-                    devSummary += '<div style="margin-bottom:2px;">' + icon + ' ' + p.label + '：' + (devNum > 0 ? '+' : '') + p.deviation + ' ' + p.unit + '</div>';
+                    var percentNum = parseFloat(p.percentDeviation) || 0;
+                    var icon, color;
+                    if (p.level === 'error') {
+                        icon = '<span style="color:#FF3B30;">✗</span>';
+                        color = 'color:#FF3B30;';
+                    } else if (p.level === 'warn') {
+                        icon = '<span style="color:#FF9500;">!</span>';
+                        color = 'color:#FF9500;';
+                    } else {
+                        icon = '<span style="color:#34C759;">✓</span>';
+                        color = 'color:#34C759;';
+                    }
+                    devSummary += '<div style="margin-bottom:2px;">' + icon + ' <span style="' + color + '">' + p.label + '：' + (devNum > 0 ? '+' : '') + p.deviation + ' ' + p.unit + ' (' + percentNum.toFixed(1) + '%)</span></div>';
                 });
                 
                 document.getElementById('uploadSpinner').style.display = 'none';
