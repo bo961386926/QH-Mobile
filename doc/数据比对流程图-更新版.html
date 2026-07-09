@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据比对流程图（更新版）</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#F8F9FA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:40px 20px;color:#333}
+h1{text-align:center;font-size:22px;font-weight:700;margin-bottom:30px;color:#1a1a2e}
+.flow-container{max-width:900px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,08);padding:32px}
+
+/* 入口 */
+.entry-node{width:180px;height:44px;border-radius:22px;background:#378ADD;color:#fff;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.arrow-down{width:2px;height:18px;background:#888;margin:0 auto 10px;position:relative}
+.arrow-down::after{content:'';position:absolute;bottom:-5px;left:-4px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid #888}
+
+/* 区域容器 */
+.section-box{border-radius:14px;padding:16px 20px;margin-bottom:16px;position:relative}
+.section-title{font-size:14px;font-weight:700;text-align:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1.5px solid rgba(0,0,0,0.06)}
+
+.step-card{background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid;transition:transform .15s}
+.step-card:hover{transform:translateX(2px)}
+.step-name{font-size:13.5px;font-weight:600;margin-bottom:3px}
+.step-detail{font-size:11.5px;color:#666;line-height:1.55}
+
+/* 蓝色系 - 设备选择 */
+.blue-section{background:#E6F1FB;border:2px solid #378ADD}
+.blue-section .section-title{color:#185FA5;border-color:rgba(24,95,165,0.15)}
+.blue-step{border-color:#85B7EB}
+.blue-step .step-name{color:#0C447C}
+
+/* 橙色系 - 参数卡片 */
+.orange-section{background:#FFF8F0;border:2px solid #FF9500}
+.orange-section .section-title{color:#993C1D;border-color:rgba(153,60,29,0.15)}
+.orange-step{border-color:#EF9F27}
+.orange-step .step-name{color:#993C1D}
+
+.decision-diamond{width:100px;height:48px;margin:10px auto;display:flex;align-items:center;justify-content:center;font-size:11.5px;color:#993C1D;font-weight:600;border:1.5px solid #EF9F27;border-radius:5px;background:#fff}
+
+.result-tag{display:inline-block;padding:4px 12px;border-radius:14px;font-size:11.5px;font-weight:600;text-align:center}
+.result-ok{background:#EAF3DE;color:#3B6D11}.result-warn{background:#FFF3E0;color:#993C1D}
+
+/* 绿色系 - 现场证据 */
+.green-section{background:#F0FFF0;border:2px solid #34C759}
+.green-section .section-title{color:#228B22;border-color:rgba(34,139,34,0.15)}
+.green-step{border-color:#97C459}
+.green-step .step-name{color:#3B6D11}
+
+/* 紫色系 - 提交 */
+.purple-section{background:#EEEDFE;border:2px solid #7F77DD}
+.purple-section .section-title{color:#534AB7;border-color:rgba(83,74,183,0.15)}
+.purple-step{border-color:#AFA9EC}
+.purple-step .step-name{color:#534AB7}
+
+/* 提交按钮 */
+.submit-btn{display:inline-block;padding:10px 28px;border-radius:20px;color:#fff;font-weight:600;font-size:13.5px;text-align:center}
+.btn-blue{background:#378ADD}.btn-green{background:#639922}.btn-orange{background:#FF9500;color:#fff}.btn-gray{background:#B4B2A9}
+
+/* 并排分支 */
+.branch-row{display:flex;gap:10px;margin:8px 0}
+.branch-item{flex:1}
+
+/* 自动填充区 */
+.autofill-row{display:flex;gap:12px;margin-bottom:12px}
+.autofill-item{flex:1;background:#f5f5f0;border:1px solid #ddd;border-radius:8px;padding:8px 12px;text-align:center;font-size:11.5px;color:#666}
+.autofill-item b{color:#333}
+
+/* 图例 */
+.legend{margin-top:16px;padding:12px 16px;background:#f8f9fa;border-radius:8px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:11.5px;color:#666}
+.legend-dot{width:16px;height:16px;border-radius:4px;border:1px solid;display:inline-block;vertical-align:middle;margin-right:4px}
+</style>
+</head>
+<body>
+<div class="flow-container">
+
+<h1>数据比对（数据比例）流程图</h1>
+
+<!-- 入口 -->
+<div class="entry-node">运维中心 · 点击「比对」</div>
+<div class="arrow-down"></div>
+
+<!-- ===== 第一步：设备选择 ===== -->
+<div class="section-box blue-section">
+<div class="section-title">第一步：选择设备</div>
+
+<div class="step-card blue-step">
+<div class="step-name">自动 GPS 定位</div>
+<div class="step-detail">检测当前位置 → 范围过滤（500m / 1km / 3km / 5km）→ 只显示范围内的站点和设备</div>
+</div>
+
+<div style="text-align:center;font-size:11px;color:#378ADD;margin:4px 0;font-weight:600">快速识别?</div>
+
+<div class="branch-row">
+<div class="branch-item step-card blue-step">
+<div class="step-name">扫一扫</div>
+<div class="step-detail">扫描设备二维码<br/>自动识别设备</div>
+</div>
+<div class="branch-item step-card blue-step">
+<div class="step-name">NFC 感应</div>
+<div class="step-detail">贴近设备NFC标签<br/>自动识别设备</div>
+</div>
+<div class="branch-item step-card blue-step">
+<div class="step-name">手动选择</div>
+<div class="step-detail">浏览站点芯片<br/>按距离排序的设备列表</div>
+</div>
+</div>
+
+<div style="text-align:center;margin-top:8px">
+<span class="submit-btn btn-blue" style="font-size:12px;padding:6px 20px">选中设备 → 存入 localStorage → 跳转比对表单页</span>
+</div>
+</div>
+
+<div class="arrow-down"></div>
+
+<!-- ===== 比对表单 ===== -->
+<div class="step-card blue-step" style="border-color:#378ADD">
+<div class="step-name">比对数据采集表单</div>
+</div>
+<div class="arrow-down"></div>
+
+<!-- ===== 自动填充 ===== -->
+<div class="autofill-row">
+<div class="autofill-item"><b>设备信息</b><br/>从选择页带入</div>
+<div class="autofill-item"><b>操作人员</b><br/>从登录用户读取</div>
+</div>
+<div class="arrow-down"></div>
+
+<!-- ===== 选择比对类型 + 参数卡片 ===== -->
+<div class="section-box orange-section">
+<div class="section-title">参数卡片 · 核心填报区域</div>
+
+<div class="step-card orange-step">
+<div class="step-name">选择比对类型</div>
+<div class="step-detail">周期性校准 / 故障排查 / 验收测试</div>
+</div>
+
+<div class="step-card orange-step">
+<div class="step-name">从平台获取比对指标</div>
+<div class="step-detail">根据设备类型动态加载可用指标<br/>→ 动态生成参数卡片（每个指标一张独立卡片）</div>
+</div>
+
+<div style="text-align:center;font-size:11px;color:#993C1D;margin:8px 0;font-weight:600">↓ 每张参数卡片内部 ↓</div>
+
+<div class="step-card orange-step">
+<div class="step-name">标准值 — 平台自动下发</div>
+</div>
+
+<div class="decision-diamond">录入模式?</div>
+
+<div class="branch-row">
+<div class="branch-item step-card orange-step">
+<div class="step-name">手动输入</div>
+<div class="step-detail">键盘输入实测值</div>
+</div>
+<div class="branch-item step-card orange-step">
+<div class="step-name">蓝牙采集</div>
+<div class="step-detail">蓝牙连接采集设备<br/>自动读取数据</div>
+</div>
+<div class="branch-item step-card orange-step">
+<div class="step-name">OCR 识别</div>
+<div class="step-detail">拍照识别仪表盘<br/>OCR自动提取数值</div>
+</div>
+</div>
+
+<div class="step-card orange-step">
+<div class="step-name">自动计算偏差 = 实测值 − 标准值</div>
+</div>
+
+<div class="decision-diamond" style="border-color:#639922;color:#3B6D11">偏差 ≤ 容差?</div>
+
+<div style="display:flex;gap:16px;justify-content:center;margin:8px 0">
+<div><span class="result-tag result-ok">✓ 正常 · 绿色</span></div>
+<div><span class="result-tag result-warn">! 异常 · 橙色 → 展开偏差原因输入框</span></div>
+</div>
+</div>
+
+<div class="arrow-down"></div>
+
+<!-- ===== 环境参数 ===== -->
+<div class="step-card orange-step" style="max-width:500px;margin:0 auto 10px">
+<div class="step-name">现场环境多选标签</div>
+<div class="step-detail">高温 / 低温 / 高湿 / 雨天 / 通风不良 等<br/><b>互斥：「环境正常」取消其他选项</b></div>
+</div>
+<div class="arrow-down"></div>
+
+<!-- ===== 现场证据 ===== -->
+<div class="section-box green-section">
+<div class="section-title">现场证据</div>
+<div style="display:flex;gap:12px">
+<div class="step-card green-step" style="flex:1">
+<div class="step-name">水印开关</div>
+<div class="step-detail">时间 + 设备ID + GPS坐标</div>
+</div>
+<div class="step-card green-step" style="flex:1.5">
+<div class="step-name">照片 · 最多9张</div>
+<div class="step-detail">拍照或相册选择<br/>Canvas 自动添加水印</div>
+</div>
+<div class="step-card green-step" style="flex:1">
+<div class="step-name">视频 · 最多1个</div>
+<div class="step-detail">仅允许手机录制<br/>限60秒 / 50MB</div>
+</div>
+</div>
+</div>
+
+<div class="arrow-down"></div>
+
+<!-- ===== 提交操作 ===== -->
+<div class="section-box purple-section">
+<div class="section-title">提交操作</div>
+<div style="text-align:center;font-size:12px;color:#534AB7;font-weight:600;margin-bottom:10px">数据校验</div>
+
+<div class="branch-row" style="margin-bottom:12px">
+<div class="branch-item" style="text-align:center">
+<div style="font-size:11.5px;color:#666;margin-bottom:4px">缺少实测值</div>
+<div class="result-tag result-warn">提醒填写实测值</div>
+</div>
+<div class="branch-item" style="text-align:center">
+<div style="font-size:11.5px;color:#666;margin-bottom:4px">偏差未填原因</div>
+<div class="result-tag result-warn">提醒填写偏差原因</div>
+</div>
+<div class="branch-item" style="text-align:center">
+<div style="font-size:11.5px;color:#666;margin-bottom:4px">通过</div>
+<span class="submit-btn btn-blue">上报云平台 ✓</span>
+</div>
+</div>
+
+<div style="display:flex;gap:10px;justify-content:center;margin-top:10px">
+<span class="submit-btn btn-orange">保存草稿 → localStorage</span>
+<span class="submit-btn btn-gray">重置表单</span>
+</div>
+</div>
+
+<div class="arrow-down"></div>
+
+<!-- ===== 云上报结果 ===== -->
+<div class="section-box blue-section">
+<div class="section-title">云上报成功</div>
+<div class="step-card blue-step" style="max-width:480px;margin:0 auto">
+<div class="step-name">摘要展示</div>
+<div class="step-detail">记录编号 · 设备名称 · 操作人员<br/>各指标偏差汇总（✓正常 / !异常）<br/>照片/视频数量 · 水印状态</div>
+</div>
+</div>
+
+<!-- 图例 -->
+<div class="legend">
+<b style="margin-right:8px">图例：</b>
+<span class="legend-dot" style="background:#E6F1DB;border-color:#378ADD"></span>设备选择/云上报(蓝)
+<span class="legend-dot" style="background:#FFF8F0;border-color:#FF9500"></span>参数卡片(橙)
+<span class="legend-dot" style="background:#F0FFF0;border-color:#34C759"></span>现场证据(绿)
+<span class="legend-dot" style="background:#EEEDFE;border-color:#7F77DD"></span>提交操作(紫)
+</div>
+
+</div><!-- end container -->
+</body>
+</html>

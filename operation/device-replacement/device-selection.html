@@ -375,6 +375,7 @@
                 </button>
             </div>
             <div class="radius-chips" id="radiusChips">
+                <button class="radius-chip" onclick="setRadius(0)" data-r="0">全部</button>
                 <button class="radius-chip" onclick="setRadius(500)" data-r="500">500m</button>
                 <button class="radius-chip active" onclick="setRadius(1000)" data-r="1000">1km</button>
                 <button class="radius-chip" onclick="setRadius(3000)" data-r="3000">3km</button>
@@ -454,9 +455,16 @@
 
         // ========== RADIUS ==========
         function setRadius(meters) {
-            currentRadius = meters;
+            if (meters === 0) {
+                // 「全部」→ 不限范围
+                currentRadius = Infinity;
+            } else {
+                // 点击已选中的范围 → 取消筛选（显示全部）
+                currentRadius = (currentRadius === meters) ? Infinity : meters;
+            }
             document.querySelectorAll('.radius-chip').forEach(function(el) {
-                el.classList.toggle('active', parseInt(el.dataset.r) === meters);
+                var r = parseInt(el.dataset.r);
+                el.classList.toggle('active', r === 0 ? currentRadius === Infinity : currentRadius !== Infinity && r === currentRadius);
             });
             updateLocPill();
             renderSiteStrip(); renderDevices();
@@ -496,7 +504,7 @@
             }).length;
 
             text.innerHTML = '<b>' + nearestSite.name + '</b> · ' + formatDistance(nearestDist) +
-                ' · <em>' + nearbyCount + '台</em>';
+                (currentRadius !== Infinity ? ' · <em>' + nearbyCount + '台</em>' : ' · <em>全部</em>');
         }
 
         // ========== SITE STRIP ==========
@@ -559,12 +567,12 @@
 
             document.getElementById('resultCount').textContent = devices.length + ' 台设备';
             document.getElementById('resultHint').textContent = userLocation
-                ? (currentRadius>=1000?(currentRadius/1000)+'km':currentRadius+'m') + '内 · 按距离排序' : '';
+                ? (currentRadius !== Infinity ? (currentRadius>=1000?(currentRadius/1000)+'km':currentRadius+'m') + '内 · 按距离排序' : '不限范围 · 按距离排序') : '';
 
             if (devices.length === 0) {
                 var et, ed, ea;
                 if (searchText) { et='未找到匹配的设备'; ed='试试其他关键词'; ea='clearSearch()'; }
-                else if (userLocation) { var rl=currentRadius>=1000?(currentRadius/1000)+'km':currentRadius+'m'; et='范围内无设备'; ed='当前'+rl+'内未发现设备'; ea='setRadius(5000)'; }
+                else if (userLocation) { var rl=currentRadius!==Infinity?(currentRadius>=1000?(currentRadius/1000)+'km':currentRadius+'m'):'全部范围'; et='范围内无设备'; ed='当前'+rl+'内未发现设备'; ea='setRadius(5000)'; }
                 else { et='请先获取位置'; ed='获取位置后将展示附近设备'; ea='getLocation()'; }
                 container.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="bi '+(searchText?'bi-search':'bi-geo-alt')+'"></i></div>'+
                     '<div class="empty-title">'+et+'</div><div class="empty-desc">'+ed+'</div>'+

@@ -411,6 +411,12 @@
             background: rgba(0,122,255,0.06); border: none; border-radius: 8px;
             cursor: pointer; flex-shrink: 0; padding: 6px 12px; font-weight: 500;
         }
+        /* 已锁定不可重选的设备卡片 */
+        .device-picked.locked {
+            background: #FAFAFA; border-color: #EEE;
+            border-left: 3px solid var(--step-color, #007AFF);
+        }
+        .device-picked.locked .device-picked-icon { opacity: 0.9; }
 
         /* 数据填报表格 */
         .data-grid { margin-top: 8px; }
@@ -424,7 +430,33 @@
             border-radius: 6px; font-size: 13px; width: 80px; text-align: right;
         }
         .data-row input:focus { outline: none; border-color: var(--step-color, #007AFF); }
+        .data-row input[readonly] {
+            background: #F7F7F7; color: var(--dark-text);
+            cursor: default; border-color: #EEE;
+        }
+        .data-row input[readonly]:focus { outline: none; }
         .data-row-unit { font-size: 12px; color: var(--gray-text); min-width: 30px; }
+
+        /* 云端获取 */
+        .cloud-fetch-row { margin: -2px 0 12px; }
+        .cloud-fetch-btn {
+            width: 100%; padding: 10px; border: 1px solid var(--step-color, #007AFF);
+            background: rgba(0,122,255,0.06); color: var(--step-color, #007AFF);
+            border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .cloud-fetch-btn:disabled { opacity: 0.6; cursor: default; }
+        .cloud-fetch-btn .spin { animation: cloudSpin 0.9s linear infinite; }
+        @keyframes cloudSpin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+        .cloud-tag {
+            font-size: 11px; font-weight: 400; color: #34C759;
+            margin-left: auto; display: inline-flex; align-items: center; gap: 3px;
+        }
+        .data-grid.loading { opacity: 0.5; pointer-events: none; }
+        .data-row input.cloud-filled {
+            border-color: #34C759; background: rgba(52,199,89,0.08);
+            transition: background 0.4s, border-color 0.4s;
+        }
 
         /* 现场证据 */
         .photo-grid {
@@ -615,7 +647,7 @@
         <div class="mode-card card-install" onclick="selectMode('install')">
             <div class="mode-card-icon"><i class="bi bi-plus-circle"></i></div>
             <div class="mode-card-body">
-                <div class="mode-card-name">新设备安装</div>
+                <div class="mode-card-name">拆除后安装</div>
                 <div class="mode-card-desc">全新位置安装设备，适用于新建站点、扩容部署</div>
                 <div class="mode-card-steps"><span>安装</span><span>数据</span><span>证据</span><span>确认</span></div>
             </div>
@@ -682,7 +714,7 @@ var MODES = {
         name: '设备更换', tag: '更换模式',
         steps: [
             { key: 'old-device', label: '旧设备拆除', icon: 'bi-dash-circle' },
-            { key: 'new-device', label: '新设备安装', icon: 'bi-plus-circle' },
+            { key: 'new-device', label: '拆除后安装', icon: 'bi-plus-circle' },
             { key: 'data', label: '数据填报', icon: 'bi-clipboard-data' },
             { key: 'evidence', label: '现场证据', icon: 'bi-camera' },
             { key: 'confirm', label: '确认提交', icon: 'bi-check2-circle' }
@@ -690,7 +722,7 @@ var MODES = {
     },
     install: {
         color: '#34C759', lightBg: '#F6FFF8', iconBg: '#E8F8ED',
-        name: '新设备安装', tag: '安装模式',
+        name: '拆除后安装', tag: '安装模式',
         steps: [
             { key: 'new-device', label: '设备安装', icon: 'bi-plus-circle' },
             { key: 'data', label: '数据填报', icon: 'bi-clipboard-data' },
@@ -727,7 +759,10 @@ var formData = {
     video: null,         // 视频 {url, file, duration, sizeMB}
     watermark: true,
     jobStartTime: null,  // 打卡开始时间 ISO
-    jobEndTime: null     // 打卡结束时间 ISO
+    jobEndTime: null,    // 打卡结束时间 ISO
+    cloudFetched: false, // 是否已从平台读取测点
+    cloudFetchedAt: '',  // 最近一次读取时间
+    cloudParams: []     // 从平台获取的测点列表 [{key,label,unit,value}]
 };
 
 // 打卡计时器
@@ -961,9 +996,6 @@ function renderClockCard() {
             '<div class="clock-row">' +
             '<span class="clock-label">耗时</span>' +
             '<span style="font-size:16px;font-weight:600;color:var(--secondary-color);">' + durationText + '</span>' +
-            '</div>' +
-            '<div class="clock-btn-row">' +
-            '<button class="clock-btn clock-btn-restart" onclick="restartClock()">重新打卡</button>' +
             '</div>';
         if (jobTimerInterval) { clearInterval(jobTimerInterval); jobTimerInterval = null; }
     }
@@ -1059,7 +1091,6 @@ function formatClockTime(isoStr) {
 // ============================
 function selectMode(mode) {
     if (hasDraft(mode)) {
-        // 有暂存 → 弹出恢复确认对话框
         showDraftRestoreDialog(mode);
     } else {
         enterMode(mode, false);
@@ -1176,17 +1207,15 @@ function renderOldDeviceStep() {
     var dev = formData.oldDevice;
     var html = '';
 
-    // 设备选择
+    // 设备选择（已选旧设备后锁定，不可重选）
     if (dev) {
-        var statusColor = dev.status === 'offline' ? 'var(--danger-color)' : 'var(--secondary-color)';
-        html += '<div class="device-picked">';
+        html += '<div class="device-picked locked">';
         html += '<div class="device-picked-icon" style="background:' + modeConfig.color + '18;color:' + modeConfig.color + ';">';
         html += '<i class="bi bi-gear"></i></div>';
         html += '<div class="device-picked-info">';
         html += '<div class="device-picked-id">' + dev.id + ' <span style="font-size:12px;font-weight:400;color:var(--gray-text);">' + dev.name + '</span></div>';
-        html += '<div class="device-picked-meta">' + dev.type + ' · ' + dev.location + ' · <span style="color:' + statusColor + '">' + (dev.status === 'offline' ? '故障中' : '在线') + '</span></div>';
+        html += '<div class="device-picked-meta">' + dev.type + ' · ' + dev.location + '</div>';
         html += '</div>';
-        html += '<button class="device-picked-reselect" onclick="resetDevice(\'old\')" style="color:' + modeConfig.color + '">重选</button>';
         html += '</div>';
     } else {
         html += '<div class="card">';
@@ -1296,23 +1325,21 @@ document.addEventListener('click', function(e) {
 });
 
 // ============================
-//  步骤2/1：新设备安装
+//  步骤2/1：拆除后安装
 // ============================
 function renderNewDeviceStep() {
     var dev = formData.newDevice;
     var html = '';
 
-    // 设备选择
+    // 设备选择（已选新设备后锁定，不可重选）
     if (dev) {
-        var statusColor = dev.status === 'offline' ? 'var(--danger-color)' : 'var(--secondary-color)';
-        html += '<div class="device-picked">';
+        html += '<div class="device-picked locked">';
         html += '<div class="device-picked-icon" style="background:' + modeConfig.color + '18;color:' + modeConfig.color + ';">';
         html += '<i class="bi bi-gear"></i></div>';
         html += '<div class="device-picked-info">';
         html += '<div class="device-picked-id">' + dev.id + ' <span style="font-size:12px;font-weight:400;color:var(--gray-text);">' + dev.name + '</span></div>';
-        html += '<div class="device-picked-meta">' + dev.type + ' · ' + dev.location + ' · <span style="color:' + statusColor + '">' + (dev.status === 'offline' ? '故障中' : '在线') + '</span></div>';
+        html += '<div class="device-picked-meta">' + dev.type + ' · ' + dev.location + '</div>';
         html += '</div>';
-        html += '<button class="device-picked-reselect" onclick="resetDevice(\'new\')" style="color:' + modeConfig.color + '">重选</button>';
         html += '</div>';
     } else {
         html += '<div class="card">';
@@ -1379,25 +1406,28 @@ function renderDataStep() {
             '<div style="font-size:12px;color:var(--gray-text);margin-top:4px;">设备参数将在选择设备后自动加载</div></div>';
     }
 
-    var params = targetDevice.paramKeys || [];
+    var cloudParams = formData.cloudParams || [];
+    var cloudState = formData.cloudFetched ? ' <span class="cloud-tag" id="cloudTag"><i class="bi bi-cloud-check"></i> 已读取 ' + (formData.cloudFetchedAt || '') + '</span>' : '';
     var html = '<div class="card">';
-    html += '<div class="card-title"><i class="bi bi-clipboard-data"></i> 设备参数填报</div>';
-    html += '<div class="card-subtitle">设备：<b>' + targetDevice.id + '</b> ' + targetDevice.name + '（共 ' + params.length + ' 项参数）</div>';
+    html += '<div class="card-title"><i class="bi bi-clipboard-data"></i> 设备参数填报' + cloudState + '</div>';
+    html += '<div class="card-subtitle">设备：<b>' + targetDevice.id + '</b> ' + targetDevice.name + (cloudParams.length ? '（共 ' + cloudParams.length + ' 项测点）' : '') + '</div>';
+    html += '<div class="cloud-fetch-row">';
+    html += '<button class="cloud-fetch-btn" id="cloudFetchBtn" onclick="fetchCloudParams()"><i class="bi bi-cloud-download"></i> 手动读取最新值</button>';
+    html += '</div>';
 
-    if (params.length === 0) {
-        html += '<div style="text-align:center;padding:20px;color:var(--gray-text);">该设备无参数数据</div>';
+    html += '<div class="data-grid" id="dataGrid">';
+    if (cloudParams.length === 0) {
+        html += '<div style="text-align:center;padding:30px 16px;color:var(--gray-text);font-size:13px;">点击上方按钮从平台读取设备测点数据</div>';
     } else {
-        html += '<div class="data-grid">';
-        params.forEach(function(key) {
-            var val = formData.dataRows[key] || '';
+        cloudParams.forEach(function(p) {
             html += '<div class="data-row">';
-            html += '<span class="data-row-name">' + (PARAM_LABELS[key] || key) + '</span>';
-            html += '<input type="number" placeholder="输入值" step="0.01" value="' + val + '" onchange="saveDataRow(\'' + key + '\', this.value)">';
-            html += '<span class="data-row-unit">' + (PARAM_UNITS[key] || '') + '</span>';
+            html += '<span class="data-row-name">' + p.label + '</span>';
+            html += '<input type="text" id="param_' + p.key + '" value="' + p.value + '" readonly>';
+            html += '<span class="data-row-unit">' + p.unit + '</span>';
             html += '</div>';
         });
-        html += '</div>';
     }
+    html += '</div>';
     html += '</div>';
 
     // 备注
@@ -1417,6 +1447,124 @@ function renderDataStep() {
 
 function saveDataRow(key, value) {
     formData.dataRows[key] = value;
+}
+
+// 从平台获取设备测点数据（名称、单位、值均由平台返回）
+function fetchCloudParams() {
+    var targetDevice = (currentMode === 'replace' || currentMode === 'install') ? formData.newDevice : null;
+    if (!targetDevice) return;
+
+    var btn = document.getElementById('cloudFetchBtn');
+    var grid = document.getElementById('dataGrid');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> 正在读取最新值...';
+    }
+    if (grid) grid.classList.add('loading');
+
+    // 模拟平台请求（生产环境替换为实际 API 调用）
+    setTimeout(function() {
+        // 从平台获取该设备下的所有测点（名称、单位、值）
+        formData.cloudParams = fetchDeviceParamsFromPlatform(targetDevice.id);
+
+        // 同步值到 dataRows（供确认页/暂存使用）
+        formData.cloudParams.forEach(function(p) {
+            formData.dataRows[p.key] = p.value;
+        });
+
+        var now = new Date();
+        var stamp = String(now.getHours()).padStart(2,'0') + ':' +
+                    String(now.getMinutes()).padStart(2,'0') + ':' +
+                    String(now.getSeconds()).padStart(2,'0');
+        formData.cloudFetched = true;
+        formData.cloudFetchedAt = stamp;
+
+        // 重新渲染数据网格
+        renderDataGrid();
+
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> 重新读取最新值';
+        }
+        if (grid) grid.classList.remove('loading');
+
+        // 更新卡片标题旁的同步状态标签
+        var title = document.querySelector('.card-title');
+        if (title && !document.getElementById('cloudTag')) {
+            var tag = document.createElement('span');
+            tag.className = 'cloud-tag';
+            tag.id = 'cloudTag';
+            tag.innerHTML = '<i class="bi bi-cloud-check"></i> 已读取 ' + stamp;
+            title.appendChild(tag);
+        } else if (document.getElementById('cloudTag')) {
+            document.getElementById('cloudTag').innerHTML = '<i class="bi bi-cloud-check"></i> 已读取 ' + stamp;
+        }
+    }, 900);
+}
+
+// 重新渲染测点数据网格（读取后调用）
+function renderDataGrid() {
+    var grid = document.getElementById('dataGrid');
+    if (!grid) return;
+    var cloudParams = formData.cloudParams || [];
+    var html = '';
+    if (cloudParams.length === 0) {
+        html = '<div style="text-align:center;padding:30px 16px;color:var(--gray-text);font-size:13px;">该设备暂无测点数据</div>';
+    } else {
+        cloudParams.forEach(function(p) {
+            html += '<div class="data-row">';
+            html += '<span class="data-row-name">' + p.label + '</span>';
+            html += '<input type="text" id="param_' + p.key + '" value="' + p.value + '" readonly>';
+            html += '<span class="data-row-unit">' + p.unit + '</span>';
+            html += '</div>';
+        });
+    }
+    grid.innerHTML = html;
+}
+
+// 模拟从平台获取设备测点列表（演示用，生产环境替换为实际 API）
+// 返回: [{ key, label, unit, value }]
+function fetchDeviceParamsFromPlatform(deviceId) {
+    // 模拟平台根据设备ID返回该设备绑定的测点
+    var deviceParamMap = {
+        'DT-2024-009': ['temperature','humidity'],
+        'DT-2024-001': ['temperature'],
+        'DT-2024-002': ['level','flow'],
+        'DT-2024-010': ['ph','turbidity','temperature'],
+        'DT-2024-011': ['flow','pressure'],
+        'DT-2024-012': ['pressure'],
+        'DT-2024-013': ['level'],
+        'DT-2024-014': ['flow'],
+        'DT-2024-015': ['pressure'],
+        'DT-2024-016': ['temperature','humidity'],
+        'DT-2024-017': ['ph','turbidity'],
+        'DT-2024-018': ['level']
+    };
+    var keys = deviceParamMap[deviceId] || [];
+    return keys.map(function(key) {
+        return {
+            key: key,
+            label: PARAM_LABELS[key] || key,
+            unit: PARAM_UNITS[key] || '',
+            value: simulateCloudValue(key)
+        };
+    });
+}
+
+// 模拟云端实时测点值（演示用）
+function simulateCloudValue(key) {
+    var base = {
+        temperature: 22 + Math.random() * 8,      // 22~30 °C
+        humidity: 50 + Math.random() * 30,        // 50~80 %RH
+        level: 1 + Math.random() * 3,             // 1~4 m
+        flow: 10 + Math.random() * 90,            // 10~100 L/s
+        ph: 6.5 + Math.random() * 1.5,            // 6.5~8 pH
+        turbidity: 1 + Math.random() * 9,         // 1~10 NTU
+        pressure: 0.1 + Math.random() * 0.5       // 0.1~0.6 MPa
+    };
+    var v = base[key];
+    if (v === undefined) v = Math.random() * 100;
+    return Math.round(v * 100) / 100;
 }
 
 // ============================
@@ -1515,17 +1663,14 @@ function renderConfirmStep() {
         if (key === 'data') {
             var targetDevice = (currentMode === 'replace') ? formData.newDevice : formData.newDevice;
             if (targetDevice) {
-                var params = targetDevice.paramKeys || [];
+                var cloudParams = formData.cloudParams || [];
                 html += '<div class="summary-row"><span class="s-label">关联设备</span><span class="s-value">' + targetDevice.id + '</span></div>';
-                var hasData = false;
-                params.forEach(function(k) {
-                    if (formData.dataRows[k]) {
-                        html += '<div class="summary-row"><span class="s-label">' + (PARAM_LABELS[k] || k) + '</span><span class="s-value">' + formData.dataRows[k] + ' ' + (PARAM_UNITS[k] || '') + '</span></div>';
-                        hasData = true;
-                    }
-                });
-                if (!hasData) {
-                    html += '<div style="font-size:12px;color:var(--gray-text);">尚未填写参数数据</div>';
+                if (cloudParams.length === 0) {
+                    html += '<div style="font-size:12px;color:var(--gray-text);">尚未读取测点数据</div>';
+                } else {
+                    cloudParams.forEach(function(p) {
+                        html += '<div class="summary-row"><span class="s-label">' + p.label + '</span><span class="s-value">' + p.value + ' ' + p.unit + '</span></div>';
+                    });
                 }
             }
             if (formData.remark) {
@@ -1930,7 +2075,7 @@ function deleteVideo() {
 //  提交信息
 // ============================
 function submitOrder() {
-    // 最终校验
+    // 最终校验（仅拆除模式不检查新设备）
     if ((currentMode === 'replace' || currentMode === 'remove') && !formData.oldDevice) {
         showToast('请选择待拆除设备'); return;
     }
@@ -2048,6 +2193,9 @@ function showModeSwitchConfirm() {
 }
 
 function resetToModeSelection() {
+    // 返回前先把当前模式进度暂存，确保设备ID等数据可回填
+    saveDraftInternal();
+
     currentMode = null;
     currentStep = 0;
     formData = {
@@ -2057,7 +2205,8 @@ function resetToModeSelection() {
         installType: '', installLocation: '',
         dataRows: {}, remark: '', voiceAudios: {},
         photos: [], video: null, watermark: true,
-        jobStartTime: null, jobEndTime: null
+        jobStartTime: null, jobEndTime: null,
+        cloudFetched: false, cloudFetchedAt: '', cloudParams: []
     };
     if (jobTimerInterval) { clearInterval(jobTimerInterval); jobTimerInterval = null; }
     audioRecordings = {};
@@ -2066,6 +2215,8 @@ function resetToModeSelection() {
     document.getElementById('bottomBar').style.display = 'none';
     document.getElementById('headerModeTag').style.display = 'none';
     document.getElementById('headerTitle').textContent = '设备更换';
+    // 刷新各模式暂存标签
+    updateDraftBadges();
 }
 
 // ============================
@@ -2337,6 +2488,7 @@ window.addEventListener('pageshow', function(e) {
 window.addEventListener('beforeunload', function() {
     if (currentMode) saveDraftInternal();
 });
+
 </script>
 </body>
 </html>

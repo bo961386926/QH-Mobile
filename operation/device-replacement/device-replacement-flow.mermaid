@@ -1,129 +1,96 @@
 flowchart TD
-    Start([运维中心 · 点击「更换」]) --> SelectPage[设备选择页]
+    Start([运维中心 · 点击「设备操作」]) --> SelectPage[设备选择页]
 
-    %% ===== 第一步：设备选择 =====
     subgraph DeviceSelect [第一步：选择设备]
         direction TB
-        AutoGPS[自动GPS定位<br>检测当前位置] --> RadiusFilter[范围过滤<br>500m / 1km / 3km / 5km]
-        RadiusFilter --> NearbyList[只显示范围内的<br>站点和设备]
-
-        QuickAction{快速识别?}
-        QuickAction -->|扫一扫| QRScan[扫描设备二维码<br>自动识别设备]
-        QuickAction -->|NFC感应| NFCTap[贴近设备NFC标签<br>自动识别设备]
-        QuickAction -->|手动选择| BrowseList[浏览站点芯标<br>按距离排序的设备列表]
-
-        QRScan --> SelectDevice
-        NFCTap --> SelectDevice
-        BrowseList --> SelectDevice
-        NearbyList --> SelectDevice
-        SelectDevice[选中设备<br>存入 localStorage] --> NextPage([跳转更换操作页])
+        AutoGPS[自动GPS定位] --> RadiusFilter[范围过滤]
+        RadiusFilter --> QuickAction{快速识别?}
+        QuickAction -->|扫一扫/NFC/手动| SelectDevice[选中设备]
+        SelectDevice --> NextPage([进入模式选择])
     end
 
     SelectPage --> DeviceSelect
 
-    %% ===== 第二步：更换操作 =====
-    NextPage --> FormPage[设备更换操作表单]
-
-    subgraph AutoFill [自动填充]
-        direction TB
-        AutoDevice[设备信息<br>从选择页带入] --- AutoType[更换类型默认<br>故障更换]
+    subgraph ModePage [第二步：操作模式选择]
+        direction LR
+        Pick{选择模式}
+        Pick -->|🔧 设备更换| EnterReplace([进入更换表单])
+        Pick -->|📦 拆除后安装| EnterInstall([进入安装表单])
+        Pick -->|🗑️ 设备拆除| EnterRemove([进入拆除表单])
     end
 
-    FormPage --> AutoFill
+    NextPage --> ModePage
 
-    AutoFill --> CheckPending{是否有待完成<br>安装工单?}
+    %% ===== 进入表单 → 先打卡 =====
+    EnterReplace --> ClockRemind
+    EnterInstall --> ClockRemind
+    EnterRemove --> ClockRemind
 
-    CheckPending -->|有| PendingBanner[顶部橙色提示条<br>点击继续安装]
-    CheckPending -->|无| ModeChoice{选择操作模式}
+    ClockRemind["📍 进入表单<br/>⚠️ 提醒：请先完成作业打卡"] --> StartClock["🎬 开始打卡<br/>计时器启动 · 持续运行"]
 
-    PendingBanner --> LoadOrder[选择待完成工单]
-    LoadOrder --> ResumeMode[续做模式<br>拆除信息只读 · 直接填安装]
+    %% 打卡 + 填表并行
+    StartClock --> FillStart[开始填写步骤]
 
-    ModeChoice -->|默认| Scene1
-    ModeChoice -->|打开开关| Scene3
+    %% ===== 更换模式 =====
+    FillStart --> ReplaceOld[步骤1 · 旧设备拆除<br/>设备编号 · 拆除原因 · 去向]
+    ReplaceOld --> ReplaceNew[步骤2 · 拆除后安装<br/>新设备编号扫码/NFC · 安装位置]
+    ReplaceNew --> ReplaceEvidence[步骤3 · 现场证据<br/>水印照片+视频]
+    ReplaceEvidence --> ReplaceData[步骤4 · 数据填报<br/>选指标 → 逐一手动填值]
+    ReplaceData --> EndClock
 
-    %% ===== 场景一：一次搞定 =====
-    subgraph Scene1 [场景一：带了新设备 · 一次搞定]
+    %% ===== 安装模式 =====
+    FillStart --> InstallDevice[步骤1 · 新设备信息<br/>设备编号扫码/NFC · 安装位置]
+    InstallDevice --> InstallEvidence[步骤2 · 现场证据<br/>水印照片+视频]
+    InstallEvidence --> InstallData[步骤3 · 数据填报<br/>选指标 → 逐一手动填值]
+    InstallData --> EndClock
+
+    %% ===== 拆除模式 =====
+    FillStart --> DemoDevice[步骤1 · 旧设备拆除<br/>设备编号 · 拆除原因 · 去向]
+    DemoDevice --> DemoEvidence[步骤2 · 现场证据<br/>水印照片+视频]
+    DemoEvidence --> EndClock
+
+    %% ===== 结束打卡 =====
+    EndClock["⏹️ 结束打卡<br/>jobEndTime 记录"]
+
+    EndClock --> Validate{提交校验}
+    Validate -->|未开始打卡| Err1["❌ 请先完成作业打卡"]
+    Validate -->|未结束打卡| Err2["❌ 请先结束打卡"]
+    Validate -->|字段缺失| Err3["❌ 补填缺失项"]
+    Err1 --> StartClock
+    Err2 --> EndClock
+    Err3 --> FillStart
+
+    Validate -->|通过| CloudSubmit
+
+    subgraph CloudSubmit [☁️ 云上报]
         direction TB
-        S1_Type[选择更换类型<br>故障/预防/升级] --> S1_Old[旧设备拆除区<br>设备编号 · 拆除原因 · 旧设备去向]
-        S1_Old --> S1_New[新设备安装区<br>新设备编号扫码/NFC · 安装位置<br>原因详情语音]
-        S1_New --> S1_Evidence[现场证据<br>水印照片+视频]
-        S1_Evidence --> S1_Report[数据填报验证<br>选指标 → 人工填值]
-        S1_Report --> S1_Submit([提交更换 ✓])
+        UploadAnim[上报中...] --> UploadDone[上报成功]
+        UploadDone --> Summary["摘要展示 · 清除暂存"]
     end
 
-    %% ===== 场景二：分两次到场 =====
-    Scene1 -.->|新设备未填时<br>可用下方按钮| Scene2Entry
-    modeSwitch["「仅提交拆除」按钮"] --> Scene2
+    %% ===== 打卡旁路 =====
+    StartClock -.->|⏱ 计时器持续运行| EndClock
 
-    subgraph Scene2 [场景二：没带新设备 · 分两次到场]
-        direction TB
-        S2_Old[只填旧设备拆除区<br>设备编号 · 拆除原因 · 旧设备去向] --> S2_Submit([提交拆除记录])
-        S2_Submit --> S2_Pending[生成「待安装」工单<br>存入待完成列表]
-        S2_Pending --> S2_Banner[下次进场时<br>页面顶部显示橙色提示条]
-        S2_Banner --> S2_Load[点击提示条 → 选择工单]
-        S2_Load --> S2_Resume[加载拆除记录 · 只读展示]
-        S2_Resume --> S2_Install[填写新设备安装区<br>新设备编号 · 安装位置 · 备注]
-        S2_Install --> S2_Report[数据填报验证]
-        S2_Report --> S2_Done([提交安装<br>两次数据合并 ✓])
+    %% ===== 分两次到场说明 =====
+    CloudSubmit --> SplitNote
+    SplitNote["💡 分两次到场怎么处理？<br/>第一次：选「设备拆除」模式 → 拆旧返厂<br/>第二次：选「设备更换」模式 → 到现场装新<br/>两次各独立打卡，两张独立工单"]
+
+    FillStart -.->|底部操作| GlobalActions
+    subgraph GlobalActions [通用底部操作]
+        direction LR
+        SaveDraft[💾 暂存草稿]
+        ResetForm[🔄 清空表单]
     end
 
-    Scene2Entry --> Scene2
-
-    %% ===== 场景三：仅新增 =====
-    subgraph Scene3 [场景三：全新位置加装 · 无旧设备]
-        direction TB
-        S3_Toggle[打开仅新增安装开关] --> S3_Hide[旧设备拆除区隐藏]
-        S3_Hide --> S3_Install[只填新设备安装区<br>新设备编号 · 安装位置 · 备注]
-        S3_Install --> S3_Evidence[现场证据]
-        S3_Evidence --> S3_Report[数据填报验证]
-        S3_Report --> S3_Submit([提交安装 ✓])
-    end
-
-    ResumeMode --> S2_Install
-
-    %% ===== 数据填报验证（三种场景公用） =====
-    S1_Report --> ReportDetail
-    S2_Report --> ReportDetail
-    S3_Report --> ReportDetail
-
-    subgraph ReportDetail [数据填报验证 · 简化版]
-        direction TB
-        R1[选择测量指标<br>pH值/浊度/COD/氨氮<br>温度/液位/流量/压力<br>多选标签] --> R2[逐一手动填写实测值<br>每个指标一个输入框]
-        R2 --> R3[选填环境参数标签<br>高温/高湿/雨天等]
-        R3 --> R4[填写备注<br>支持语音输入]
-        R4 --> R5{提交校验}
-        R5 -->|指标值未填| R5_Err[提醒填写指标值]
-        R5 -->|通过| R6([上报云平台 ✓])
-        R5_Err --> R2
-    end
-
-    %% ===== 提交 =====
-    S1_Submit --> CloudUpload
-    S2_Done --> CloudUpload
-    S3_Submit --> CloudUpload
-
-    subgraph CloudUpload [云上报]
-        direction TB
-        UploadAnim[上报动画<br>数据打包中...] --> UploadDone[上报成功]
-        UploadDone --> Summary["摘要展示<br>记录编号 · 操作模式<br>设备信息 · 填报指标<br>照片/视频 · 水印状态"]
-    end
-
-    %% ===== 底部操作 =====
-    S1_Submit -.->|可选操作| SaveDraft[保存草稿 → localStorage]
-    S1_Submit -.->|可选操作| ResetForm[重置表单]
-
-    %% ===== 样式 =====
     style Start fill:#007AFF,color:#fff,stroke:none
-    style NextPage fill:#007AFF,color:#fff,stroke:none
     style DeviceSelect fill:#F0F8FF,stroke:#007AFF
-    style AutoFill fill:#F5F5F5,stroke:#E5E5EA
-    style Scene1 fill:#F0FFF0,stroke:#34C759
-    style Scene2 fill:#FFF8F0,stroke:#FF9500
-    style Scene3 fill:#F0F0FF,stroke:#007AFF
-    style ReportDetail fill:#FAFAFA,stroke:#E5E5EA
-    style CloudUpload fill:#F0F0FF,stroke:#007AFF
-    style PendingBanner fill:#FFF3E0,color:#E65100,stroke:#FFB74D
-    style SaveDraft fill:#FF9500,color:#fff,stroke:none
-    style ResetForm fill:#E5E5EA,color:#666,stroke:none
-    style modeSwitch fill:#FF9500,color:#fff,stroke:none
+    style ModePage fill:#F0F0FF,stroke:#7B61FF
+    style ClockRemind fill:#FFF3E0,stroke:#FF6D00
+    style StartClock fill:#FF6D00,color:#fff,stroke:none
+    style EndClock fill:#4CAF50,color:#fff,stroke:none
+    style CloudSubmit fill:#F0F0FF,stroke:#007AFF
+    style SplitNote fill:#FFF8E1,stroke:#FFC107
+    style GlobalActions fill:#F5F5F5,stroke:#C7C7CC
+    style Err1 fill:#FFEBEE,color:#C62828,stroke:#EF5350
+    style Err2 fill:#FFEBEE,color:#C62828,stroke:#EF5350
+    style Err3 fill:#FFEBEE,color:#C62828,stroke:#EF5350

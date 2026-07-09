@@ -1,7 +1,7 @@
 flowchart TD
     Start([运维中心 · 点击「比对」]) --> SelectPage[设备选择页]
 
-    %% ===== 设备选择 =====
+    %% ===== 第一步：设备选择 =====
     subgraph DeviceSelect [第一步：选择设备]
         direction TB
         AutoGPS[自动GPS定位<br>检测当前位置] --> RadiusFilter[范围过滤<br>500m / 1km / 3km / 5km]
@@ -10,7 +10,7 @@ flowchart TD
         QuickAction{快速识别?}
         QuickAction -->|扫一扫| QRScan[扫描设备二维码<br>自动识别设备]
         QuickAction -->|NFC感应| NFCTap[贴近设备NFC标签<br>自动识别设备]
-        QuickAction -->|手动选择| BrowseList[浏览站点芯片<br>按距离排序的设备列表]
+        QuickAction -->|手动选择| BrowseList[浏览站点芯标<br>按距离排序的设备列表]
 
         QRScan --> SelectDevice
         NFCTap --> SelectDevice
@@ -21,7 +21,7 @@ flowchart TD
 
     SelectPage --> DeviceSelect
 
-    %% ===== 比对表单 =====
+    %% ===== 第二步：比对表单 =====
     NextPage --> FormPage[比对数据采集表单]
 
     subgraph AutoFill [自动填充]
@@ -31,58 +31,61 @@ flowchart TD
 
     FormPage --> AutoFill
 
-    %% ===== 表单填写流程 =====
+    %% ===== 比对类型 =====
     AutoFill --> CompType[选择比对类型<br>周期性校准 / 故障排查 / 验收测试]
 
-    CompType --> FetchType[从平台获取比对指标]
+    CompType --> FetchType[从平台获取比对指标<br>每个指标含标准值+容差范围]
     FetchType --> ParamCards[动态生成参数卡片<br>每个指标一张独立卡片]
 
-    subgraph ParamCard [每张参数卡片]
+    %% ===== 参数卡片核心 =====
+    subgraph ParamCard [📊 每张参数卡片]
         direction TB
-        StdValue[标准值<br>平台自动下发] --> InputMode{录入模式}
-        InputMode -->|手动| ManualInput[键盘输入实测值]
-        InputMode -->|蓝牙| BTScan[蓝牙采集设备<br>自动读取数据]
-        InputMode -->|OCR| OCRScan[拍照识别<br>OCR自动提取数值]
+        StdValue[标准值 · 平台自动下发] --> InputMode{录入模式选择}
+        InputMode -->|手动录入| ManualInput[键盘输入实测值<br>支持小数/负数]
+        InputMode -->|蓝牙采集| BTScan[蓝牙连接采集设备<br>自动读取传感器数据]
+        InputMode -->|OCR识别| OCRScan[拍照识别<br>OCR自动提取数值]
         ManualInput --> CalcDeviation
         BTScan --> CalcDeviation
         OCRScan --> CalcDeviation
-        CalcDeviation[自动计算偏差<br>实测值 − 标准值] --> CheckTol{偏差 ≤ 容差?}
-        CheckTol -->|是| Normal[✓ 正常 · 绿色]
-        CheckTol -->|否| Abnormal[! 异常 · 橙色<br>展开偏差原因输入框]
+        CalcDeviation[自动计算偏差<br>偏差 = 实测值 − 标准值] --> CheckTol{偏差 ≤ 容差?}
+        CheckTol -->|是 ✓| Normal["正常 · 绿色标记<br/>无需额外操作"]
+        CheckTol -->|否 !| Abnormal["异常 · 橙色标记<br/>展开偏差原因输入框<br/>必填 · 支持语音"]
     end
 
     ParamCards --> ParamCard
 
     %% ===== 环境参数 =====
-    ParamCard --> EnvChips[现场环境多选标签<br>高温/低温/高湿/雨天/通风不良等<br>互斥：「环境正常」取消其他]
+    ParamCard --> EnvChips[现场环境多选标签<br>高温 · 低温 · 高湿 · 雨天 · 通风不良 · 沙尘 · 雷暴 · 风速大<br>互斥逻辑：「环境正常」选中后取消其他所有标签<br>「环境正常」取消后清空所有已选标签]
 
     %% ===== 现场证据 =====
     EnvChips --> Evidence
-    subgraph Evidence [现场证据]
+    subgraph Evidence [📷 现场证据]
         direction TB
-        Watermark[水印开关<br>时间+设备ID+GPS坐标]
+        Watermark[水印开关<br>时间 · 设备ID · GPS坐标]
         Photos[照片 · 最多9张<br>拍照或相册选择<br>Canvas自动添加水印]
         Video[视频 · 最多1个<br>仅允许手机录制<br>限60秒 / 50MB]
     end
 
-    %% ===== 提交 =====
+    %% ===== 提交操作 =====
     Evidence --> SubmitChoice{提交操作}
-    SubmitChoice -->|保存草稿| SaveDraft[存入 localStorage<br>下次自动恢复]
-    SubmitChoice -->|提交比对| Validate{数据校验}
+    SubmitChoice -->|📄 保存草稿| SaveDraft[存入 localStorage<br>下次自动恢复]
 
-    Validate -->|缺少实测值| AlertFill[提醒填写实测值]
-    Validate -->|偏差未填原因| AlertReason[提醒填写偏差原因]
+    SubmitChoice -->|✅ 提交比对| Validate{数据校验}
+    Validate -->|缺少实测值| AlertFill[⚠️ 提醒填写实测值]
+    Validate -->|偏差未填原因| AlertReason[⚠️ 提醒填写偏差原因]
     AlertFill --> ParamCard
     AlertReason --> ParamCard
 
-    Validate -->|通过| CloudUpload
-    subgraph CloudUpload [云上报]
-        direction TB
-        UploadAnim[上传动画<br>数据打包中...] --> UploadDone[上报成功]
-        UploadDone --> Summary["摘要展示<br>记录编号 · 设备 · 操作人员<br>各指标偏差汇总（✓/!）<br>照片/视频数量 · 水印状态"]
-    end
+    Validate -->|校验通过| CloudUpload
 
-    SubmitChoice -->|重置表单| ResetForm[清空所有填写内容]
+    SubmitChoice -->|🔄 重置表单| ResetForm[清空所有填写内容<br>二次确认]
+
+    %% ===== 云上报 =====
+    subgraph CloudUpload [☁️ 云上报]
+        direction TB
+        UploadAnim[上传动画<br>数据打包中...] --> UploadDone[上报成功 ✓]
+        UploadDone --> Summary["摘要展示<br>记录编号 · 设备信息<br>各指标偏差汇总 ✓/!<br>照片/视频数量 · 水印状态<br>操作人员 · GPS坐标"]
+    end
 
     %% ===== 样式 =====
     style Start fill:#007AFF,color:#fff,stroke:none
