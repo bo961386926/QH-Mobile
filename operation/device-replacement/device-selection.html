@@ -235,6 +235,21 @@
         .group-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .3px; }
         .group-count { font-size: 10.5px; color: var(--text-tertiary); margin-left: auto; }
 
+        /* ======== IOT DEVICE HEADER ======== */
+        .iot-device-header {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 4px 6px 12px; margin: 2px 0 0;
+            background: rgba(0,122,255,0.03); border-radius: var(--radius-sm);
+            border-left: 3px solid rgba(0,122,255,0.25);
+            cursor: default;
+        }
+        .iot-device-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); flex-shrink: 0; }
+        .iot-device-name { font-size: 12px; font-weight: 500; color: var(--primary); line-height: 1.3; }
+        .iot-device-sub-count { font-size: 10.5px; color: var(--text-tertiary); margin-left: auto; }
+
+        /* ======== SUB DEVICE WRAPPER ======== */
+        .sub-device-list { display: flex; flex-direction: column; gap: 6px; padding: 2px 0 2px 16px; }
+
         /* ======== DEVICE LIST ======== */
         .device-list { display: flex; flex-direction: column; gap: 7px; }
         .device-card {
@@ -418,20 +433,26 @@
             { id: 'site-002', name: '城西泵站', address: '城西区排水泵站', lat: 30.2600, lng: 120.1300, color: '#FF9500' },
             { id: 'site-003', name: '北区管网监测点', address: '北区供水管网枢纽', lat: 30.3000, lng: 120.1700, color: '#34C759' }
         ];
+        var iotDevices = [
+            { id: 'IOT-001', name: '智能网关-A', site: 'site-001', icon: 'bi-hdd-stack', lat: 30.2745, lng: 120.1555 },
+            { id: 'IOT-002', name: '智能网关-B', site: 'site-001', icon: 'bi-hdd-stack', lat: 30.2765, lng: 120.1540 },
+            { id: 'IOT-003', name: '泵站控制柜', site: 'site-002', icon: 'bi-cpu', lat: 30.2603, lng: 120.1308 },
+            { id: 'IOT-004', name: '管网监测终端', site: 'site-003', icon: 'bi-router', lat: 30.3002, lng: 120.1702 }
+        ];
         var allDevices = [
-            { id: 'DT-2024-001', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'type-temp', site: 'site-001', location: '一期生化池', lat: 30.2743, lng: 120.1553, status: 'online', paramKeys:['temperature','humidity'] },
-            { id: 'DT-2024-002', name: '液位计', type: '超声波液位计', icon: 'bi-water', iconClass: 'type-level', site: 'site-001', location: '进水口', lat: 30.2760, lng: 120.1545, status: 'online', paramKeys:['level'] },
-            { id: 'DT-2024-003', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'type-temp', site: 'site-001', location: '二期沉淀池', lat: 30.2750, lng: 120.1560, status: 'online', paramKeys:['temperature','humidity'] },
-            { id: 'DT-2024-004', name: '流量计', type: '电磁流量计', icon: 'bi-speedometer2', iconClass: 'type-flow', site: 'site-001', location: '总出水口', lat: 30.2770, lng: 120.1558, status: 'online', paramKeys:['flow'] },
-            { id: 'DT-2024-005', name: '压力传感器', type: '压阻式压力变送器', icon: 'bi-gauge', iconClass: 'type-water', site: 'site-001', location: '泵房主管道', lat: 30.2735, lng: 120.1540, status: 'online', paramKeys:['pressure'] },
-            { id: 'DT-2024-006', name: '水质分析仪', type: '多参数水质监测仪', icon: 'bi-droplet-half', iconClass: 'type-water', site: 'site-001', location: '出水口', lat: 30.2780, lng: 120.1580, status: 'offline', paramKeys:['ph','turbidity'] },
-            { id: 'DT-2024-007', name: '液位计', type: '雷达液位计', icon: 'bi-water', iconClass: 'type-level', site: 'site-002', location: '集水井A', lat: 30.2605, lng: 120.1305, status: 'online', paramKeys:['level'] },
-            { id: 'DT-2024-008', name: '流量计', type: '超声波流量计', icon: 'bi-speedometer2', iconClass: 'type-flow', site: 'site-002', location: '出水管道', lat: 30.2610, lng: 120.1310, status: 'online', paramKeys:['flow'] },
-            { id: 'DT-2024-009', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'type-temp', site: 'site-002', location: '泵房内部', lat: 30.2615, lng: 120.1295, status: 'online', paramKeys:['temperature','humidity'] },
-            { id: 'DT-2024-010', name: '压力传感器', type: '压力变送器', icon: 'bi-gauge', iconClass: 'type-water', site: 'site-003', location: '主管段A', lat: 30.3005, lng: 120.1705, status: 'online', paramKeys:['pressure'] },
-            { id: 'DT-2024-011', name: '流量计', type: '电磁流量计', icon: 'bi-speedometer2', iconClass: 'type-flow', site: 'site-003', location: '分支管段B', lat: 30.3010, lng: 120.1710, status: 'online', paramKeys:['flow'] },
-            { id: 'DT-2024-012', name: '液位计', type: '静压液位计', icon: 'bi-water', iconClass: 'type-level', site: 'site-003', location: '蓄水池', lat: 30.3020, lng: 120.1690, status: 'offline', paramKeys:['level'] },
-            { id: 'DT-2024-013', name: '水质分析仪', type: '在线水质监测仪', icon: 'bi-droplet-half', iconClass: 'type-water', site: 'site-003', location: '监测点B', lat: 30.3015, lng: 120.1720, status: 'online', paramKeys:['ph','turbidity'] }
+            { id: 'DT-2024-001', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'type-temp', site: 'site-001', iotDevice: 'IOT-001', location: '一期生化池', lat: 30.2743, lng: 120.1553, status: 'online', paramKeys:['temperature','humidity'] },
+            { id: 'DT-2024-002', name: '液位计', type: '超声波液位计', icon: 'bi-water', iconClass: 'type-level', site: 'site-001', iotDevice: 'IOT-001', location: '进水口', lat: 30.2760, lng: 120.1545, status: 'online', paramKeys:['level'] },
+            { id: 'DT-2024-003', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'type-temp', site: 'site-001', iotDevice: 'IOT-002', location: '二期沉淀池', lat: 30.2750, lng: 120.1560, status: 'online', paramKeys:['temperature','humidity'] },
+            { id: 'DT-2024-004', name: '流量计', type: '电磁流量计', icon: 'bi-speedometer2', iconClass: 'type-flow', site: 'site-001', iotDevice: 'IOT-002', location: '总出水口', lat: 30.2770, lng: 120.1558, status: 'online', paramKeys:['flow'] },
+            { id: 'DT-2024-005', name: '压力传感器', type: '压阻式压力变送器', icon: 'bi-gauge', iconClass: 'type-water', site: 'site-001', iotDevice: 'IOT-001', location: '泵房主管道', lat: 30.2735, lng: 120.1540, status: 'online', paramKeys:['pressure'] },
+            { id: 'DT-2024-006', name: '水质分析仪', type: '多参数水质监测仪', icon: 'bi-droplet-half', iconClass: 'type-water', site: 'site-001', iotDevice: 'IOT-002', location: '出水口', lat: 30.2780, lng: 120.1580, status: 'offline', paramKeys:['ph','turbidity'] },
+            { id: 'DT-2024-007', name: '液位计', type: '雷达液位计', icon: 'bi-water', iconClass: 'type-level', site: 'site-002', iotDevice: 'IOT-003', location: '集水井A', lat: 30.2605, lng: 120.1305, status: 'online', paramKeys:['level'] },
+            { id: 'DT-2024-008', name: '流量计', type: '超声波流量计', icon: 'bi-speedometer2', iconClass: 'type-flow', site: 'site-002', iotDevice: 'IOT-003', location: '出水管道', lat: 30.2610, lng: 120.1310, status: 'online', paramKeys:['flow'] },
+            { id: 'DT-2024-009', name: '温度传感器', type: '温感传感器', icon: 'bi-thermometer-half', iconClass: 'type-temp', site: 'site-002', iotDevice: 'IOT-003', location: '泵房内部', lat: 30.2615, lng: 120.1295, status: 'online', paramKeys:['temperature','humidity'] },
+            { id: 'DT-2024-010', name: '压力传感器', type: '压力变送器', icon: 'bi-gauge', iconClass: 'type-water', site: 'site-003', iotDevice: 'IOT-004', location: '主管段A', lat: 30.3005, lng: 120.1705, status: 'online', paramKeys:['pressure'] },
+            { id: 'DT-2024-011', name: '流量计', type: '电磁流量计', icon: 'bi-speedometer2', iconClass: 'type-flow', site: 'site-003', iotDevice: 'IOT-004', location: '分支管段B', lat: 30.3010, lng: 120.1710, status: 'online', paramKeys:['flow'] },
+            { id: 'DT-2024-012', name: '液位计', type: '静压液位计', icon: 'bi-water', iconClass: 'type-level', site: 'site-003', iotDevice: 'IOT-004', location: '蓄水池', lat: 30.3020, lng: 120.1690, status: 'offline', paramKeys:['level'] },
+            { id: 'DT-2024-013', name: '水质分析仪', type: '在线水质监测仪', icon: 'bi-droplet-half', iconClass: 'type-water', site: 'site-003', iotDevice: 'IOT-004', location: '监测点B', lat: 30.3015, lng: 120.1720, status: 'online', paramKeys:['ph','turbidity'] }
         ];
 
         // 排除已选设备
@@ -554,9 +575,11 @@
             if (searchText) {
                 devices = devices.filter(function(d) {
                     var site = sites.find(function(s) { return s.id === d.site; });
+                    var iot = iotDevices.find(function(i) { return i.id === d.iotDevice; });
                     return d.id.toLowerCase().indexOf(searchText)!==-1 || d.name.toLowerCase().indexOf(searchText)!==-1 ||
                            d.type.toLowerCase().indexOf(searchText)!==-1 || d.location.toLowerCase().indexOf(searchText)!==-1 ||
-                           (site && site.name.toLowerCase().indexOf(searchText)!==-1);
+                           (site && site.name.toLowerCase().indexOf(searchText)!==-1) ||
+                           (iot && iot.name.toLowerCase().indexOf(searchText)!==-1);
                 });
             }
             if (userLocation) {
@@ -580,21 +603,53 @@
                 return;
             }
 
-            var html = '', lastSite = null;
-            devices.forEach(function(d) {
+            // Group by site → iotDevice
+            var html = '', lastSite = null, lastIot = null, subHtml = '';
+            devices.forEach(function(d, idx) {
                 var site = sites.find(function(s) { return s.id === d.site; });
-                if (currentSite==='all'&&lastSite!==d.site) {
-                    lastSite = d.site;
+                var iot = iotDevices.find(function(i) { return i.id === d.iotDevice; });
+
+                // New site group header
+                if (currentSite==='all' && lastSite !== d.site) {
+                    if (lastSite !== null) {
+                        html += subHtml + '</div>';  // close previous sub-device-list
+                    }
+                    lastSite = d.site; lastIot = null; subHtml = '';
                     var sd = devices.filter(function(x){return x.site===d.site});
                     html += '<div class="group-header"><div class="group-dot" style="background:'+(site?site.color:'#8E8E93')+'"></div>'+
                         '<span class="group-name">'+(site?site.name:'')+'</span><span class="group-count">'+sd.length+'台</span></div>';
                 }
-                var distHtml = d._dist!==undefined ? '<span class="device-dist-badge '+getDistClass(d._dist)+'">'+formatDistance(d._dist)+'</span>' : '';
-                html += '<div class="device-card" onclick="selectDevice(\''+d.id+'\')">'+
+
+                // New IOT device header within the same site
+                if (lastIot !== d.iotDevice) {
+                    if (lastIot !== null) {
+                        html += subHtml + '</div>';  // close previous sub-device-list
+                    }
+                    lastIot = d.iotDevice; subHtml = '';
+                    var iotSubCount = devices.filter(function(x){return x.iotDevice===d.iotDevice}).length;
+                    var iotDistHtml = '';
+                    if (userLocation && iot && iot.lat !== undefined) {
+                        var iotDist = calcDistance(userLocation.lat, userLocation.lng, iot.lat, iot.lng);
+                        iotDistHtml = '<span class="device-dist-badge '+getDistClass(iotDist)+'">'+formatDistance(iotDist)+'</span>';
+                    }
+                    html += '<div class="iot-device-header"><div class="iot-device-dot"></div>'+
+                        '<span class="iot-device-name">'+(iot?iot.name:'IOT设备')+'</span>'+
+                        iotDistHtml +
+                        '<span class="iot-device-sub-count">'+iotSubCount+'个子设备</span></div>'+
+                        '<div class="sub-device-list">';
+                }
+
+                // Sub-device card
+                subHtml += '<div class="device-card" onclick="selectDevice(\''+d.id+'\')">'+
                     '<div class="device-status-dot '+(d.status==='offline'?'offline':'online')+'"></div>'+
                     '<div class="device-icon '+d.iconClass+'"><i class="bi '+d.icon+'"></i></div>'+
                     '<div class="device-info"><div class="device-id">'+d.id+'</div><div class="device-detail">'+d.type+' · '+d.location+'</div></div>'+
-                    distHtml+'<div class="device-chevron"><i class="bi bi-chevron-right"></i></div></div>';
+                    '<div class="device-chevron"><i class="bi bi-chevron-right"></i></div></div>';
+
+                // Last device — close sub-device-list
+                if (idx === devices.length - 1) {
+                    html += subHtml + '</div>';
+                }
             });
             container.innerHTML = html;
         }
@@ -645,6 +700,8 @@
         function selectDevice(deviceId) {
             var device = allDevices.find(function(d) { return d.id === deviceId; });
             if (!device) return;
+            var iot = iotDevices.find(function(i) { return i.id === device.iotDevice; });
+            var site = sites.find(function(s) { return s.id === device.site; });
             localStorage.setItem('selectedReplaceDevice', JSON.stringify({
                 id: device.id,
                 name: device.name,
@@ -652,6 +709,8 @@
                 location: device.location,
                 status: device.status,
                 paramKeys: device.paramKeys,
+                iotDevice: iot ? iot.name : null,
+                site: site ? site.name : null,
                 target: pickTarget
             }));
             // 直接跳转到主流程页

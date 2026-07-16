@@ -265,6 +265,7 @@
             margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
         }
         .card-title .required::after { content: "*"; color: var(--danger-color); margin-left: 2px; }
+        .form-label .required::after { content: "*"; color: var(--danger-color); margin-left: 2px; }
         .card-subtitle {
             font-size: 12px; color: var(--gray-text); margin-bottom: 12px;
         }
@@ -1150,10 +1151,40 @@ function showDraftRestoreDialog(mode) {
         '<div class="confirm-box-desc">检测到 <b>' + cfg.name + '</b> 模式下有未完成的暂存记录' +
         (timeAgo ? '<br><span style="font-size:12px;color:var(--gray-text);">暂存时间：' + timeAgo + '</span>' : '') + '</div>' +
         '<div class="confirm-box-btns">' +
-        '<button class="confirm-cancel" onclick="clearDraft(\'' + mode + '\');this.closest(\'.confirm-overlay\').remove();enterMode(\'' + mode + '\', false);">重新开始</button>' +
+        '<button class="confirm-cancel" onclick="restartModePreservingDevice(\'' + mode + '\');this.closest(\'.confirm-overlay\').remove();">重新开始</button>' +
         '<button class="confirm-ok" style="background:' + cfg.color + ';" onclick="this.closest(\'.confirm-overlay\').remove();enterMode(\'' + mode + '\', true);">恢复暂存</button>' +
         '</div></div>';
     document.body.appendChild(overlay);
+}
+
+// 重新开始（保留设备编码）
+function restartModePreservingDevice(mode) {
+    // 从暂存中提取设备编码信息
+    var preservedDevices = null;
+    var raw = localStorage.getItem('draft_' + mode);
+    if (raw) {
+        try {
+            var d = JSON.parse(raw);
+            preservedDevices = {
+                oldDevice: d.oldDevice || null,
+                newDevice: d.newDevice || null,
+                manualOldId: d.manualOldId || '',
+                manualNewId: d.manualNewId || ''
+            };
+        } catch(e) {}
+    }
+    // 清除暂存
+    clearDraft(mode);
+    // 进入模式（全新开始）
+    enterMode(mode, false);
+    // 恢复设备编码
+    if (preservedDevices) {
+        formData.oldDevice = preservedDevices.oldDevice;
+        formData.newDevice = preservedDevices.newDevice;
+        formData.manualOldId = preservedDevices.manualOldId;
+        formData.manualNewId = preservedDevices.manualNewId;
+        renderCurrentStep();
+    }
 }
 
 // ============================
@@ -1245,10 +1276,10 @@ function renderOldDeviceStep() {
     html += '</div>';
 
     html += '<div class="form-row" style="align-items:flex-start;">';
-    html += '<span class="form-label" style="padding-top:10px;">拆除原因</span>';
+    html += '<span class="form-label" style="padding-top:10px;"><span class="required">拆除原因</span></span>';
     html += '<div style="flex:1;">';
     html += '<div class="textarea-box">';
-    html += '<textarea class="textarea-inner" id="oldRemoveReason" placeholder="请描述拆除原因（选填）">' + (formData.oldRemoveReason || '') + '</textarea>';
+    html += '<textarea class="textarea-inner" id="oldRemoveReason" placeholder="请描述拆除原因">' + (formData.oldRemoveReason || '') + '</textarea>';
     html += '<button class="voice-fab" id="voiceBtn_oldRemoveReason" onclick="toggleRecord(\'oldRemoveReason\', this)">';
     html += '<i class="bi bi-mic-fill"></i></button>';
     html += '<span class="voice-fab-status" id="voiceStatus_oldRemoveReason"></span>';
@@ -1257,7 +1288,7 @@ function renderOldDeviceStep() {
     html += '</div>';
     html += '</div>';
     html += '<div class="form-row" style="margin-top:10px;">';
-    html += '<span class="form-label">设备去向</span>';
+    html += '<span class="form-label"><span class="required">设备去向</span></span>';
     html += '<div class="custom-select" id="oldRemoveToSelect">';
     html += '<div class="custom-select-trigger' + (formData.oldRemoveTo ? '' : ' placeholder') + '" id="oldRemoveToTrigger" onclick="toggleOldRemoveTo(event)">';
     html += '<span id="oldRemoveToText">' + (formData.oldRemoveTo || '请选择去向') + '</span>';
@@ -1369,7 +1400,7 @@ function renderNewDeviceStep() {
     html += '</div>';
 
     html += '<div class="form-row">';
-    html += '<span class="form-label">安装位置</span>';
+    html += '<span class="form-label"><span class="required">安装位置</span></span>';
     html += '<input class="form-input" id="installLocation" placeholder="如：一期生化池·A区" value="' + (formData.installLocation || '') + '">';
     html += '</div>';
     html += '</div>';
@@ -1797,6 +1828,9 @@ function validateCurrentStep() {
         var typeActive = document.querySelector('#oldRemoveTypeChips .type-chip.active');
         if (!typeActive) { showToast('请选择拆除类型'); return false; }
         formData.oldRemoveType = typeActive.getAttribute('data-val');
+        var reasonEl = document.getElementById('oldRemoveReason');
+        if (!reasonEl || !reasonEl.value.trim()) { showToast('请填写拆除原因'); return false; }
+        if (!formData.oldRemoveTo) { showToast('请选择设备去向'); return false; }
     }
 
     if (key === 'new-device') {
@@ -1804,6 +1838,8 @@ function validateCurrentStep() {
         var typeActive2 = document.querySelector('#installTypeChips .type-chip.active');
         if (!typeActive2) { showToast('请选择安装类型'); return false; }
         formData.installType = typeActive2.getAttribute('data-val');
+        var locEl = document.getElementById('installLocation');
+        if (!locEl || !locEl.value.trim()) { showToast('请填写安装位置'); return false; }
     }
 
     return true;
@@ -1847,6 +1883,8 @@ function saveCurrentStepData() {
 function openDeviceSelection(target) {
     // 静默保存当前表单状态（用于从设备选择页返回后恢复）
     saveDraftInternal();
+    // 保存当前模式，供返回时恢复
+    sessionStorage.setItem('returnMode', currentMode || '');
     var url = 'device-selection.html?target=' + target;
     // 排除已选设备
     if (target === 'new' && formData.oldDevice) {
@@ -2442,31 +2480,46 @@ window.addEventListener('load', function() {
     // 检测各模式暂存状态，更新卡片标签
     updateDraftBadges();
 
-    // 检查是否有从设备选择页带过来的设备
-    var preselected = JSON.parse(localStorage.getItem('selectedReplaceDevice') || 'null');
-    if (preselected) {
-        localStorage.removeItem('selectedReplaceDevice');
-        var device = allDevices.find(function(d) { return d.id === preselected.id; });
-        if (device) {
-            if (preselected.target === 'new') {
-                formData.newDevice = device;
-                formData.manualNewId = '';
-            } else {
-                formData.oldDevice = device;
-                formData.manualOldId = '';
-            }
-            // 如果当前在流程中，刷新步骤
-            if (currentMode) renderCurrentStep();
-        }
-    }
+    // 注意：selectedReplaceDevice 由 pageshow 统一处理
+    // load 阶段 currentMode 尚未恢复，无法正确渲染
 });
 
 // 从设备选择页返回时（pageshow 比 load 更可靠，包括 bfcache 恢复）
 window.addEventListener('pageshow', function(e) {
+    // 恢复流程模式（从 sessionStorage）
+    if (!currentMode) {
+        var savedMode = sessionStorage.getItem('returnMode');
+        if (savedMode && MODES[savedMode]) {
+            currentMode = savedMode;
+            modeConfig = MODES[savedMode];
+            document.getElementById('modeScreen').style.display = 'none';
+            document.getElementById('flowScreen').classList.add('active');
+            document.getElementById('bottomBar').style.display = 'flex';
+            document.getElementById('headerModeTag').style.display = '';
+            document.getElementById('headerModeTag').textContent = modeConfig.tag;
+            document.getElementById('headerModeTag').style.background = modeConfig.color + '18';
+            document.getElementById('headerModeTag').style.color = modeConfig.color;
+            document.getElementById('headerTitle').textContent = modeConfig.name;
+            document.documentElement.style.setProperty('--step-color', modeConfig.color);
+        }
+        sessionStorage.removeItem('returnMode');
+    }
+
     var preselected = JSON.parse(localStorage.getItem('selectedReplaceDevice') || 'null');
     if (preselected) {
         localStorage.removeItem('selectedReplaceDevice');
         var device = allDevices.find(function(d) { return d.id === preselected.id; });
+        // 如果设备库中找不到，直接用 preselected 数据构造设备对象
+        if (!device) {
+            device = {
+                id: preselected.id,
+                name: preselected.name,
+                type: preselected.type,
+                location: (preselected.site || '') + '·' + (preselected.location || ''),
+                status: preselected.status,
+                paramKeys: preselected.paramKeys || []
+            };
+        }
         if (device) {
             if (preselected.target === 'new') {
                 formData.newDevice = device;
